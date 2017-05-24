@@ -1,0 +1,6 @@
+s, "Error"
+s, "Failed"
+s, "Fail"
+s, "Unable"
+s, "CRIT"
+s, "does not exist"

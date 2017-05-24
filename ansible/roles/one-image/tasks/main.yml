@@ -1,3 +1,6 @@
 - name: Deploy ONE image to device.
   include: deploy.yml
   tags: deploy
+- name: Check ONE image deploy
+  include: check_deploy.yml
+  tags: check_deploy
