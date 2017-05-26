@@ -465,7 +465,7 @@
       vars:
         config_file: "{{ config_rule_in_non_existing_table }}"
         test_expect_file: "{{ config_rule_in_non_existing_table_expect }}"
-        errors_expected: true
+        errors_expected: false
         run_cleanup: true
       include: "{{ run_config_test }}"
 
