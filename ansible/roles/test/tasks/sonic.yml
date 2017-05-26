@@ -63,6 +63,17 @@
   include: ecmp.yml
   tags: ecmp
 
+- name: Set sonic_hwsku fact
+  set_fact:
+    sonic_hwsku: "ACS-MSN2700"
+  # "{{minigraph_hwsku}}"
+  tags: qos
+
+- name: Test QoS using SAI
+  include: qos_sai.yml
+  #when: sonic_hwsku in mellanox_hwskus and sonic_version=='v2' and host_saithrift
+  tags: qos
+
 - name: Test Control-Plain policing COPP
   include: copp.yml
   tags: copp
