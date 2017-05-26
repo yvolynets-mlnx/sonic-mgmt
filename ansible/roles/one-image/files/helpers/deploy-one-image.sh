@@ -90,6 +90,8 @@ expect <<- DONE
     sleep 2
     send -- "v"
     sleep 1
+    send -- "v"
+    sleep 1
     send -- "\n\r"
     expect "*GNU GRUB*ONIE: Rescue*"
     sleep 2
