@@ -1,0 +1,7 @@
+---
+# This Playbook would deploy to all the devices.
+
+- hosts: sonic
+  gather_facts: no
+  roles:
+      - role: one-image

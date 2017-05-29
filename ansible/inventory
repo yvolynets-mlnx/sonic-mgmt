@@ -5,12 +5,43 @@ switch3  ansible_host=10.0.0.102  sonic_version=v2  sonic_hwsku=Force10-S6000   
 switch4  ansible_host=10.0.0.103  sonic_version=v2  sonic_hwsku=AS7512 sonic_portsku=32x40
 switch5  ansible_host=10.0.0.104  sonic_version=v2  sonic_hwsku=ACS-MSN2700 # LAG topo: 8 LAGs x 2 members/lag to spines; 16 ports to Tors
 
+# MLNX Lab
+arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81"
+arc-switch1026  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
+arc-switch1027  ansible_host=arc-switch1027  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7030 10.224.2.81"
+arc-switch1028  ansible_host=arc-switch1028  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7021 10.224.2.81"
+mts-sai-test-sw-1-t1  ansible_host=mts-sai-test-sw-1  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf
+arc-switch1026-t1-lag  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
+arc-switch1026-t0-64-32  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700
+
+# Add arc-build-server here to be able to use it in tasks
+arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=12345
+
+arc-switch1007 ansible_host=arc-switch1007 ansible_ssh_user=admin ansible_ssh_pass=admin
+
 [sonic:children]
 sonic_latest
 
 [leaf_topo_1]
 switch1
 switch5
+arc-switch1026
+mts-sai-test-sw-1-t1
+arc-switch1026-t1-lag
+
+[lab]
+switch1
+switch5
+arc-switch1026
+mts-sai-test-sw-1-t1
+arc-switch1026-t1-lag
+
+[leaf_topo_1:vars]
+podset_number=200
+
 
 [ptf]
 ptf-1 ansible_host=10.0.0.200 ansible_ssh_user=root ansible_ssh_pass=password
+ptf-fib ansible_host=10.224.23.237 ansible_ssh_user=root ansible_ssh_pass=root
+mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=12345

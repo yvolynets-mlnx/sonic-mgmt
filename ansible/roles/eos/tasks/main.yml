@@ -13,4 +13,6 @@
   when: hostname in configuration
   notify:
     - Restart the box
+    - Pause for reboot
+    - Wait for VM to come up
 

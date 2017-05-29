@@ -1,24 +1,81 @@
 [vm_host_1]
-STR-ACS-SERV-01 ansible_host=10.251.0.245
+ARC-HOST60 ansible_host=arc-host60
 
 [vm_host_2]
-STR-ACS-SERV-02 ansible_host=10.251.0.192
+MTS-SAI-HOST-3 ansible_host=mts-sai-host-3
+
 
 [vm_host:children]
 vm_host_1
 vm_host_2
 
 [vms_1]
-VM0100 ansible_host=10.250.0.2
-VM0101 ansible_host=10.250.0.3
-VM0102 ansible_host=10.250.0.4
-VM0103 ansible_host=10.250.0.5
+VM0101 ansible_host=10.224.23.180
+VM0102 ansible_host=10.224.23.181
+VM0103 ansible_host=10.224.23.182
+VM0104 ansible_host=10.224.23.183
+VM0105 ansible_host=10.224.23.184
+VM0106 ansible_host=10.224.23.185
+VM0107 ansible_host=10.224.23.186
+VM0108 ansible_host=10.224.23.187
+VM0109 ansible_host=10.224.23.188
+VM0110 ansible_host=10.224.23.189
+VM0111 ansible_host=10.224.23.190
+VM0112 ansible_host=10.224.23.191
+VM0113 ansible_host=10.224.23.192
+VM0114 ansible_host=10.224.23.193
+VM0115 ansible_host=10.224.23.194
+VM0116 ansible_host=10.224.23.195
+VM0117 ansible_host=10.224.23.196
+VM0118 ansible_host=10.224.23.197
+VM0119 ansible_host=10.224.23.198
+VM0120 ansible_host=10.224.23.199
+VM0121 ansible_host=10.224.23.200
+VM0122 ansible_host=10.224.23.201
+VM0123 ansible_host=10.224.23.202
+VM0124 ansible_host=10.224.23.203
+VM0125 ansible_host=10.224.23.152
+VM0126 ansible_host=10.224.23.153
+VM0127 ansible_host=10.224.23.154
+VM0128 ansible_host=10.224.23.155
+VM0129 ansible_host=10.224.23.156
+VM0130 ansible_host=10.224.23.157
+VM0131 ansible_host=10.224.23.158
+VM0132 ansible_host=10.224.23.159
 
 [vms_2]
-VM0200 ansible_host=10.250.0.51
-VM0201 ansible_host=10.250.0.52
-VM0202 ansible_host=10.250.0.53
-VM0203 ansible_host=10.250.0.54
+VM0201 ansible_host=10.12.78.180
+VM0202 ansible_host=10.12.78.181
+VM0203 ansible_host=10.12.78.182
+VM0204 ansible_host=10.12.78.183
+VM0205 ansible_host=10.12.78.184
+VM0206 ansible_host=10.12.78.185
+VM0207 ansible_host=10.12.78.186
+VM0208 ansible_host=10.12.78.187
+VM0209 ansible_host=10.12.78.188
+VM0210 ansible_host=10.12.78.189
+VM0211 ansible_host=10.12.78.190
+VM0212 ansible_host=10.12.78.191
+VM0213 ansible_host=10.12.78.192
+VM0214 ansible_host=10.12.78.193
+VM0215 ansible_host=10.12.78.194
+VM0216 ansible_host=10.12.78.195
+VM0217 ansible_host=10.12.78.196
+VM0218 ansible_host=10.12.78.197
+VM0219 ansible_host=10.12.78.198
+VM0220 ansible_host=10.12.78.199
+VM0221 ansible_host=10.12.78.200
+VM0222 ansible_host=10.12.78.201
+VM0223 ansible_host=10.12.78.202
+VM0224 ansible_host=10.12.78.203
+VM0225 ansible_host=10.12.78.152
+VM0226 ansible_host=10.12.78.153
+VM0227 ansible_host=10.12.78.154
+VM0228 ansible_host=10.12.78.155
+VM0229 ansible_host=10.12.78.156
+VM0230 ansible_host=10.12.78.157
+VM0231 ansible_host=10.12.78.158
+VM0232 ansible_host=10.12.78.159
 
 [eos:children]
 vms_1
@@ -30,14 +87,14 @@ vm_host_1
 vms_1
 
 [server_1:vars]
-host_var_file=host_vars/STR-ACS-SERV-01.yml
+host_var_file=host_vars/ARC-HOST60.yml
 
 [server_2:children]
 vm_host_2
 vms_2
 
 [server_2:vars]
-host_var_file=host_vars/STR-ACS-SERV-02.yml
+host_var_file=host_vars/MTS-SAI-HOST-3.yml
 
 [servers:children]
 server_1

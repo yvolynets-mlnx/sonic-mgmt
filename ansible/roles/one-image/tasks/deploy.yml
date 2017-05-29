@@ -1,0 +1,30 @@
+# Deploy ONE image to device.
+# Command example: 
+# ANSIBLE_SCP_IF_SSH=y ansible-playbook -i inventory --limit SWITCH one_image.yml --tags deploy -b -vvvvv -e CMD image_url=URL 
+
+- fail: msg="serial_console variable is not set."
+  when: serial_console is not defined
+
+- fail: msg="image_path or image_url variable should be provided."
+  when: (image_path is not defined) and (image_url is not defined)
+
+- name: Reboot device.
+  command: /sbin/shutdown -r
+  async: 0
+  poll: 0
+  ignore_errors: true
+
+- set_fact:
+    deploy_command: roles/one-image/files/helpers/deploy-one-image.sh -s "{{ serial_console }}" -a {{ ansible_ssh_host }} -p {{ image_path }}
+  when: image_path is defined
+
+- set_fact:
+    deploy_command: roles/one-image/files/helpers/deploy-one-image.sh -s "{{ serial_console }}" -a {{ ansible_ssh_host }} -u {{ image_url }}
+  when: image_url is defined
+
+- debug:
+    var: deploy_command
+
+- name: Run script to deploy image to device.
+  command: "{{ deploy_command }}"
+  connection: local

@@ -93,7 +93,7 @@ class FibTest(BaseTest):
         self.balancing_test_ratio = self.test_params.get('balancing_test_ratio', self.DEFAULT_BALANCING_TEST_RATIO)
 
         if self.test_params['testbed_type'] == 't1' or self.test_params['testbed_type'] == 't1-lag':
-            self.src_ports = range(0, 32)
+            self.src_ports = range(0, 31)
         if self.test_params['testbed_type'] == 't0':
             self.src_ports = range(1, 25) + range(28, 32)
     #---------------------------------------------------------------------
@@ -106,7 +106,7 @@ class FibTest(BaseTest):
 
         for ip_range in ip_ranges:
             # Get the expected list of ports that would receive the packets
-            exp_port_list = self.fib[ip_range.get_first_ip()].get_next_hop_list()
+            exp_port_list = [ port for port in self.fib[ip_range.get_first_ip()].get_next_hop_list() if port != 31]
             # Choose random one source port from all ports excluding the expected ones
             src_port = random.choice([port for port in self.src_ports if port not in exp_port_list])
 

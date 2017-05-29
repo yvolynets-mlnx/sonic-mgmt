@@ -1,0 +1,3 @@
+- name: Deploy ONE image to device.
+  include: deploy.yml
+  tags: deploy

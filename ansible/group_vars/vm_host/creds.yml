@@ -1,5 +1,5 @@
 ---
-ansible_user: use_own_value
-ansible_password: use_own_value
-ansible_sudo_pass: use_own_value
+ansible_user: root
+ansible_password: 12345
+ansible_sudo_pass: 12345
 

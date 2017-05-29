@@ -19,6 +19,7 @@
 - name: Verify bgp sessions are established
   assert: { that: "'{{ bgp_neighbors[item]['state'] }}' == 'established'" }
   with_items: "{{ bgp_neighbors.keys() }}"
+  when: item != "10.0.0.63" and item != "fc00::7e"
   
 - name: Verify locat ASNs in bgp sessions
   assert: { that: "'{{ bgp_neighbors[item]['local AS'] }}' == '{{ minigraph_bgp_asn }}'" }
