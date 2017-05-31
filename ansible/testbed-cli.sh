@@ -7,6 +7,7 @@ function usage
   echo "testbed-cli. Interface to testbeds"
   echo "Usage : $0 { start-vms | stop-vms    } server-name vault-password-file"
   echo "Usage : $0 { add-topo  | remove-topo | renumber-topo } topo-name vault-password-file"
+  echo "Usage : $0 reset-topo dut-name topo-name vault-password-file"
   echo
   echo "To start VMs on a server: $0 start-vms 'server-name' ~/.password"
   echo "To stop VMs on a server:  $0 stop-vms 'server-name' ~/.password"
@@ -116,6 +117,27 @@ function renumber_topo
   echo Done
 }
 
+function reset_topo
+{
+    echo "Resetting topology to '$2'"
+
+    if [ -f /tmp/topo-$1 ]; then
+        if [ "$(cat /tmp/topo-$1)" == "$2" ]; then
+            echo "Topo $2 already applied"
+            exit 0
+        fi
+
+        remove_topo $(cat /tmp/topo-$1) $3
+        rm /tmp/topo-$1
+    else
+        echo "No saved topology found for $1"
+    fi
+
+    add_topo $2 $3
+
+    echo $2 > /tmp/topo-$1
+}
+
 
 if [ $# -lt 3 ]
 then
@@ -132,6 +154,8 @@ case "$1" in
   remove-topo) remove_topo $2 $3
                ;;
   renumber-topo) renumber_topo $2 $3
+               ;;
+  reset-topo) reset_topo $2 $3 $4
                ;;
   *)           usage
                ;;
