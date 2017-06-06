@@ -35,7 +35,7 @@ switch5
 arc-switch1026
 mts-sai-test-sw-1-t1
 arc-switch1026-t1-lag
-rc-switch1028
+arc-switch1028
 
 [leaf_topo_1:vars]
 podset_number=200
