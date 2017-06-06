@@ -28,6 +28,7 @@ switch5
 arc-switch1026
 mts-sai-test-sw-1-t1
 arc-switch1026-t1-lag
+arc-switch1028
 
 [lab]
 switch1
