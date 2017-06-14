@@ -95,9 +95,9 @@
   include: snmp/interfaces.yml
   tags: snmp_interfaces
 
-#- name: Test Interface Flap from Neighbor
-#  include: link_flap.yml
-#  tags: link_flap
+- name: Test Interface Flap from Neighbor
+  include: link_flap.yml
+  tags: link_flap
 
 - name: Test kernel ARP behavior
   include: arpall.yml

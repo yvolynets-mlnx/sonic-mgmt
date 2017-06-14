@@ -3,7 +3,7 @@
 # is updated to the correct up/down state.
 
 - name: Gathering lab graph facts about the device
-  conn_graph_facts: host={{ inventory_hostname }}
+  conn_graph_facts: host={{ ansible_host }}
   connection: local
   tags: always
 
