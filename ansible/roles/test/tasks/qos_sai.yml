@@ -76,62 +76,62 @@
         test_params: ""
 
     #XOFF limit
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: xoff limit ptf test dscp = {{ qp.xoff_1.dscp }}, ecn = {{ qp.xoff_1.ecn }}
-        test_path: sai_qos_tests.PFCtest
-        test_params: dscp={{ qp.xoff_1.dscp }};ecn={{ qp.xoff_1.ecn }};xoff_th_pkts={{ qp.xoff_1.xoff_th_pkts }};fill_buffer_pkts={{ qp.xoff_1.fill_buffer_pkts }};pg={{ qp.xoff_1.pg }}
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: xoff limit ptf test dscp = {{ qp.xoff_1.dscp }}, ecn = {{ qp.xoff_1.ecn }}
+#        test_path: sai_qos_tests.PFCtest
+#        test_params: dscp={{ qp.xoff_1.dscp }};ecn={{ qp.xoff_1.ecn }};xoff_th_pkts={{ qp.xoff_1.xoff_th_pkts }};fill_buffer_pkts={{ qp.xoff_1.fill_buffer_pkts }};pg={{ qp.xoff_1.pg }}
 
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
-        test_path: sai_qos_tests.PFCtest
-        test_params: dscp={{ qp.xoff_2.dscp }};ecn={{ qp.xoff_2.ecn }};xoff_th_pkts={{ qp.xoff_2.xoff_th_pkts }};fill_buffer_pkts={{ qp.xoff_2.fill_buffer_pkts }};pg={{ qp.xoff_2.pg }}
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
+#        test_path: sai_qos_tests.PFCtest
+#        test_params: dscp={{ qp.xoff_2.dscp }};ecn={{ qp.xoff_2.ecn }};xoff_th_pkts={{ qp.xoff_2.xoff_th_pkts }};fill_buffer_pkts={{ qp.xoff_2.fill_buffer_pkts }};pg={{ qp.xoff_2.pg }}
 
     #XON limit
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: xon limit ptf test dscp = {{ qp.xon_1.dscp }}, ecn = {{ qp.xon_1.ecn }}
-        test_path: sai_qos_tests.PFCXonTest
-        test_params: dscp={{ qp.xon_1.dscp }};ecn={{ qp.xon_1.ecn }};xon_th_pkts={{ qp.xon_1.xon_th_pkts }};xoff_th_pkts={{ qp.xon_1.xoff_th_pkts }};pg={{ qp.xon_1.pg }}
-
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: xon limit ptf test dscp = {{ qp.xon_2.dscp }}, ecn = {{ qp.xon_2.ecn }}
-        test_path: sai_qos_tests.PFCXonTest
-        test_params: dscp={{ qp.xon_2.dscp }};ecn={{ qp.xon_2.ecn }};xon_th_pkts={{ qp.xon_2.xon_th_pkts }};xoff_th_pkts={{ qp.xon_2.xoff_th_pkts }};pg={{ qp.xon_2.pg }}
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: xon limit ptf test dscp = {{ qp.xon_1.dscp }}, ecn = {{ qp.xon_1.ecn }}
+#        test_path: sai_qos_tests.PFCXonTest
+#        test_params: dscp={{ qp.xon_1.dscp }};ecn={{ qp.xon_1.ecn }};xon_th_pkts={{ qp.xon_1.xon_th_pkts }};xoff_th_pkts={{ qp.xon_1.xoff_th_pkts }};pg={{ qp.xon_1.pg }}
+#
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: xon limit ptf test dscp = {{ qp.xon_2.dscp }}, ecn = {{ qp.xon_2.ecn }}
+#        test_path: sai_qos_tests.PFCXonTest
+#        test_params: dscp={{ qp.xon_2.dscp }};ecn={{ qp.xon_2.ecn }};xon_th_pkts={{ qp.xon_2.xon_th_pkts }};xoff_th_pkts={{ qp.xon_2.xoff_th_pkts }};pg={{ qp.xon_2.pg }}
 
     #ECN limit
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: ECN threshold. dscp = {{ qp.ecn_1.dscp }}, ecn = {{ qp.ecn_1.ecn }}, number of packets = {{ qp.ecn_1.num_of_pkts }}
-        test_path: sai_qos_tests.DscpEcnSend
-        test_params: dscp={{ qp.ecn_1.dscp }};ecn={{ qp.ecn_1.ecn }};num_of_pkts={{ qp.ecn_1.num_of_pkts }};limit={{ qp.ecn_1.limit }};min_limit={{ qp.ecn_1.min_limit }};cell_size={{ qp.ecn_1.cell_size }}
-
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: ECN threshold. dscp = {{ qp.ecn_2.dscp }}, ecn = {{ qp.ecn_2.ecn }}, number of packets = {{ qp.ecn_2.num_of_pkts }}
-        test_path: sai_qos_tests.DscpEcnSend
-        test_params: dscp={{ qp.ecn_2.dscp }};ecn={{ qp.ecn_2.ecn }};num_of_pkts={{ qp.ecn_2.num_of_pkts }};limit={{ qp.ecn_2.limit }};min_limit={{ qp.ecn_2.min_limit }};cell_size={{ qp.ecn_2.cell_size }}
-
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: ECN threshold. dscp = {{ qp.ecn_3.dscp }}, ecn = {{ qp.ecn_3.ecn }}, number of packets = {{ qp.ecn_3.num_of_pkts }}
-        test_path: sai_qos_tests.DscpEcnSend
-        test_params: dscp={{ qp.ecn_3.dscp }};ecn={{ qp.ecn_3.ecn }};num_of_pkts={{ qp.ecn_3.num_of_pkts }};limit={{ qp.ecn_3.limit }};min_limit={{ qp.ecn_3.min_limit }};cell_size={{ qp.ecn_3.cell_size }}
-
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: ECN threshold. dscp = {{ qp.ecn_4.dscp }}, ecn = {{ qp.ecn_4.ecn }}, number of packets = {{ qp.ecn_4.num_of_pkts }}
-        test_path: sai_qos_tests.DscpEcnSend
-        test_params: dscp={{ qp.ecn_4.dscp }};ecn={{ qp.ecn_4.ecn }};num_of_pkts={{ qp.ecn_4.num_of_pkts }};limit={{ qp.ecn_4.limit }};min_limit={{ qp.ecn_4.min_limit }};cell_size={{ qp.ecn_4.cell_size }}
-
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: ECN threshold. dscp = {{ qp.ecn_1.dscp }}, ecn = {{ qp.ecn_1.ecn }}, number of packets = {{ qp.ecn_1.num_of_pkts }}
+#        test_path: sai_qos_tests.DscpEcnSend
+#        test_params: dscp={{ qp.ecn_1.dscp }};ecn={{ qp.ecn_1.ecn }};num_of_pkts={{ qp.ecn_1.num_of_pkts }};limit={{ qp.ecn_1.limit }};min_limit={{ qp.ecn_1.min_limit }};cell_size={{ qp.ecn_1.cell_size }}
+#
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: ECN threshold. dscp = {{ qp.ecn_2.dscp }}, ecn = {{ qp.ecn_2.ecn }}, number of packets = {{ qp.ecn_2.num_of_pkts }}
+#        test_path: sai_qos_tests.DscpEcnSend
+#        test_params: dscp={{ qp.ecn_2.dscp }};ecn={{ qp.ecn_2.ecn }};num_of_pkts={{ qp.ecn_2.num_of_pkts }};limit={{ qp.ecn_2.limit }};min_limit={{ qp.ecn_2.min_limit }};cell_size={{ qp.ecn_2.cell_size }}
+#
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: ECN threshold. dscp = {{ qp.ecn_3.dscp }}, ecn = {{ qp.ecn_3.ecn }}, number of packets = {{ qp.ecn_3.num_of_pkts }}
+#        test_path: sai_qos_tests.DscpEcnSend
+#        test_params: dscp={{ qp.ecn_3.dscp }};ecn={{ qp.ecn_3.ecn }};num_of_pkts={{ qp.ecn_3.num_of_pkts }};limit={{ qp.ecn_3.limit }};min_limit={{ qp.ecn_3.min_limit }};cell_size={{ qp.ecn_3.cell_size }}
+#
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: ECN threshold. dscp = {{ qp.ecn_4.dscp }}, ecn = {{ qp.ecn_4.ecn }}, number of packets = {{ qp.ecn_4.num_of_pkts }}
+#        test_path: sai_qos_tests.DscpEcnSend
+#        test_params: dscp={{ qp.ecn_4.dscp }};ecn={{ qp.ecn_4.ecn }};num_of_pkts={{ qp.ecn_4.num_of_pkts }};limit={{ qp.ecn_4.limit }};min_limit={{ qp.ecn_4.min_limit }};cell_size={{ qp.ecn_4.cell_size }}
+#
     #Lossy queue
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: Lossy queue, shared buffer dynamic allocation. dscp = {{ qp.lossy_queue.dscp }}, ecn = {{ qp.lossy_queue.ecn }}, number of packets = {{ qp.lossy_queue.num_of_pkts }}
-        test_path: sai_qos_tests.LossyQueueTest
-        test_params: dscp={{ qp.lossy_queue.dscp }};ecn={{ qp.lossy_queue.ecn }};num_of_pkts={{ qp.lossy_queue.num_of_pkts }}
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: Lossy queue, shared buffer dynamic allocation. dscp = {{ qp.lossy_queue.dscp }}, ecn = {{ qp.lossy_queue.ecn }}, number of packets = {{ qp.lossy_queue.num_of_pkts }}
+#        test_path: sai_qos_tests.LossyQueueTest
+#        test_params: dscp={{ qp.lossy_queue.dscp }};ecn={{ qp.lossy_queue.ecn }};num_of_pkts={{ qp.lossy_queue.num_of_pkts }}
 
     #WRR test
     - include: qos_sai_ptf.yml

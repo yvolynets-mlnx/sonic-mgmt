@@ -15,6 +15,8 @@
 """
 Thrift SAI interface basic tests
 """
+import sys
+sys.path.append("/usr/include/local/lib/python2.7/site-packages")
 
 import switch_sai_thrift
 from sai_base_test import *

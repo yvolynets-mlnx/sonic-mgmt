@@ -485,7 +485,7 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
                                         ip_id=101,
                                         ip_ttl=63)
                 send_packet(self, 0, pkt)
-                verify_packets(self, exp_pkt, [1])
+                verify_packet(self, exp_pkt, 1)
 
             ## Read Counters
             port_results, queue_results = sai_thrift_read_port_counters(self.client, port_list[DST_PORT])
