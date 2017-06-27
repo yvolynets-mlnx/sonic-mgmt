@@ -27,9 +27,9 @@ QUEUE_4 = 4
 # Constants
 STOP_PORT_MAX_RATE = 1
 RELEASE_PORT_MAX_RATE = 0
-SRC_PORT  = 0  # eth0
-DST_PORT  = 1  # eth1
-DST_PORT2 = 2  # eth2
+SRC_PORT  = 16  # eth16
+DST_PORT  = 17  # eth17
+DST_PORT2 = 18  # eth18
 ECN_INDEX_IN_HEADER = 53 # Fits the ptf hex_dump_buffer() parse function
 DSCP_INDEX_IN_HEADER = 52 # Fits the ptf hex_dump_buffer() parse function
 
@@ -465,27 +465,27 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
         ## DSCP Mapping test
         try:
             src_mac = [None, None]
-            src_mac[0] = self.dataplane.get_mac(0,0)
-            src_mac[1] = self.dataplane.get_mac(0,1)
+            src_mac[0] = self.dataplane.get_mac(0, SRC_PORT)
+            src_mac[1] = self.dataplane.get_mac(0, DST_PORT)
             for dscp in range(0,64):
                 tos = dscp << 2
                 pkt = simple_tcp_packet(eth_dst=router_mac,
                                         eth_src=src_mac[0],
-                                        ip_src='10.0.0.1',
-                                        ip_dst='10.0.0.3',
+                                        ip_src='10.0.0.33',
+                                        ip_dst='10.0.0.35',
                                         ip_tos=tos,
                                         ip_id=101,
                                         ip_ttl=64)
 
                 exp_pkt = simple_tcp_packet(eth_dst=src_mac[1],
                                         eth_src=router_mac,
-                                        ip_src='10.0.0.1',
-                                        ip_dst='10.0.0.3',
+                                        ip_src='10.0.0.33',
+                                        ip_dst='10.0.0.35',
                                         ip_tos=tos,
                                         ip_id=101,
                                         ip_ttl=63)
-                send_packet(self, 0, pkt)
-                verify_packet(self, exp_pkt, 1)
+                send_packet(self, SRC_PORT, pkt)
+                verify_packet(self, exp_pkt, DST_PORT)
 
             ## Read Counters
             port_results, queue_results = sai_thrift_read_port_counters(self.client, port_list[DST_PORT])
@@ -530,11 +530,11 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
 
         #send packets
         src_mac = [None, None]
-        src_mac[0] = self.dataplane.get_mac(0, 0)
+        src_mac[0] = self.dataplane.get_mac(0, SRC_PORT)
         router_mac = self.test_params['router_mac']
         ecn = 1
-        ip_src = '10.0.0.1'
-        ip_dst = '10.0.0.3'
+        ip_src = '10.0.0.33'
+        ip_dst = '10.0.0.35'
         queue_0_num_of_pkts = self.test_params['q0_num_of_pkts']
         queue_1_num_of_pkts = self.test_params['q1_num_of_pkts']
         queue_3_num_of_pkts = self.test_params['q3_num_of_pkts']
@@ -552,7 +552,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_tos=tos,
                             ip_id=i,
                             ip_ttl=64)
-                send_packet(self, 0, pkt)
+                send_packet(self, SRC_PORT, pkt)
 
             for i in range(0, queue_1_num_of_pkts):
                 dscp = 8
@@ -565,7 +565,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_tos=tos,
                             ip_id=i,
                             ip_ttl=64)
-                send_packet(self, 0, pkt)
+                send_packet(self, SRC_PORT, pkt)
 
             for i in range(0, queue_3_num_of_pkts):
                 dscp = 3
@@ -578,7 +578,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_tos=tos,
                             ip_id=i,
                             ip_ttl=64)
-                send_packet(self, 0, pkt)
+                send_packet(self, SRC_PORT, pkt)
 
             for i in range(0, queue_4_num_of_pkts):
                 dscp = 4
@@ -591,7 +591,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_tos=tos,
                             ip_id=i,
                             ip_ttl=64)
-                send_packet(self, 0, pkt)
+                send_packet(self, SRC_PORT, pkt)
 
             leaking_pkt_number = 0
             for (rcv_port_number, pkt_str, pkt_time) in self.dataplane.packets(0, 1):
@@ -611,7 +611,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
             cnt = 0
             pkts = []
             for i in xrange(queue_0_num_of_pkts+queue_1_num_of_pkts+queue_3_num_of_pkts+queue_4_num_of_pkts):
-                (rcv_device, rcv_port, rcv_pkt, pkt_time) = dp_poll(self, device_number=0, port_number=1, timeout=0.2)
+                (rcv_device, rcv_port, rcv_pkt, pkt_time) = dp_poll(self, device_number=0, port_number=DST_PORT, timeout=0.2)
                 if rcv_pkt is not None:
                     cnt += 1
                     pkts.append(rcv_pkt)
