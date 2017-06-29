@@ -4,10 +4,13 @@ ARC-HOST60 ansible_host=arc-host60
 [vm_host_2]
 MTS-SAI-HOST-3 ansible_host=mts-sai-host-3
 
+[vm_host_3]
+ARC-HOST83 ansible_host=arc-host83
 
 [vm_host:children]
 vm_host_1
 vm_host_2
+vm_host_3
 
 [vms_1]
 VM0101 ansible_host=10.224.23.180
@@ -77,9 +80,44 @@ VM0230 ansible_host=10.12.78.157
 VM0231 ansible_host=10.12.78.158
 VM0232 ansible_host=10.12.78.159
 
+[vms_3]
+VM0301 ansible_host=10.224.34.101
+VM0302 ansible_host=10.224.34.102
+VM0303 ansible_host=10.224.34.103
+VM0304 ansible_host=10.224.34.104
+VM0305 ansible_host=10.224.34.105
+VM0306 ansible_host=10.224.34.106
+VM0307 ansible_host=10.224.34.107
+VM0308 ansible_host=10.224.34.108
+VM0309 ansible_host=10.224.34.109
+VM0310 ansible_host=10.224.34.110
+VM0311 ansible_host=10.224.34.111
+VM0312 ansible_host=10.224.34.112
+VM0313 ansible_host=10.224.34.113
+VM0314 ansible_host=10.224.34.114
+VM0315 ansible_host=10.224.34.115
+VM0316 ansible_host=10.224.34.116
+VM0317 ansible_host=10.224.34.117
+VM0318 ansible_host=10.224.34.118
+VM0319 ansible_host=10.224.34.119
+VM0320 ansible_host=10.224.34.120
+VM0321 ansible_host=10.224.34.121
+VM0322 ansible_host=10.224.34.122
+VM0323 ansible_host=10.224.34.123
+VM0324 ansible_host=10.224.34.124
+VM0325 ansible_host=10.224.34.125
+VM0326 ansible_host=10.224.34.126
+VM0327 ansible_host=10.224.34.127
+VM0328 ansible_host=10.224.34.128
+VM0329 ansible_host=10.224.34.129
+VM0330 ansible_host=10.224.34.130
+VM0331 ansible_host=10.224.34.131
+VM0332 ansible_host=10.224.34.132
+
 [eos:children]
 vms_1
 vms_2
+vms_3
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -96,9 +134,17 @@ vms_2
 [server_2:vars]
 host_var_file=host_vars/MTS-SAI-HOST-3.yml
 
+[server_3:children]
+vm_host_3
+vms_3
+
+[server_3:vars]
+host_var_file=host_vars/ARC-HOST83.yml
+
 [servers:children]
 server_1
 server_2
+server_3
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't0', 'ptf32', 'ptf64', 't0-64', 't0-64-32']

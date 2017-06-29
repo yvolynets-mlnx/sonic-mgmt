@@ -79,7 +79,7 @@ function add_topo
   case "$server" in
     server_1) server_port=p4p1 ;;
     server_2) server_port=p4p1 ;;
-    server_3) server_port=p5p1 ;;
+    server_3) server_port=p4p1 ;;
   esac
 
   ansible-playbook fanout_connect.yml -i str --limit "$dut" -b --vault-password-file="$2" -e "server=${server/server_/str-acs-serv-0} server_port=$server_port"
@@ -109,7 +109,7 @@ function renumber_topo
   case "$server" in
     server_1) server_port=p4p1 ;;
     server_2) server_port=p4p1 ;;
-    server_3) server_port=p5p1 ;;
+    server_3) server_port=p4p1 ;;
   esac
 
   ansible-playbook fanout_connect.yml -i str --limit "$dut" -b --vault-password-file="$2" -e "server=${server/server_/str-acs-serv-0} server_port=$server_port"
