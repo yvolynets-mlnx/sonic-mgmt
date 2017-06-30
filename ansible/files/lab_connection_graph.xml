@@ -124,7 +124,7 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="10.12.74.45/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch1039">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.224.34.38/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.224.34.39/24"/>
     </DevicesL3Info>
     <DevicesL2Info Hostname="arc-switch1007">
       <InterfaceVlan mode="Access" portname="ethernet 1/1" vlanids="101"/>
