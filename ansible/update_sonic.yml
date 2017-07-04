@@ -1,0 +1,7 @@
+---
+# This Playbook would update SONiC image on all devices.
+
+- hosts: sonic
+  gather_facts: no
+  roles:
+      - role: update-sonic

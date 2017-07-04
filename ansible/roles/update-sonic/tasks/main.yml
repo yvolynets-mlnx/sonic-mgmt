@@ -1,0 +1,3 @@
+- name: SONiC to SONiC update.
+  include: update.yml
+  tags: update
