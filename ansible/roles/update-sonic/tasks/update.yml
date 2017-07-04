@@ -21,13 +21,3 @@
 
 - name: Wait for device to come back.
   local_action: wait_for host={{ ansible_ssh_host }} state=started
-
-- name: Gather minigraph facts about the device.
-  minigraph_facts: host={{ inventory_hostname }}
-  connection: local
-  tags: always
-  become: no
-
-- name: Verify interfaces are up.
-  include: roles/test/tasks/interface.yml
-  tags: always
