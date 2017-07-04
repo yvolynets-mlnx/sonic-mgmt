@@ -251,28 +251,28 @@
       <DeviceLinkBase>
         <ElementType>DeviceInterfaceLink</ElementType>
         <EndDevice>ARISTA01T1</EndDevice>
-        <EndPort>Ethernet1/1</EndPort>
+        <EndPort>Ethernet1</EndPort>
         <StartDevice>arc-switch1026-t0</StartDevice>
         <StartPort>Ethernet108</StartPort>
       </DeviceLinkBase>
       <DeviceLinkBase>
         <ElementType>DeviceInterfaceLink</ElementType>
         <EndDevice>ARISTA02T1</EndDevice>
-        <EndPort>Ethernet1/1</EndPort>
+        <EndPort>Ethernet1</EndPort>
         <StartDevice>arc-switch1026-t0</StartDevice>
         <StartPort>Ethernet112</StartPort>
       </DeviceLinkBase>
       <DeviceLinkBase>
         <ElementType>DeviceInterfaceLink</ElementType>
         <EndDevice>ARISTA03T1</EndDevice>
-        <EndPort>Ethernet1/1</EndPort>
+        <EndPort>Ethernet1</EndPort>
         <StartDevice>arc-switch1026-t0</StartDevice>
         <StartPort>Ethernet116</StartPort>
       </DeviceLinkBase>
       <DeviceLinkBase>
         <ElementType>DeviceInterfaceLink</ElementType>
         <EndDevice>ARISTA04T1</EndDevice>
-        <EndPort>Ethernet1/1</EndPort>
+        <EndPort>Ethernet1</EndPort>
         <StartDevice>arc-switch1026-t0</StartDevice>
         <StartPort>Ethernet120</StartPort>
       </DeviceLinkBase>
