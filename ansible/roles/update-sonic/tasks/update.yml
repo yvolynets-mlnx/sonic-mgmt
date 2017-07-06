@@ -12,6 +12,13 @@
 
 - name: Update SONiC image.
   command: sh /tmp/{{ image_url | basename }}
+  register: update_output
+  ignore_errors: yes
+
+- fail: msg="{{ update_output.stdout }}"
+  when:
+    - update_output.rc != 0
+    - "'Running SONiC has the same version' not in update_output.stdout"
 
 - name: Reboot device.
   command: /sbin/shutdown -r
