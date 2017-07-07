@@ -15,11 +15,11 @@
 
 - name: Upload SONiC image to device.
   copy:
-    src: {{ filename }}
-    dest: {{ filename }}
+    src: "{{ filename }}"
+    dest: "{{ filename }}"
 
 - name: Remove SONiC image from local server.
-  local_action: rm -rf {{ filename }}
+  local_action: file path={{ filename }} state=absent
 
 - name: Update SONiC image.
   command: sh {{ filename }}
