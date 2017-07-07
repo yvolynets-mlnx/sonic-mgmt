@@ -5,13 +5,24 @@
 - fail: msg="image_url variable should be provided."
   when: image_url is not defined
 
+- set_fact: timestamp="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- set_fact: filename="/tmp/update_image_{{ timestamp }}"
+- debug: var=filename
+
 - name: Download SONiC image.
-  get_url:
-    url: "{{ image_url }}"
-    dest: /tmp/
+  local_action: get_url url={{ image_url }} dest={{ filename }}
+
+- name: Upload SONiC image to device.
+  copy:
+    src: {{ filename }}
+    dest: {{ filename }}
+
+- name: Remove SONiC image from local server.
+  local_action: rm -rf {{ filename }}
 
 - name: Update SONiC image.
-  command: sh /tmp/{{ image_url | basename }}
+  command: sh {{ filename }}
   register: update_output
   ignore_errors: yes
 
