@@ -1,60 +1,76 @@
 [sonic_latest]
-switch1  ansible_host=10.0.0.100  sonic_version=v2  sonic_hwsku=Force10-S6000
-switch2  ansible_host=10.0.0.101  sonic_version=v2  sonic_hwsku=ACS-MSN2700 
-switch3  ansible_host=10.0.0.102  sonic_version=v2  sonic_hwsku=Force10-S6000   # LAG topo: 8 LAGs x 2 members/lag to spines; 16 ports to Tors
-switch4  ansible_host=10.0.0.103  sonic_version=v2  sonic_hwsku=AS7512 sonic_portsku=32x40
-switch5  ansible_host=10.0.0.104  sonic_version=v2  sonic_hwsku=ACS-MSN2700 # LAG topo: 8 LAGs x 2 members/lag to spines; 16 ports to Tors
-
 # MLNX Lab
+
+# Dev setup switches
 arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81"
-arc-switch1026  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
 arc-switch1027  ansible_host=arc-switch1027  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7030 10.224.2.81"
 arc-switch1028  ansible_host=arc-switch1028  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7021 10.224.2.81" ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-mts-sai-test-sw-1-t1  ansible_host=mts-sai-test-sw-1  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
-arc-switch1026-t1-lag  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
-arc-switch1026-t0-64-32  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
+# MTR testbed arc-switch1026 topologies
+arc-switch1026  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
 arc-switch1026-t0  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81" ptf_host=ptf-fib
+arc-switch1026-t0-64-32  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
+arc-switch1026-t1  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
+arc-switch1026-t1-lag  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
+
+# MTR testbed arc-switch1041 topologies
 arc-switch1041-t1  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041
 
-# Add arc-build-server here to be able to use it in tasks
-arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=12345
+# MTS testbed mts-sai-test-sw-1 topologies
+mts-sai-test-sw-1-t1  ansible_host=mts-sai-test-sw-1  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
+# MTR Lab devices info
+arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=12345
 arc-switch1007 ansible_host=arc-switch1007 ansible_ssh_user=admin ansible_ssh_pass=admin
 
 [sonic:children]
 sonic_latest
 
 [leaf_topo_1]
-switch1
-switch5
+# MTR arc-switch1026 topologies
 arc-switch1026
-mts-sai-test-sw-1-t1
-arc-switch1026-t1-lag
-arc-switch1028
-arc-switch1026-t0-64-32 
 arc-switch1026-t0
+arc-switch1026-t0-64-32 
+arc-switch1026-t1
+arc-switch1026-t1-lag
+
+# MTR arc-switch1041 topologies
 arc-switch1041-t1
 
-[lab]
-switch1
-switch5
-arc-switch1026
+# MTS testbed mts-sai-test-sw-1 topologies
 mts-sai-test-sw-1-t1
-arc-switch1026-t1-lag
+
+# MTR dev setup switches
 arc-switch1028
-arc-switch1026-t0-64-32 
+
+[lab]
+# MTR arc-switch1026 topologies
+arc-switch1026
 arc-switch1026-t0
+arc-switch1026-t0-64-32 
+arc-switch1026-t1
+arc-switch1026-t1-lag
+
+# MTR arc-switch1041 topologies
 arc-switch1041-t1
+
+# MTS testbed mts-sai-test-sw-1 topologies
+mts-sai-test-sw-1-t1
+
+# MTR dev setup switches
+arc-switch1028
 
 [leaf_topo_1:vars]
 podset_number=200
 
 
 [ptf]
-ptf-1 ansible_host=10.0.0.200 ansible_ssh_user=root ansible_ssh_pass=password
+# MTR arc-switch1026 PTF host
 ptf-fib ansible_host=10.224.23.237 ansible_ssh_user=root ansible_ssh_pass=root
+# MTS mts-sai-test-sw-1-t1 PTF host
 mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR arc-switch1041 PTF host
 ptf-1041 ansible_host=10.224.34.237 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR dev setup PTF host
 ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=12345
 
