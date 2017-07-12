@@ -95,7 +95,7 @@ class FibTest(BaseTest):
         if self.test_params['testbed_type'] == 't1' or self.test_params['testbed_type'] == 't1-lag':
             self.src_ports = range(0, 31)
         if self.test_params['testbed_type'] == 't0':
-            self.src_ports = range(1, 25) + range(28, 32)
+            self.src_ports = range(1, 25) + range(28, 31)
     #---------------------------------------------------------------------
 
     def filter_port_range(self, port_range):
