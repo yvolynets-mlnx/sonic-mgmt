@@ -84,6 +84,7 @@ function add_topo
 
   ansible-playbook fanout_connect.yml -i str --limit "$dut" -b --vault-password-file="$2" -e "server=${server/server_/str-acs-serv-0} server_port=$server_port"
 
+  echo $1 > /tmp/topo-$dut
   echo Done
 }
 
@@ -95,6 +96,7 @@ function remove_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_remove_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename"
 
+  rm /tmp/topo-$dut
   echo Done
 }
 
@@ -128,14 +130,11 @@ function reset_topo
         fi
 
         remove_topo $(cat /tmp/topo-$1) $3
-        rm /tmp/topo-$1
     else
         echo "No saved topology found for $1"
     fi
 
     add_topo $2 $3
-
-    echo $2 > /tmp/topo-$1
 }
 
 
