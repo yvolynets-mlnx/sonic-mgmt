@@ -14,7 +14,7 @@ function usage
   echo "To deploy a topology on a server: $0 add-topo 'topo-name' ~/.password"
   echo "To remove a topology on a server: $0 remove-topo 'topo-name' ~/.password"
   echo "To renumber a topology on a server: $0 renumber-topo 'topo-name' ~/.password" , where topo-name is target topology
-  echo "To deploy image to the DUT with specific topology: $0 deploy 'server-name' 'topo-name' 'image_url' ~/.password"
+  echo "To deploy image to the DUT with specific topology: $0 deploy 'switch-name' 'topo-name' 'image_url' ~/.password"
   echo
   echo "You should define your topology in testbed.csv file"
   echo
