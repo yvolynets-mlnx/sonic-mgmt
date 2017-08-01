@@ -14,6 +14,7 @@ function usage
   echo "To deploy a topology on a server: $0 add-topo 'topo-name' ~/.password"
   echo "To remove a topology on a server: $0 remove-topo 'topo-name' ~/.password"
   echo "To renumber a topology on a server: $0 renumber-topo 'topo-name' ~/.password" , where topo-name is target topology
+  echo "To deploy image to the DUT with specific topology: $0 deploy 'server-name' 'topo-name' 'image_url' ~/.password"
   echo
   echo "You should define your topology in testbed.csv file"
   echo
@@ -137,6 +138,23 @@ function reset_topo
     add_topo $2 $3
 }
 
+function deploy
+{
+    switch="$1"
+    topo="$2"
+    image_url="$3"
+
+    # Set topology on server side
+    reset_topo ${switch} ${switch}-${topo} veos  >/tmp/${switch}-${topo}.reset_topo.log  &
+
+    ANSIBLE_SCP_IF_SSH=y ansible-playbook  -i inventory --limit ${switch}-${topo} update_sonic.yml --tags update -b -vvvvv -e "image_url=${image_url}" -e "dut_minigraph=${switch}-${topo}.xml"
+
+    echo "Deploy finished. Waiting for topology change."
+    wait ${!}
+
+    cat /tmp/${switch}-${topo}.reset_topo.log
+}
+
 
 if [ $# -lt 3 ]
 then
@@ -155,6 +173,8 @@ case "$1" in
   renumber-topo) renumber_topo $2 $3
                ;;
   reset-topo) reset_topo $2 $3 $4
+               ;;
+  deploy) deploy $2 $3 $4
                ;;
   *)           usage
                ;;
