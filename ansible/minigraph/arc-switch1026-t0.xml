@@ -108,6 +108,11 @@
             <RouteMapOut i:nil="true"/>
             <Vrf i:nil="true"/>
           </BGPPeer>
+          <BGPPeer>
+            <Address>10.1.0.32</Address>  
+            <a:Name>BGPSLBPassive</a:Name>
+            <a:PeersRange>10.10.10.10/26;100.100.100.100/26;192.168.0.0/27</a:PeersRange>
+          </BGPPeer>
         </a:Peers>
         <a:RouteMaps/>
       </a:BGPRouterDeclaration>
@@ -309,6 +314,21 @@
       </Device>
     </Devices>
   </PngDec>
+  <MetadataDeclaration>
+    <Devices xmlns:a="http://schemas.datacontract.org/2004/07/Microsoft.Search.Autopilot.Evolution">
+      <a:DeviceMetadata>
+        <a:Name>arc-switch1026-t0</a:Name>
+        <a:Properties>
+          <a:DeviceProperty>
+            <a:Name>DeploymentId</a:Name>
+            <a:Value>1</a:Value>
+          </a:DeviceProperty>
+        </a:Properties>
+      </a:DeviceMetadata>
+    </Devices>
+    <Properties xmlns:a="http://schemas.datacontract.org/2004/07/Microsoft.Search.Autopilot.Evolution"/>
+  </MetadataDeclaration>
+
   <Hostname>arc-switch1026-t0</Hostname>
   <HwSku>ACS-MSN2700</HwSku>
 </DeviceMiniGraph>
