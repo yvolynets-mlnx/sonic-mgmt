@@ -49,16 +49,21 @@
   - debug: var=port_alias
 
   - name: save original minigraph file (if original file does not exist, then ignore errors)
-    shell: mv minigraph/{{ inventory_hostname }}-{{ topo }}.xml minigraph/{{ inventory_hostname }}-{{ topo }}.xml.orig
+    shell: mv minigraph/{{ inventory_hostname }}.xml minigraph/{{ inventory_hostname }}.xml.orig
     connection: local
     ignore_errors: true
 
   - name: create minigraph file in minigraph folder
     become: true
     template: src=templates/topo/{{ template_name }}.j2
-              dest=minigraph/{{ inventory_hostname}}-{{ topo }}.xml
+              dest=minigraph/{{ inventory_hostname}}.xml
     connection: local
   
+  - name: create minigraph file in minigraph folder
+    become: true
+    shell: cp minigraph/{{ inventory_hostname}}.xml minigraph/{{ inventory_hostname }}-{{ topo }}.xml
+    connection: local
+
   - block:
       - name: saved original minigraph file (if original file may don't exist, then ignore errors)
         shell: mv /etc/sonic/minigraph.xml /etc/sonic/minigraph.xml.orig
