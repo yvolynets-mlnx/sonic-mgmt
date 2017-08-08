@@ -1050,8 +1050,659 @@
         <Hostname>arc-switch1041</Hostname>
         <HwSku>ACS-MSN2740</HwSku>
       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA01T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.196</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA01T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.180</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA02T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.197</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA02T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.181</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA03T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.198</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA03T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.182</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA04T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.199</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA04T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.183</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA05T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.200</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA05T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.184</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA06T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.201</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA06T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.185</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA07T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.202</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA07T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.186</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA08T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.203</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA08T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.187</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA09T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.152</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA09T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.188</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA10T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.153</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA10T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.189</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA11T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.154</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA11T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.190</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA12T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.155</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA12T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.191</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA13T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.156</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA13T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.192</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA14T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.157</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA14T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.193</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA15T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.158</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA15T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.194</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="ToRRouter">
+         <Hostname>"ARISTA16T0"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.159</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
+      <Device i:type="SpineRouter">
+         <Hostname>"ARISTA16T2"</Hostname>
+         <HwSku>Arista-VM</HwSku>
+         <ManagementAddress xmlns:a="Microsoft.Search.Autopilot.NetMux">
+           <a:IPPrefix>10.224.23.195</a:IPPrefix>
+         </ManagementAddress>
+       </Device>
     </Devices>
   </PngDec>
+  <DeviceInfos>
+    <DeviceInfo>
+      <AutoNegotiation>true</AutoNegotiation>
+      <EthernetInterfaces xmlns:a="http://schemas.datacontract.org/2004/07/Microsoft.Search.Autopilot.Evolution">
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet0</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet4</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet8</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet12</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet16</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet20</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet24</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet28</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet32</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet36</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet40</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet44</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet48</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet52</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet56</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet60</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet64</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet68</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet72</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet76</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet80</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet84</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet88</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet92</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet96</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet100</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet104</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet108</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet112</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet116</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet120</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+        <a:EthernetInterface>
+          <ElementType>DeviceInterface</ElementType>
+          <AlternateSpeeds i:nil="true"/>
+          <EnableAutoNegotiation>true</EnableAutoNegotiation>
+          <EnableFlowControl>true</EnableFlowControl>
+          <Index>1</Index>
+          <InterfaceName>Ethernet124</InterfaceName>
+          <InterfaceType i:nil="true"/>
+          <MultiPortsInterface>false</MultiPortsInterface>
+          <PortName>0</PortName>
+          <Priority>0</Priority>
+          <Speed>100000</Speed>
+        </a:EthernetInterface>
+      </EthernetInterfaces>
+      <FlowControl>true</FlowControl>
+      <Height>0</Height>
+      <HwSku>ACS-MSN2740</HwSku>
+      <ManagementInterfaces/>
+    </DeviceInfo>
+  </DeviceInfos>
   <Hostname>arc-switch1041</Hostname>
   <HwSku>ACS-MSN2740</HwSku>
 </DeviceMiniGraph>
