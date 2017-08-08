@@ -7,6 +7,7 @@ function usage
   echo "testbed-cli. Interface to testbeds"
   echo "Usage : $0 { start-vms | stop-vms    } server-name vault-password-file"
   echo "Usage : $0 { add-topo  | remove-topo | renumber-topo } topo-name vault-password-file"
+  echo "Usage : $0 { gen-mg | deploy-mg } topo-name vault-password-file"
   echo "Usage : $0 reset-topo dut-name topo-name vault-password-file"
   echo
   echo "To start VMs on a server: $0 start-vms 'server-name' ~/.password"
@@ -14,6 +15,8 @@ function usage
   echo "To deploy a topology on a server: $0 add-topo 'topo-name' ~/.password"
   echo "To remove a topology on a server: $0 remove-topo 'topo-name' ~/.password"
   echo "To renumber a topology on a server: $0 renumber-topo 'topo-name' ~/.password" , where topo-name is target topology
+  echo "To generate minigraph for DUT in a topology: $0 gen-mg 'topo-name' ~/.password"
+  echo "To deploy minigraph to DUT in a topology: $0 deploy-mg 'topo-name' ~/.password"
   echo "To deploy image to the DUT with specific topology: $0 deploy 'switch-name' 'topo-name' 'image_url' ~/.password"
   echo
   echo "You should define your topology in testbed.csv file"
@@ -77,13 +80,7 @@ function add_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_add_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename"
 
-  case "$server" in
-    server_1) server_port=p4p1 ;;
-    server_2) server_port=p4p1 ;;
-    server_3) server_port=p4p1 ;;
-  esac
-
-  ansible-playbook fanout_connect.yml -i str --limit "$dut" -b --vault-password-file="$2" -e "server=${server/server_/str-acs-serv-0} server_port=$server_port"
+  ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut"
 
   echo $1 > /tmp/topo-$dut
   echo Done
@@ -109,13 +106,29 @@ function renumber_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_renumber_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename"
 
-  case "$server" in
-    server_1) server_port=p4p1 ;;
-    server_2) server_port=p4p1 ;;
-    server_3) server_port=p4p1 ;;
-  esac
+  ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut"
 
-  ansible-playbook fanout_connect.yml -i str --limit "$dut" -b --vault-password-file="$2" -e "server=${server/server_/str-acs-serv-0} server_port=$server_port"
+  echo Done
+}
+
+function generate_minigraph
+{
+  echo "Generating minigraph '$1'"
+
+  read_file $1
+
+  ansible-playbook -i lab config_sonic_basedon_testbed.yml --vault-password-file="$2" -l "$dut" -e vm_base="$vm_base" -e topo="$topo"
+
+  echo Done
+}
+
+function deploy_minigraph
+{
+  echo "Deploying minigraph '$1'"
+
+  read_file $1
+
+  ansible-playbook -i lab config_sonic_basedon_testbed.yml --vault-password-file="$2" -l "$dut" -e vm_base="$vm_base" -e topo="$topo" -e deploy=true
 
   echo Done
 }
@@ -155,7 +168,6 @@ function deploy
     cat /tmp/${switch}-${topo}.reset_topo.log
 }
 
-
 if [ $# -lt 3 ]
 then
  usage
@@ -172,6 +184,10 @@ case "$1" in
                ;;
   renumber-topo) renumber_topo $2 $3
                ;;
+  gen-mg)      generate_minigraph $2 $3
+               ;;
+  deploy-mg)   deploy_minigraph $2 $3
+               ;;
   reset-topo) reset_topo $2 $3 $4
                ;;
   deploy) deploy $2 $3 $4
@@ -179,4 +195,3 @@ case "$1" in
   *)           usage
                ;;
 esac
-
