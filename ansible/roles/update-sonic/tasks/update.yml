@@ -59,9 +59,17 @@
     - name: Wait for device to come back.
       local_action: wait_for host={{ ansible_ssh_host }} state=started
 
-    - name: Wait for ASIC interface become up.
+    - name: Gathering minigraph facts about the device
+      minigraph_facts: host={{ inventory_hostname }}
+      connection: local
+      become: no
+      tags: always
+
+    - name: Verify interfaces are up correctly
       wait_for:
-          path: /sys/class/net/Ethernet4/operstate
+          path: /sys/class/net/{{ item }}/operstate
           search_regex: up
+      with_items: "{{ minigraph_ports }}"
+      when: "item != 'Ethernet124'"
 
   when: dut_minigraph is defined
