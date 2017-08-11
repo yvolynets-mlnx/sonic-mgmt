@@ -27,7 +27,6 @@ topology:
     - 24
     - 25
     - 26
-    - 27
     - 31
   VMs:
     ARISTA01T1:
