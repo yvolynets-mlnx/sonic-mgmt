@@ -72,4 +72,16 @@
       with_items: "{{ minigraph_ports }}"
       when: "item != 'Ethernet124'"
 
+    - name: Verify PortChannel interfaces are up correctly
+      wait_for:
+          path: /sys/class/net/{{ item }}/operstate
+          search_regex: up
+      with_items: "{{ minigraph_portchannels.keys() }}"
+
+    - name: Verify VLAN interfaces are up correctly
+      wait_for:
+          path: /sys/class/net/{{ item }}/operstate
+          search_regex: up
+      with_items: "{{ minigraph_vlans.keys() }}"
+
   when: dut_minigraph is defined
