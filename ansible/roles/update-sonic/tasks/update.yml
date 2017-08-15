@@ -44,7 +44,7 @@
     - name: Deploy minigraph file.
       copy:
         src: "minigraph/{{ dut_minigraph }}"
-        dest: "/etc/sonic/minigraph.xml"
+        dest: "/host/minigraph.xml"
 
     - name: Change default GW address.
       command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
