@@ -50,6 +50,8 @@
       command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
       when: "ansible_ssh_host == 'arc-switch1041'"
 
+    - name: Restore firsttime
+      shell: 'touch /host/image-$(cat /etc/sonic/sonic_version.yml | grep build_version | cut -f2 -d" ")/platform/firsttime'
     - name: Reboot device.
       command: /sbin/shutdown -r
       async: 0
@@ -59,29 +61,30 @@
     - name: Wait for device to come back.
       local_action: wait_for host={{ ansible_ssh_host }} state=started
 
-    - name: Gathering minigraph facts about the device
-      minigraph_facts: host={{ inventory_hostname }}
-      connection: local
-      become: no
-      tags: always
-
-    - name: Verify interfaces are up correctly
-      wait_for:
-          path: /sys/class/net/{{ item }}/operstate
-          search_regex: up
-      with_items: "{{ minigraph_ports }}"
-      when: "item != 'Ethernet124'"
-
-    - name: Verify PortChannel interfaces are up correctly
-      wait_for:
-          path: /sys/class/net/{{ item }}/operstate
-          search_regex: up
-      with_items: "{{ minigraph_portchannels.keys() }}"
-
-    - name: Verify VLAN interfaces are up correctly
-      wait_for:
-          path: /sys/class/net/{{ item }}/operstate
-          search_regex: up
-      with_items: "{{ minigraph_vlans.keys() }}"
-
   when: dut_minigraph is defined
+
+- name: Gathering minigraph facts about the device
+  minigraph_facts: host={{ inventory_hostname }}
+  connection: local
+  become: no
+  tags: always
+
+- name: Verify interfaces are up correctly
+  wait_for:
+      path: /sys/class/net/{{ item }}/operstate
+      search_regex: up
+  with_items: "{{ minigraph_ports }}"
+  when: "item != 'Ethernet124'"
+
+- name: Verify PortChannel interfaces are up correctly
+  wait_for:
+      path: /sys/class/net/{{ item }}/operstate
+      search_regex: up
+  with_items: "{{ minigraph_portchannels.keys() }}"
+
+- name: Verify VLAN interfaces are up correctly
+  wait_for:
+      path: /sys/class/net/{{ item }}/operstate
+      search_regex: up
+  with_items: "{{ minigraph_vlans.keys() }}"
+
