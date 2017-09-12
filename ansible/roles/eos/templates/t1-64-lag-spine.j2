@@ -1,6 +1,5 @@
 {% set host = configuration[hostname] %}
 {% set mgmt_ip = ansible_host %}
-{% set tornum = host['tornum'] %}
 hostname {{ hostname }}
 !
 vrf definition MGMT
@@ -27,15 +26,25 @@ ipv6 unicast-routing
 !
 ip route vrf MGMT 0.0.0.0/0 {{ mgmt_gw }}
 !
+route-map DEFAULT_ROUTES permit
+!
+{% for podset in range(0, props.podset_number) %}
+{% for tor in range(0, props.tor_number) %}
 {% for subnet in range(0, props.tor_subnet_number) %}
-ip route 172.16.{{ tornum }}.{{ subnet }}/32 {{ props.nhipv4 }}
-ipv6 route 20AC:10{{ '%02X' % tornum }}:0:{{ '%02X' % subnet }}::/64 {{ props.nhipv6 }}
+ip route 192.168.{{ podset }}.{{ tor * 16 + subnet }}/32 {{ props.nhipv4 }}
+ipv6 route 20C0:A8{{ '%02X' % podset }}:0:{{ '%02X' % (tor * 16 + subnet)}}::/64 {{ props.nhipv6 }}
 {% endfor %}
-{% if 'vips' in host %}
-{% for subnet in host['vips']['ipv4'] %}
-ip route {{ subnet }} {{ props.nhipv4 }}
 {% endfor %}
-{% endif %}
+{% endfor %}
+!
+{% for podset in range(0, props.podset_number) %}
+{% for tor in range(0, props.tor_number) %}
+ip prefix-list test_ipv4_{{ podset}}_{{ tor }} seq 10 permit 192.168.{{ podset }}.{{ tor * 16 }}/28 ge 28
+ipv6 prefix-list test_ipv6_{{ podset}}_{{ tor }}
+ seq 10 permit 20C0:A8{{ '%02X' % podset }}:0:{{ '%02X' % (tor * 16) }}::/60 ge 60
+exit
+{% endfor %}
+{% endfor %}
 !
 interface Management 1
  description TO LAB MGMT SWITCH
@@ -50,6 +59,13 @@ interface {{ name }}
 {% else %}
  no switchport
 {% endif %}
+{% if name.startswith('Port-Channel') %}
+ port-channel min-links 2
+{% endif %}
+{% if iface['lacp'] is defined %}
+ channel-group {{ iface['lacp'] }} mode active
+ lacp rate normal
+{% endif %}
 {% if iface['ipv4'] is defined %}
  ip address {{ iface['ipv4'] }}
 {% endif %}
@@ -61,6 +77,23 @@ interface {{ name }}
  no shutdown
 !
 {% endfor %}
+{% for podset in range(0, props.podset_number) %}
+{% if range(0, 1000)|random() >= props.failure_rate %}
+{% for tor in range(0, props.tor_number) %}
+{% set leafasn = props.leaf_asn_start + podset %}
+{% set torasn = props.tor_asn_start + tor %}
+route-map PREPENDAS permit {{ 2 * (podset * props.tor_number + tor + 1) }}
+  match ip address prefix-list test_ipv4_{{ podset }}_{{ tor }}
+  set as-path prepend {{ leafasn }} {{ torasn }}
+!
+route-map PREPENDAS permit {{ 2 * (podset * props.tor_number + tor + 1) + 1 }}
+  match ipv6 address prefix-list test_ipv6_{{ podset }}_{{ tor }}
+  set as-path prepend {{ leafasn }} {{ torasn }}
+!
+{% endfor %}
+{% endif %}
+{% endfor %}
+!
 router bgp {{ host['bgp']['asn'] }}
  router-id {{ host['interfaces']['Loopback0']['ipv4'] |  ipaddr('address') }}
  !
@@ -68,6 +101,7 @@ router bgp {{ host['bgp']['asn'] }}
 {% for remote_ip in remote_ips %}
  neighbor {{ remote_ip }} remote-as {{ asn }}
  neighbor {{ remote_ip }} description {{ asn }}
+ neighbor {{ remote_ip }} default-originate route-map DEFAULT_ROUTES
 {% if remote_ip | ipv6 %}
  address-family ipv6
   neighbor {{ remote_ip }} activate
@@ -84,15 +118,7 @@ router bgp {{ host['bgp']['asn'] }}
  network {{ iface['ipv6'] }}
 {% endif %}
 {% endfor %}
-{% for subnet in range(0, props.tor_subnet_number) %}
- network 172.16.{{ tornum }}.{{ subnet }}/32
- network 20AC:10{{ '%02X' % tornum }}:0:{{ '%02X' % subnet }}::/64
-{% endfor %}
-{% if 'vips' in host %}
-{% for subnet in host['vips']['ipv4'] %}
- network {{ subnet }}
-{% endfor %}
-{% endif %}
+ redistribute static route-map PREPENDAS
 !
 management api http-commands
  no protocol https

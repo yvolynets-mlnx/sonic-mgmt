@@ -7,102 +7,98 @@ topology:
       vm_offset: 0
     ARISTA03T2:
       vlans:
-        - 2
-        - 3
+        - 4 
+        - 5
       vm_offset: 1
     ARISTA05T2:
       vlans:
-        - 4
-        - 5
+        - 16
+        - 17
       vm_offset: 2
     ARISTA07T2:
       vlans:
-        - 6
-        - 7
+        - 20
+        - 21
       vm_offset: 3
-    ARISTA09T2:
-      vlans:
-        - 8
-        - 9
-      vm_offset: 4
-    ARISTA11T2:
-      vlans:
-        - 10
-        - 11
-      vm_offset: 5
-    ARISTA13T2:
-      vlans:
-        - 12
-        - 13
-      vm_offset: 6
-    ARISTA15T2:
-      vlans:
-        - 14
-        - 15
-      vm_offset: 7
     ARISTA01T0:
       vlans:
-        - 16
-      vm_offset: 8
+        - 34
+      vm_offset: 4
     ARISTA02T0:
       vlans:
-        - 17
-      vm_offset: 9
+        - 36
+      vm_offset: 5
     ARISTA03T0:
       vlans:
-        - 18
-      vm_offset: 10
+        - 37
+      vm_offset: 6
     ARISTA04T0:
       vlans:
-        - 19
-      vm_offset: 11
+        - 38
+      vm_offset: 7
     ARISTA05T0:
       vlans:
-        - 20
-      vm_offset: 12
+        - 39
+      vm_offset: 8
     ARISTA06T0:
       vlans:
-        - 21
-      vm_offset: 13
+        - 42
+      vm_offset: 9
     ARISTA07T0:
       vlans:
-        - 22
-      vm_offset: 14
+        - 44
+      vm_offset: 10
     ARISTA08T0:
       vlans:
-        - 23
-      vm_offset: 15
+        - 45
+      vm_offset: 11
     ARISTA09T0:
       vlans:
-        - 24
-      vm_offset: 16
+        - 46
+      vm_offset: 12
     ARISTA10T0:
       vlans:
-        - 25
-      vm_offset: 17
+        - 47
+      vm_offset: 13
     ARISTA11T0:
       vlans:
-        - 26
-      vm_offset: 18
+        - 50
+      vm_offset: 14
     ARISTA12T0:
       vlans:
-        - 27
-      vm_offset: 19
+        - 52
+      vm_offset: 15
     ARISTA13T0:
       vlans:
-        - 28
-      vm_offset: 20
+        - 53
+      vm_offset: 16
     ARISTA14T0:
       vlans:
-        - 29
-      vm_offset: 21
+        - 54
+      vm_offset: 17
     ARISTA15T0:
       vlans:
-        - 30
-      vm_offset: 22
+        - 55
+      vm_offset: 18
     ARISTA16T0:
       vlans:
-        - 31
+        - 58
+      vm_offset: 19
+    ARISTA17T0:
+      vlans:
+        - 60
+      vm_offset: 20
+    ARISTA18T0:
+      vlans:
+        - 61
+      vm_offset: 21
+    ARISTA19T0:
+      vlans:
+        - 62
+      vm_offset: 22
+    ARISTA20T0:
+      vlans:
+        - 63
       vm_offset: 23
 
 configuration_properties:
@@ -156,7 +152,7 @@ configuration:
       peers:
         65100:
         - 10.0.0.4
-        - FC00::9
+        - FC00::5
     interfaces:
       Loopback0:
         ipv4: 100.1.0.3/32
@@ -170,7 +166,7 @@ configuration:
         ipv6: fc0a::6/64
       Port-Channel1:
         ipv4: 10.0.0.5/31
-        ipv6: fc00::a/126
+        ipv6: fc00::6/126
 
   ARISTA05T2:
     properties:
@@ -181,7 +177,7 @@ configuration:
       peers:
         65100:
         - 10.0.0.8
-        - FC00::11
+        - FC00::9
     interfaces:
       Loopback0:
         ipv4: 100.1.0.5/32
@@ -195,7 +191,7 @@ configuration:
         ipv6: fc0a::a/64
       Port-Channel1:
         ipv4: 10.0.0.9/31
-        ipv6: fc00::12/126
+        ipv6: fc00::a/126
 
   ARISTA07T2:
     properties:
@@ -206,7 +202,7 @@ configuration:
       peers:
         65100:
         - 10.0.0.12
-        - FC00::19
+        - FC00::D
     interfaces:
       Loopback0:
         ipv4: 100.1.0.7/32
@@ -220,107 +216,7 @@ configuration:
         ipv6: fc0a::e/64
       Port-Channel1:
         ipv4: 10.0.0.13/31
-        ipv6: fc00::1a/126
-
-  ARISTA09T2:
-    properties:
-    - common
-    - spine
-    bgp:
-      asn: 65200
-      peers:
-        65100:
-        - 10.0.0.16
-        - FC00::21
-    interfaces:
-      Loopback0:
-        ipv4: 100.1.0.9/32
-        ipv6: 2064:100::9/128
-      Ethernet1:
-        lacp: 1
-      Ethernet2:
-        lacp: 1
-      Ethernet9:
-        ipv4: 10.10.246.9/24
-        ipv6: fc0a::12/64
-      Port-Channel1:
-        ipv4: 10.0.0.17/31
-        ipv6: fc00::22/126
-
-  ARISTA11T2:
-    properties:
-    - common
-    - spine
-    bgp:
-      asn: 65200
-      peers:
-        65100:
-        - 10.0.0.20
-        - FC00::29
-    interfaces:
-      Loopback0:
-        ipv4: 100.1.0.11/32
-        ipv6: 2064:100::b/128
-      Ethernet1:
-        lacp: 1
-      Ethernet2:
-        lacp: 1
-      Ethernet9:
-        ipv4: 10.10.246.11/24
-        ipv6: fc0a::16/64
-      Port-Channel1:
-        ipv4: 10.0.0.21/31
-        ipv6: fc00::2a/126
-
-  ARISTA13T2:
-    properties:
-    - common
-    - spine
-    bgp:
-      asn: 65200
-      peers:
-        65100:
-        - 10.0.0.24
-        - FC00::31
-    interfaces:
-      Loopback0:
-        ipv4: 100.1.0.13/32
-        ipv6: 2064:100::d/128
-      Ethernet1:
-        lacp: 1
-      Ethernet2:
-        lacp: 1
-      Ethernet9:
-        ipv4: 10.10.246.13/24
-        ipv6: fc0a::1a/64
-      Port-Channel1:
-        ipv4: 10.0.0.25/31
-        ipv6: fc00::32/126
-
-  ARISTA15T2:
-    properties:
-    - common
-    - spine
-    bgp:
-      asn: 65200
-      peers:
-        65100:
-        - 10.0.0.28
-        - FC00::39
-    interfaces:
-      Loopback0:
-        ipv4: 100.1.0.15/32
-        ipv6: 2064:100::f/128
-      Ethernet1:
-        lacp: 1
-      Ethernet2:
-        lacp: 1
-      Ethernet9:
-        ipv4: 10.10.246.15/24
-        ipv6: fc0a::1e/64
-      Port-Channel1:
-        ipv4: 10.0.0.29/31
-        ipv6: fc00::3a/126
+        ipv6: fc00::e/126
 
   ARISTA01T0:
     properties:
@@ -338,14 +234,13 @@ configuration:
         ipv4: 100.1.0.17/32
         ipv6: 2064:100::11/128
       Ethernet1:
-        ipv4: 10.0.0.33/31
-        ipv6: fc00::42/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.17/24
         ipv6: fc0a::22/64
-    vips:
-      ipv4:
-        - 200.0.1.0/24
+      Port-Channel1:
+        ipv4: 10.0.0.33/31
+        ipv6: fc00::42/126
 
   ARISTA02T0:
     properties:
@@ -363,11 +258,13 @@ configuration:
         ipv4: 100.1.0.18/32
         ipv6: 2064:100::12/128
       Ethernet1:
-        ipv4: 10.0.0.35/31
-        ipv6: fc00::46/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.18/24
         ipv6: fc0a::25/64
+      Port-Channel1:
+        ipv4: 10.0.0.35/31
+        ipv6: fc00::46/126
 
   ARISTA03T0:
     properties:
@@ -385,14 +282,13 @@ configuration:
         ipv4: 100.1.0.19/32
         ipv6: 2064:100::13/128
       Ethernet1:
-        ipv4: 10.0.0.37/31
-        ipv6: fc00::4a/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.19/24
         ipv6: fc0a::26/64
-    vips:
-      ipv4:
-        - 200.0.1.0/24
+      Port-Channel1:
+        ipv4: 10.0.0.37/31
+        ipv6: fc00::4a/126
 
   ARISTA04T0:
     properties:
@@ -410,11 +306,13 @@ configuration:
         ipv4: 100.1.0.20/32
         ipv6: 2064:100::14/128
       Ethernet1:
-        ipv4: 10.0.0.39/31
-        ipv6: fc00::4e/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.20/24
         ipv6: fc0a::29/64
+      Port-Channel1:
+        ipv4: 10.0.0.39/31
+        ipv6: fc00::4e/126
 
   ARISTA05T0:
     properties:
@@ -432,11 +330,13 @@ configuration:
         ipv4: 100.1.0.21/32
         ipv6: 2064:100::15/128
       Ethernet1:
-        ipv4: 10.0.0.41/31
-        ipv6: fc00::52/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.21/24
         ipv6: fc0a::2a/64
+      Port-Channel1:
+        ipv4: 10.0.0.41/31
+        ipv6: fc00::52/126
 
   ARISTA06T0:
     properties:
@@ -454,11 +354,13 @@ configuration:
         ipv4: 100.1.0.22/32
         ipv6: 2064:100::16/128
       Ethernet1:
-        ipv4: 10.0.0.43/31
-        ipv6: fc00::56/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.22/24
         ipv6: fc0a::2d/64
+      Port-Channel1:
+        ipv4: 10.0.0.43/31
+        ipv6: fc00::56/126
 
   ARISTA07T0:
     properties:
@@ -476,11 +378,13 @@ configuration:
         ipv4: 100.1.0.23/32
         ipv6: 2064:100::17/128
       Ethernet1:
-        ipv4: 10.0.0.45/31
-        ipv6: fc00::5a/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.23/24
         ipv6: fc0a::2e/64
+      Port-Channel1:
+        ipv4: 10.0.0.45/31
+        ipv6: fc00::5a/126
 
   ARISTA08T0:
     properties:
@@ -498,11 +402,13 @@ configuration:
         ipv4: 100.1.0.24/32
         ipv6: 2064:100::18/128
       Ethernet1:
-        ipv4: 10.0.0.47/31
-        ipv6: fc00::5e/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.24/24
         ipv6: fc0a::31/64
+      Port-Channel1:
+        ipv4: 10.0.0.47/31
+        ipv6: fc00::5e/126
 
   ARISTA09T0:
     properties:
@@ -520,11 +426,13 @@ configuration:
         ipv4: 100.1.0.25/32
         ipv6: 2064:100::19/128
       Ethernet1:
-        ipv4: 10.0.0.49/31
-        ipv6: fc00::62/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.25/24
         ipv6: fc0a::32/64
+      Port-Channel1:
+        ipv4: 10.0.0.49/31
+        ipv6: fc00::62/126
 
   ARISTA10T0:
     properties:
@@ -542,11 +450,13 @@ configuration:
         ipv4: 100.1.0.26/32
         ipv6: 2064:100::1a/128
       Ethernet1:
-        ipv4: 10.0.0.51/31
-        ipv6: fc00::66/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.26/24
         ipv6: fc0a::35/64
+      Port-Channel1:
+        ipv4: 10.0.0.51/31
+        ipv6: fc00::66/126
 
   ARISTA11T0:
     properties:
@@ -564,11 +474,13 @@ configuration:
         ipv4: 100.1.0.27/32
         ipv6: 2064:100::1b/128
       Ethernet1:
-        ipv4: 10.0.0.53/31
-        ipv6: fc00::6a/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.27/24
         ipv6: fc0a::36/64
+      Port-Channel1:
+        ipv4: 10.0.0.53/31
+        ipv6: fc00::6a/126
 
   ARISTA12T0:
     properties:
@@ -586,11 +498,13 @@ configuration:
         ipv4: 100.1.0.28/32
         ipv6: 2064:100::1c/128
       Ethernet1:
-        ipv4: 10.0.0.55/31
-        ipv6: fc00::6e/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.28/24
         ipv6: fc0a::39/64
+      Port-Channel1:
+        ipv4: 10.0.0.55/31
+        ipv6: fc00::6e/126
 
   ARISTA13T0:
     properties:
@@ -608,11 +522,13 @@ configuration:
         ipv4: 100.1.0.29/32
         ipv6: 2064:100::1d/128
       Ethernet1:
-        ipv4: 10.0.0.57/31
-        ipv6: fc00::72/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.29/24
         ipv6: fc0a::3a/64
+      Port-Channel1:
+        ipv4: 10.0.0.57/31
+        ipv6: fc00::72/126
 
   ARISTA14T0:
     properties:
@@ -630,11 +546,13 @@ configuration:
         ipv4: 100.1.0.30/32
         ipv6: 2064:100::1e/128
       Ethernet1:
-        ipv4: 10.0.0.59/31
-        ipv6: fc00::76/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.30/24
         ipv6: fc0a::3d/64
+      Port-Channel1:
+        ipv4: 10.0.0.59/31
+        ipv6: fc00::76/126
 
   ARISTA15T0:
     properties:
@@ -652,11 +570,13 @@ configuration:
         ipv4: 100.1.0.31/32
         ipv6: 2064:100::1f/128
       Ethernet1:
-        ipv4: 10.0.0.61/31
-        ipv6: fc00::7a/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.31/24
         ipv6: fc0a::3e/64
+      Port-Channel1:
+        ipv4: 10.0.0.61/31
+        ipv6: fc00::7a/126
 
   ARISTA16T0:
     properties:
@@ -674,9 +594,106 @@ configuration:
         ipv4: 100.1.0.32/32
         ipv6: 2064:100::20/128
       Ethernet1:
-        ipv4: 10.0.0.63/31
-        ipv6: fc00::7e/126
+        lacp: 1
       Ethernet9:
         ipv4: 10.10.246.32/24
         ipv6: fc0a::41/64
+      Port-Channel1:
+        ipv4: 10.0.0.63/31
+        ipv6: fc00::7e/126
 
+  ARISTA17T0:
+    properties:
+    - common
+    - tor
+    tornum: 17
+    bgp:
+      asn: 64017
+      peers:
+        65100:
+        - 10.0.0.64
+        - FC00::81
+    interfaces:
+      Loopback0:
+        ipv4: 100.1.0.33/32
+        ipv6: 2064:100::21/128
+      Ethernet1:
+        lacp: 1
+      Ethernet9:
+        ipv4: 10.10.246.33/24
+        ipv6: fc0a::43/64
+      Port-Channel1:
+        ipv4: 10.0.0.65/31
+        ipv6: fc00::82/126
+
+  ARISTA18T0:
+    properties:
+    - common
+    - tor
+    tornum: 18
+    bgp:
+      asn: 64018
+      peers:
+        65100:
+        - 10.0.0.66
+        - FC00::85
+    interfaces:
+      Loopback0:
+        ipv4: 100.1.0.34/32
+        ipv6: 2064:100::22/128
+      Ethernet1:
+        lacp: 1
+      Ethernet9:
+        ipv4: 10.10.246.34/24
+        ipv6: fc0a::45/64
+      Port-Channel1:
+        ipv4: 10.0.0.67/31
+        ipv6: fc00::86/126
+
+  ARISTA19T0:
+    properties:
+    - common
+    - tor
+    tornum: 19
+    bgp:
+      asn: 64019
+      peers:
+        65100:
+        - 10.0.0.68
+        - FC00::89
+    interfaces:
+      Loopback0:
+        ipv4: 100.1.0.35/32
+        ipv6: 2064:100::23/128
+      Ethernet1:
+        lacp: 1
+      Ethernet9:
+        ipv4: 10.10.246.35/24
+        ipv6: fc0a::47/64
+      Port-Channel1:
+        ipv4: 10.0.0.69/31
+        ipv6: fc00::8a/126
+
+  ARISTA20T0:
+    properties:
+    - common
+    - tor
+    tornum: 20
+    bgp:
+      asn: 64020
+      peers:
+        65100:
+        - 10.0.0.70
+        - FC00::8D
+    interfaces:
+      Loopback0:
+        ipv4: 100.1.0.36/32
+        ipv6: 2064:100::24/128
+      Ethernet1:
+        lacp: 1
+      Ethernet9:
+        ipv4: 10.10.246.36/24
+        ipv6: fc0a::49/64
+      Port-Channel1:
+        ipv4: 10.0.0.71/31
+        ipv6: fc00::8e/126

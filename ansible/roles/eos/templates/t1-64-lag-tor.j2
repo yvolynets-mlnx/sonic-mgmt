@@ -31,11 +31,6 @@ ip route vrf MGMT 0.0.0.0/0 {{ mgmt_gw }}
 ip route 172.16.{{ tornum }}.{{ subnet }}/32 {{ props.nhipv4 }}
 ipv6 route 20AC:10{{ '%02X' % tornum }}:0:{{ '%02X' % subnet }}::/64 {{ props.nhipv6 }}
 {% endfor %}
-{% if 'vips' in host %}
-{% for subnet in host['vips']['ipv4'] %}
-ip route {{ subnet }} {{ props.nhipv4 }}
-{% endfor %}
-{% endif %}
 !
 interface Management 1
  description TO LAB MGMT SWITCH
@@ -50,6 +45,9 @@ interface {{ name }}
 {% else %}
  no switchport
 {% endif %}
+{% if name.startswith('Port-Channel') %}
+ port-channel min-links 1
+{% endif %}
 {% if iface['ipv4'] is defined %}
  ip address {{ iface['ipv4'] }}
 {% endif %}
@@ -57,6 +55,10 @@ interface {{ name }}
  ipv6 enable
  ipv6 address {{ iface['ipv6'] }}
  ipv6 nd ra suppress
+{% endif %}
+{% if iface['lacp'] is defined %}
+ channel-group {{ iface['lacp'] }} mode active
+ lacp rate normal
 {% endif %}
  no shutdown
 !
@@ -88,11 +90,6 @@ router bgp {{ host['bgp']['asn'] }}
  network 172.16.{{ tornum }}.{{ subnet }}/32
  network 20AC:10{{ '%02X' % tornum }}:0:{{ '%02X' % subnet }}::/64
 {% endfor %}
-{% if 'vips' in host %}
-{% for subnet in host['vips']['ipv4'] %}
- network {{ subnet }}
-{% endfor %}
-{% endif %}
 !
 management api http-commands
  no protocol https
