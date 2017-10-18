@@ -164,3 +164,7 @@
 - name: BGP GR helper test
   include: bgp_gr_helper.yml
   tags: bgp_gr_helper
+
+- name: PFC Watchdog test
+  include: pfc_wd.yml
+  tags: pfc_wd
