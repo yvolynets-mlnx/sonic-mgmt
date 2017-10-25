@@ -8,21 +8,21 @@ arc-switch1028  ansible_host=arc-switch1028  sonic_version=v2  sonic_hwsku=ACS-M
 
 # MTR testbed arc-switch1026 topologies
 arc-switch1026  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
-arc-switch1026-t0  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81" ptf_host=ptf-fib
-arc-switch1026-t0-64-32  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
+arc-switch1026-t0  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81" ptf_host=ptf-fib rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1026-t0-64-32  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81" rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 arc-switch1026-t1  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
 arc-switch1026-t1-lag  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
 
 # MTR testbed arc-switch1041 topologies
 arc-switch1041 ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81"
-arc-switch1041-t1  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041
-arc-switch1041-t1-lag  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041
-arc-switch1041-t0  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041
+arc-switch1041-t1  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1041-t1-lag  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1041-t0  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTR testbed arc-switch1029 topologies
 arc-switch1029  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81"
-arc-switch1029-t1  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029
-arc-switch1029-t0  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029
+arc-switch1029-t1  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1029-t0  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTS testbed mts-sai-test-sw-1 topologies
 mts-sai-test-sw-1-t1  ansible_host=mts-sai-test-sw-1  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"

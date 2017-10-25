@@ -16,7 +16,9 @@
 Thrift SAI interface basic tests
 """
 import sys
-sys.path.append("/usr/include/local/lib/python2.7/site-packages")
+# Temporary solution for saithrift
+# Should be verified and fixed on a new SAI
+sys.path.append("/usr/include/lib/python2.7/site-packages/")
 
 import switch_sai_thrift
 from sai_base_test import *
