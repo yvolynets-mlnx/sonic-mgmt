@@ -20,9 +20,18 @@ arc-switch1041-t1-lag  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsk
 # MTS testbed mts-sai-test-sw-1 topologies
 mts-sai-test-sw-1-t1  ansible_host=mts-sai-test-sw-1  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
+# MTBC testbed arc-mtbc-1001 topologies
+arc-mtbc-1001 ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208"
+arc-mtbc-1001-t0  ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208" ptf_host=ptf-mtbc01
+arc-mtbc-1001-t1  ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208" ptf_host=ptf-mtbc01
+arc-mtbc-1001-t1-lag  ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208" ptf_host=ptf-mtbc01
+
+
+
 # MTR Lab devices info
 arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=12345
 arc-switch1007 ansible_host=arc-switch1007 ansible_ssh_user=admin ansible_ssh_pass=admin
+arc-switchmtbc01 ansible_host=arc-switchmtbc01 ansible_ssh_user=admin ansible_ssh_pass=admin
 
 [sonic:children]
 sonic_latest
@@ -45,6 +54,12 @@ mts-sai-test-sw-1-t1
 # MTR dev setup switches
 arc-switch1028
 
+# MTBC arc-mtbc-1001 topologies
+arc-mtbc-1001
+arc-mtbc-1001-t0
+arc-mtbc-1001-t1
+arc-mtbc-1001-t1-lag
+
 [lab]
 # MTR arc-switch1026 topologies
 arc-switch1026
@@ -63,6 +78,12 @@ mts-sai-test-sw-1-t1
 # MTR dev setup switches
 arc-switch1028
 
+# MTBC arc-mtbc-1001 topologies
+arc-mtbc-1001
+arc-mtbc-1001-t0
+arc-mtbc-1001-t1
+arc-mtbc-1001-t1-lag
+
 [leaf_topo_1:vars]
 podset_number=200
 
@@ -76,4 +97,6 @@ mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1041 ansible_host=10.224.34.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR dev setup PTF host
 ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=12345
+# MTBC arc-mtbc-1001 PTF host
+ptf-mtbc01 ansible_host=10.12.206.220 ansible_ssh_user=root ansible_ssh_pass=root
 
