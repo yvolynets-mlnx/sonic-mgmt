@@ -70,6 +70,7 @@
   with_items: "{{ ptf_interfaces }}"
   when:
     - item not in ptf_lag_interfaces
+    - item != '31' # Only for Mellanox testbed. The last port is used for up link from DUT switch
  
 - name: Set DST port ID
   set_fact:

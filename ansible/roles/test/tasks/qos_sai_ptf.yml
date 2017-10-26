@@ -2,6 +2,12 @@
 
 - name: Set parameters for specific test
   set_fact: ptf_base_params="{{ ptf_base_params + test_params }}"
+
+# Temporary solution for Mellanox testbed
+- name: ping "{{ ptf_host }}" from  "{{ ansible_host }}"
+  shell: ping -c 20 {{ ansible_host }}
+  delegate_to: "{{ ptf_host }}"
+
   
 - name: "{{ test_name }}"
   shell: ptf --test-dir saitests {{ test_path }} --platform remote -t "{{ ptf_base_params|join(';') }}" --disable-ipv6 --disable-vxlan --disable-geneve --disable-erspan --disable-mpls --disable-nvgre {{ extra_options | default("")}} 2>&1
