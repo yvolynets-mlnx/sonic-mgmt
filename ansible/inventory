@@ -17,6 +17,11 @@ arc-switch1026-t1-lag  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=
 arc-switch1041-t1  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041
 arc-switch1041-t1-lag  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041
 
+# MTR testbed arc-switch1029 topologies
+arc-switch1029  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81"
+arc-switch1029-t1  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029
+arc-switch1029-t0  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029
+
 # MTS testbed mts-sai-test-sw-1 topologies
 mts-sai-test-sw-1-t1  ansible_host=mts-sai-test-sw-1  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
@@ -39,6 +44,11 @@ arc-switch1026-t1-lag
 arc-switch1041-t1
 arc-switch1041-t1-lag
 
+# MTR arc-switch1029 topologies
+arc-switch1029
+arc-switch1029-t1
+arc-switch1029-t0
+
 # MTS testbed mts-sai-test-sw-1 topologies
 mts-sai-test-sw-1-t1
 
@@ -52,6 +62,11 @@ arc-switch1026-t0
 arc-switch1026-t0-64-32 
 arc-switch1026-t1
 arc-switch1026-t1-lag
+
+# MTR arc-switch1029 topologies
+arc-switch1029
+arc-switch1029-t1
+arc-switch1029-t0
 
 # MTR arc-switch1041 topologies
 arc-switch1041-t1
@@ -74,6 +89,8 @@ ptf-fib ansible_host=10.224.23.237 ansible_ssh_user=root ansible_ssh_pass=root
 mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1041 PTF host
 ptf-1041 ansible_host=10.224.34.237 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR arc-switch1029 PTF host
+ptf-1029 ansible_host=10.224.34.166 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR dev setup PTF host
 ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=12345
 

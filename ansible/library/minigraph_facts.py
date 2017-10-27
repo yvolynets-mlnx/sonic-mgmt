@@ -472,8 +472,14 @@ def parse_xml(filename, hostname):
         for i in s100G_ports:
             port_alias_map["Ethernet%d/1" % i] = "Ethernet%d" % ((i - 1) * 4)
     else:
-        for i in range(0, 128, 4):
-            port_alias_map["Ethernet%d" % i] = "Ethernet%d" % i
+        if hwsku == "ACS-MSN2100":
+            for i in range(0, 30, 1):
+                port_alias_map["Ethernet%d" % i] = "Ethernet%d" % i
+            for i in range(32, 64, 4):
+                port_alias_map["Ethernet%d" % i] = "Ethernet%d" % i
+        else:
+            for i in range(0, 128, 4):
+                port_alias_map["Ethernet%d" % i] = "Ethernet%d" % i
 
     for child in root:
         if child.tag == str(QName(ns, "DpgDec")):

@@ -7,10 +7,14 @@ MTS-SAI-HOST-3 ansible_host=mts-sai-host-3
 [vm_host_3]
 ARC-HOST83 ansible_host=arc-host83
 
+[vm_host_4]
+ARC-HOST62 ansible_host=arc-host62
+
 [vm_host:children]
 vm_host_1
 vm_host_2
 vm_host_3
+vm_host_4
 
 [vms_1]
 VM0101 ansible_host=10.224.23.180
@@ -114,10 +118,45 @@ VM0330 ansible_host=10.224.34.130
 VM0331 ansible_host=10.224.34.131
 VM0332 ansible_host=10.224.34.132
 
+[vms_4]
+VM0401 ansible_host=10.224.34.134
+VM0402 ansible_host=10.224.34.135
+VM0403 ansible_host=10.224.34.136
+VM0404 ansible_host=10.224.34.137
+VM0405 ansible_host=10.224.34.138
+VM0406 ansible_host=10.224.34.139
+VM0407 ansible_host=10.224.34.140
+VM0408 ansible_host=10.224.34.141
+VM0409 ansible_host=10.224.34.142
+VM0410 ansible_host=10.224.34.143
+VM0411 ansible_host=10.224.34.144
+VM0412 ansible_host=10.224.34.145
+VM0413 ansible_host=10.224.34.146
+VM0414 ansible_host=10.224.34.147
+VM0415 ansible_host=10.224.34.148
+VM0416 ansible_host=10.224.34.149
+VM0417 ansible_host=10.224.34.150
+VM0418 ansible_host=10.224.34.151
+VM0419 ansible_host=10.224.34.152
+VM0420 ansible_host=10.224.34.153
+VM0421 ansible_host=10.224.34.154
+VM0422 ansible_host=10.224.34.155
+VM0423 ansible_host=10.224.34.156
+VM0424 ansible_host=10.224.34.157
+VM0425 ansible_host=10.224.34.158
+VM0426 ansible_host=10.224.34.159
+VM0427 ansible_host=10.224.34.160
+VM0428 ansible_host=10.224.34.161
+VM0429 ansible_host=10.224.34.162
+VM0430 ansible_host=10.224.34.163
+VM0431 ansible_host=10.224.34.164
+VM0432 ansible_host=10.224.34.165
+
 [eos:children]
 vms_1
 vms_2
 vms_3
+vms_4
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -141,10 +180,18 @@ vms_3
 [server_3:vars]
 host_var_file=host_vars/ARC-HOST83.yml
 
+[server_4:children]
+vm_host_4
+vms_4
+
+[server_4:vars]
+host_var_file=host_vars/ARC-HOST62.yml
+
 [servers:children]
 server_1
 server_2
 server_3
+server_4
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't0', 'ptf32', 'ptf64', 't0-64', 't0-64-32']

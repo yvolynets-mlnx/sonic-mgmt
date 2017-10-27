@@ -10,4 +10,6 @@ arc-switch1026-ptf32,vm-t1,ptf32,docker-ptf,10.224.23.237/24,server_1,VM0101,arc
 mts-sai-test-sw-1-t1,vm-t1,t1,docker-ptf,10.12.78.237/24,server_2,VM0201,mts-sai-test-sw-1,Mellanox MTS testbed
 arc-switch1041-t1,vm-t1,t1,docker-ptf,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
 arc-switch1041-t1-lag,vm-t1,t1-lag,docker-ptf,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
+arc-switch1029-t0,vm-t1,t0,docker-ptf,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
+arc-switch1029-t1,vm-t1,t1,docker-ptf,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
 ptf1,ptf1,ptf32,docker-ptf,10.224.23.237/24,server_1,,arc-switch1026,Tests ptf

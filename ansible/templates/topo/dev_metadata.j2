@@ -15,7 +15,11 @@
           <MultiPortsInterface>false</MultiPortsInterface>
           <PortName>0</PortName>
           <Priority>0</Priority>
+{% if  port_speed[index] != ""  %}
+          <Speed>{{ port_speed[index] }}</Speed>
+{% else %}
           <Speed>{{ iface_speed }}</Speed>
+{% endif %}
         </a:EthernetInterface>
 {% endfor %}
       </EthernetInterfaces>
