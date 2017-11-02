@@ -22,7 +22,11 @@
           <Speed>25000</Speed>
 {% endif %}
 {% else %}
+{% if  port_speed[index] != ""  %}
+          <Speed>{{ port_speed[index] }}</Speed>
+{% else %}
           <Speed>{{ iface_speed }}</Speed>
+{% endif %}	  
 {% endif %}
         </a:EthernetInterface>
 {% endfor %}
