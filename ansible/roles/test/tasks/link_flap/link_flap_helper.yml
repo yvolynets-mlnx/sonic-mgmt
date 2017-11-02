@@ -42,7 +42,7 @@
     - name: Verify {{intfs_to_exclude}} is down correctly
       assert: { that: "'{{ ansible_interface_facts[item]['active'] }}' == 'False'" }
       with_items: "{{ minigraph_ports }}"
-      when: item == "{{ intfs_to_exclude }}" and item != "Ethernet124"
+      when: item == "{{ intfs_to_exclude }}"
 
   always:
     - name: Bring up neighbor interface {{neighbor_interface}} on {{peer_host}}
