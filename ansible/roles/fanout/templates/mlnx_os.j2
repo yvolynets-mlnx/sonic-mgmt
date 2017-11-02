@@ -1,0 +1,159 @@
+config t
+
+no lldp 
+no spanning-tree 
+ip routing
+
+interface ethernet 1/32 switchport mode trunk
+
+vlan 101-131
+ex
+
+interface ethernet 1/32 switchport trunk allowed-vlan none
+
+{% for i in range(1,32) %}
+{% set ifindex = '1/' + i|string %}
+{% set vlanid = (100+i)|string %}
+interface ethernet {{ ifindex }} switchport access vlan {{ vlanid }}
+{% endfor %}
+
+
+interface ethernet 1/32 switchport trunk allowed-vlan add 101-131
+interface ethernet 1/32 switchport trunk allowed-vlan remove 1
+
+protocol openflow
+
+{% for i in range(1,33) %}
+{% set ifindex = '1/' + i|string %}
+interface ethernet {{ ifindex }} openflow mode hybrid
+{% endfor %}
+
+openflow add-flows 1  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=101,actions=output:125 
+openflow add-flows 2  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=102,actions=output:127 
+openflow add-flows 3  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=103,actions=output:121 
+openflow add-flows 4  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=104,actions=output:123 
+openflow add-flows 5  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=105,actions=output:117 
+openflow add-flows 6  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=106,actions=output:119 
+openflow add-flows 7  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=107,actions=output:113 
+openflow add-flows 8  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=108,actions=output:115 
+openflow add-flows 9  table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=109,actions=output:109 
+openflow add-flows 10 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=110,actions=output:111 
+openflow add-flows 11 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=111,actions=output:105 
+openflow add-flows 12 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=112,actions=output:107 
+openflow add-flows 13 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=113,actions=output:101 
+openflow add-flows 14 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=114,actions=output:103 
+openflow add-flows 15 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=115,actions=output:97 
+openflow add-flows 16 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=116,actions=output:99 
+openflow add-flows 17 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=117,actions=output:65 
+openflow add-flows 18 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=118,actions=output:67 
+openflow add-flows 19 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=119,actions=output:69 
+openflow add-flows 20 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=120,actions=output:71 
+openflow add-flows 21 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=121,actions=output:73 
+openflow add-flows 22 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=122,actions=output:75 
+openflow add-flows 23 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=123,actions=output:77 
+openflow add-flows 24 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=124,actions=output:79 
+openflow add-flows 25 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=125,actions=output:81 
+openflow add-flows 26 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=126,actions=output:83 
+openflow add-flows 27 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=127,actions=output:85 
+openflow add-flows 28 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=128,actions=output:87 
+openflow add-flows 29 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=129,actions=output:89 
+openflow add-flows 30 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=130,actions=output:91 
+openflow add-flows 31 table=0,priority=100,dl_type=0x88CC,in_port=95,dl_vlan=131,actions=output:93 
+ 
+openflow add-flows 32 table=0,priority=101,dl_type=0x88CC,in_port=125,actions=mod_vlan_vid:101,output:95 
+openflow add-flows 33 table=0,priority=101,dl_type=0x88CC,in_port=127,actions=mod_vlan_vid:102,output:95 
+openflow add-flows 34 table=0,priority=101,dl_type=0x88CC,in_port=121,actions=mod_vlan_vid:103,output:95 
+openflow add-flows 35 table=0,priority=101,dl_type=0x88CC,in_port=123,actions=mod_vlan_vid:104,output:95 
+openflow add-flows 36 table=0,priority=101,dl_type=0x88CC,in_port=117,actions=mod_vlan_vid:105,output:95 
+openflow add-flows 37 table=0,priority=101,dl_type=0x88CC,in_port=119,actions=mod_vlan_vid:106,output:95 
+openflow add-flows 38 table=0,priority=101,dl_type=0x88CC,in_port=113,actions=mod_vlan_vid:107,output:95 
+openflow add-flows 39 table=0,priority=101,dl_type=0x88CC,in_port=115,actions=mod_vlan_vid:108,output:95 
+openflow add-flows 40 table=0,priority=101,dl_type=0x88CC,in_port=109,actions=mod_vlan_vid:109,output:95 
+openflow add-flows 41 table=0,priority=101,dl_type=0x88CC,in_port=111,actions=mod_vlan_vid:110,output:95 
+openflow add-flows 42 table=0,priority=101,dl_type=0x88CC,in_port=105,actions=mod_vlan_vid:111,output:95 
+openflow add-flows 43 table=0,priority=101,dl_type=0x88CC,in_port=107,actions=mod_vlan_vid:112,output:95 
+openflow add-flows 44 table=0,priority=101,dl_type=0x88CC,in_port=101,actions=mod_vlan_vid:113,output:95 
+openflow add-flows 45 table=0,priority=101,dl_type=0x88CC,in_port=103,actions=mod_vlan_vid:114,output:95 
+openflow add-flows 46 table=0,priority=101,dl_type=0x88CC,in_port=97,actions=mod_vlan_vid:115,output:95 
+openflow add-flows 47 table=0,priority=101,dl_type=0x88CC,in_port=99,actions=mod_vlan_vid:116,output:95 
+openflow add-flows 48 table=0,priority=101,dl_type=0x88CC,in_port=65,actions=mod_vlan_vid:117,output:95 
+openflow add-flows 49 table=0,priority=101,dl_type=0x88CC,in_port=67,actions=mod_vlan_vid:118,output:95 
+openflow add-flows 50 table=0,priority=101,dl_type=0x88CC,in_port=69,actions=mod_vlan_vid:119,output:95 
+openflow add-flows 51 table=0,priority=101,dl_type=0x88CC,in_port=71,actions=mod_vlan_vid:120,output:95 
+openflow add-flows 52 table=0,priority=101,dl_type=0x88CC,in_port=73,actions=mod_vlan_vid:121,output:95 
+openflow add-flows 53 table=0,priority=101,dl_type=0x88CC,in_port=75,actions=mod_vlan_vid:122,output:95 
+openflow add-flows 54 table=0,priority=101,dl_type=0x88CC,in_port=77,actions=mod_vlan_vid:123,output:95 
+openflow add-flows 55 table=0,priority=101,dl_type=0x88CC,in_port=79,actions=mod_vlan_vid:124,output:95 
+openflow add-flows 56 table=0,priority=101,dl_type=0x88CC,in_port=81,actions=mod_vlan_vid:125,output:95 
+openflow add-flows 57 table=0,priority=101,dl_type=0x88CC,in_port=83,actions=mod_vlan_vid:126,output:95 
+openflow add-flows 58 table=0,priority=101,dl_type=0x88CC,in_port=85,actions=mod_vlan_vid:127,output:95 
+openflow add-flows 59 table=0,priority=101,dl_type=0x88CC,in_port=87,actions=mod_vlan_vid:128,output:95 
+openflow add-flows 60 table=0,priority=101,dl_type=0x88CC,in_port=89,actions=mod_vlan_vid:129,output:95 
+openflow add-flows 61 table=0,priority=101,dl_type=0x88CC,in_port=91,actions=mod_vlan_vid:130,output:95 
+openflow add-flows 62 table=0,priority=101,dl_type=0x88CC,in_port=93,actions=mod_vlan_vid:131,output:95 
+ 
+openflow add-flows 63 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=101,actions=output:125 
+openflow add-flows 64 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=102,actions=output:127 
+openflow add-flows 65 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=103,actions=output:121 
+openflow add-flows 66 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=104,actions=output:123 
+openflow add-flows 67 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=105,actions=output:117 
+openflow add-flows 68 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=106,actions=output:119 
+openflow add-flows 69 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=107,actions=output:113 
+openflow add-flows 70 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=108,actions=output:115 
+openflow add-flows 71 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=109,actions=output:109 
+openflow add-flows 72 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=110,actions=output:111 
+openflow add-flows 73 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=111,actions=output:105 
+openflow add-flows 74 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=112,actions=output:107 
+openflow add-flows 75 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=113,actions=output:101 
+openflow add-flows 76 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=114,actions=output:103 
+openflow add-flows 77 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=115,actions=output:97 
+openflow add-flows 78 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=116,actions=output:99 
+openflow add-flows 79 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=117,actions=output:65 
+openflow add-flows 80 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=118,actions=output:67 
+openflow add-flows 81 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=119,actions=output:69 
+openflow add-flows 82 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=120,actions=output:71 
+openflow add-flows 83 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=121,actions=output:73 
+openflow add-flows 84 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=122,actions=output:75 
+openflow add-flows 85 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=123,actions=output:77 
+openflow add-flows 86 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=124,actions=output:79 
+openflow add-flows 87 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=125,actions=output:81 
+openflow add-flows 88 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=126,actions=output:83 
+openflow add-flows 89 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=127,actions=output:85 
+openflow add-flows 90 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=128,actions=output:87 
+openflow add-flows 91 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=129,actions=output:89 
+openflow add-flows 92 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=130,actions=output:91 
+openflow add-flows 93 table=0,priority=100,dl_type=0x8809,in_port=95,dl_vlan=131,actions=output:93 
+ 
+openflow add-flows 94  table=0,priority=101,dl_type=0x8809,in_port=125,actions=mod_vlan_vid:101,output:95 
+openflow add-flows 95  table=0,priority=101,dl_type=0x8809,in_port=127,actions=mod_vlan_vid:102,output:95 
+openflow add-flows 96  table=0,priority=101,dl_type=0x8809,in_port=121,actions=mod_vlan_vid:103,output:95 
+openflow add-flows 97  table=0,priority=101,dl_type=0x8809,in_port=123,actions=mod_vlan_vid:104,output:95 
+openflow add-flows 98  table=0,priority=101,dl_type=0x8809,in_port=117,actions=mod_vlan_vid:105,output:95 
+openflow add-flows 99  table=0,priority=101,dl_type=0x8809,in_port=119,actions=mod_vlan_vid:106,output:95 
+openflow add-flows 100 table=0,priority=101,dl_type=0x8809,in_port=113,actions=mod_vlan_vid:107,output:95 
+openflow add-flows 101 table=0,priority=101,dl_type=0x8809,in_port=115,actions=mod_vlan_vid:108,output:95 
+openflow add-flows 102 table=0,priority=101,dl_type=0x8809,in_port=109,actions=mod_vlan_vid:109,output:95 
+openflow add-flows 103 table=0,priority=101,dl_type=0x8809,in_port=111,actions=mod_vlan_vid:110,output:95 
+openflow add-flows 104 table=0,priority=101,dl_type=0x8809,in_port=105,actions=mod_vlan_vid:111,output:95 
+openflow add-flows 105 table=0,priority=101,dl_type=0x8809,in_port=107,actions=mod_vlan_vid:112,output:95 
+openflow add-flows 106 table=0,priority=101,dl_type=0x8809,in_port=101,actions=mod_vlan_vid:113,output:95 
+openflow add-flows 107 table=0,priority=101,dl_type=0x8809,in_port=103,actions=mod_vlan_vid:114,output:95 
+openflow add-flows 108 table=0,priority=101,dl_type=0x8809,in_port=97,actions=mod_vlan_vid:115,output:95 
+openflow add-flows 109 table=0,priority=101,dl_type=0x8809,in_port=99,actions=mod_vlan_vid:116,output:95 
+openflow add-flows 110 table=0,priority=101,dl_type=0x8809,in_port=65,actions=mod_vlan_vid:117,output:95 
+openflow add-flows 111 table=0,priority=101,dl_type=0x8809,in_port=67,actions=mod_vlan_vid:118,output:95 
+openflow add-flows 112 table=0,priority=101,dl_type=0x8809,in_port=69,actions=mod_vlan_vid:119,output:95 
+openflow add-flows 113 table=0,priority=101,dl_type=0x8809,in_port=71,actions=mod_vlan_vid:120,output:95 
+openflow add-flows 114 table=0,priority=101,dl_type=0x8809,in_port=73,actions=mod_vlan_vid:121,output:95 
+openflow add-flows 115 table=0,priority=101,dl_type=0x8809,in_port=75,actions=mod_vlan_vid:122,output:95 
+openflow add-flows 116 table=0,priority=101,dl_type=0x8809,in_port=77,actions=mod_vlan_vid:123,output:95 
+openflow add-flows 117 table=0,priority=101,dl_type=0x8809,in_port=79,actions=mod_vlan_vid:124,output:95 
+openflow add-flows 118 table=0,priority=101,dl_type=0x8809,in_port=81,actions=mod_vlan_vid:125,output:95 
+openflow add-flows 119 table=0,priority=101,dl_type=0x8809,in_port=83,actions=mod_vlan_vid:126,output:95 
+openflow add-flows 120 table=0,priority=101,dl_type=0x8809,in_port=85,actions=mod_vlan_vid:127,output:95 
+openflow add-flows 121 table=0,priority=101,dl_type=0x8809,in_port=87,actions=mod_vlan_vid:128,output:95 
+openflow add-flows 122 table=0,priority=101,dl_type=0x8809,in_port=89,actions=mod_vlan_vid:129,output:95 
+openflow add-flows 123 table=0,priority=101,dl_type=0x8809,in_port=91,actions=mod_vlan_vid:130,output:95 
+openflow add-flows 124 table=0,priority=101,dl_type=0x8809,in_port=93,actions=mod_vlan_vid:131,output:95 
+
+
