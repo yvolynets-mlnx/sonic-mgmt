@@ -7,7 +7,8 @@
         "Nexus-3064-NX": "Nexus",
         "Force10-S6100": "Force10",
         "Force10-S6000": "Force10",
-        "MLNX-OS": "MLNX-OS"
+        "MLNX-OS": "MLNX-OS",
+        "MLNX-OS-MTBC": "MLNX-OS"
     },
     "switch_login": {
         "Nexus": { 
