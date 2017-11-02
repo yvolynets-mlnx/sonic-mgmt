@@ -5,7 +5,7 @@
   assert: { that: "'{{ ansible_interface_facts[item]['active'] }}' == 'True'" }
   with_items: "{{ minigraph_ports }}"
 # Hack for 31 port connected
-  when: item != "Ethernet124"
+  when: (sonic_hwsku == 'ACS-MSN2700' and item != 'Ethernet124') or (sonic_hwsku == 'ACS-MSN2100' and item != 'Ethernet36')
 
 - name: Verify port channel interfaces are up correctly
   assert: { that: "'{{ ansible_interface_facts[item]['active'] }}' == 'True'" }

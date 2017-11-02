@@ -31,14 +31,17 @@
     - update_output.rc != 0
     - "'Running SONiC has the same version' not in update_output.stdout"
 
-- name: Reboot device.
-  command: /sbin/shutdown -r
-  async: 0
-  poll: 0
-  ignore_errors: true
+- block:
+    - name: Reboot device.
+      command: /sbin/shutdown -r
+      async: 0
+      poll: 0
+      ignore_errors: true
+    
+    - name: Wait for device to come back.
+      local_action: wait_for host={{ ansible_ssh_host }} state=started
 
-- name: Wait for device to come back.
-  local_action: wait_for host={{ ansible_ssh_host }} state=started
+  when: "'Running SONiC has the same version' not in update_output.stdout"
 
 - block:
     - name: Deploy minigraph file.
@@ -46,12 +49,22 @@
         src: "minigraph/{{ dut_minigraph }}"
         dest: "/host/minigraph.xml"
 
+    - name: Get platform name.
+      shell: show platform summary | grep -o "x86_64-mlnx_.*"
+      register: platform_output
+
+    - name: Deploy port config file.
+      copy:
+        src: "roles/sonicv2/files/ssw/{{ sonic_hwsku }}/port_config.ini"
+        dest: "/usr/share/sonic/device/{{ platform_output.stdout }}/{{ sonic_hwsku }}/port_config.ini"
+      when: sonic_hwsku == 'ACS-MSN2100'
+
     - name: Change default GW address.
       command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
-      when: "ansible_ssh_host == 'arc-switch1041'"
 
     - name: Restore firsttime
       shell: 'touch /host/image-$(cat /etc/sonic/sonic_version.yml | grep build_version | cut -f2 -d" ")/platform/firsttime'
+
     - name: Reboot device.
       command: /sbin/shutdown -r
       async: 0
@@ -74,7 +87,7 @@
       path: /sys/class/net/{{ item }}/operstate
       search_regex: up
   with_items: "{{ minigraph_ports }}"
-  when: "item != 'Ethernet124'"
+  when: (sonic_hwsku == 'ACS-MSN2700' and item != 'Ethernet124') or (sonic_hwsku == 'ACS-MSN2100' and item != 'Ethernet36')
 
 - name: Verify PortChannel interfaces are up correctly
   wait_for:

@@ -48,6 +48,11 @@
 
   - debug: var=port_alias
 
+  - name: find interface speed mapping
+    port_speed: hwsku="{{ hwsku }}"
+
+  - debug: var=port_speed
+
   - name: save original minigraph file (if original file does not exist, then ignore errors)
     shell: mv minigraph/{{ inventory_hostname }}.xml minigraph/{{ inventory_hostname }}.xml.orig
     connection: local

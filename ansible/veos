@@ -20,6 +20,7 @@ vm_host_3
 vm_host_4
 vm_host_5
 
+
 [vms_1]
 VM0101 ansible_host=10.224.23.180
 VM0102 ansible_host=10.224.23.181

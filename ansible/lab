@@ -33,3 +33,4 @@ mts-sai-fanout-sw-1 ansible_host=10.12.74.45
 arc-switch1039    ansible_host=10.224.34.39
 arc-switch1003    ansible_host=10.224.22.191
 arc-switchmtbc01  ansible_host=10.12.67.34
+
