@@ -90,6 +90,11 @@
   with_items: "{{ minigraph_ports }}"
   when: (sonic_hwsku == 'ACS-MSN2700' and item != 'Ethernet124') or (sonic_hwsku == 'ACS-MSN2100' and item != 'Ethernet36')
 
+- name: Workaround. Wait for LAG interfaces.
+  pause:
+    minutes: 5
+  when: topo == "t0" or topo == "t1-lag"
+
 - name: Verify PortChannel interfaces are up correctly
   wait_for:
       path: /sys/class/net/{{ item }}/operstate
