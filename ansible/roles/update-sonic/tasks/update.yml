@@ -61,6 +61,7 @@
 
     - name: Change default GW address.
       command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
+      when: ansible_ssh_host != 'arc-mtbc-1001'
 
     - name: Restore firsttime
       shell: 'touch /host/image-$(cat /etc/sonic/sonic_version.yml | grep build_version | cut -f2 -d" ")/platform/firsttime'
