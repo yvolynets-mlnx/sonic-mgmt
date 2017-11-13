@@ -15,7 +15,6 @@
 - name: prepare fanout switch admin login info
   set_fact: ansible_ssh_user={{ fanout_admin_user }} ansible_ssh_pass={{ fanout_admin_password }}
 
-- debug: msg={{ device_info.HwSku }}
 
 - block:
   - name: build fanout startup config for Arista Fanout leaf
@@ -42,21 +41,38 @@
   when: device_info.HwSku == "Arista-7060CX-32S"
 
 - block:
-  - debug: msg={{ device_info.HwSku }}
-  - name: build fanout startup config for MLNX-OS-MTBC fanout
-    action: apswitch template=mlnx_os_mtbc.j2
+  - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout arc-switchmtbc01
+    action: apswitch template=mlnx_os_swmtbc01.j2
     connection: switch
     args: 
       login: "{{ switch_login['MLNX-OS'] }}"
-    when: device_info.HwSku == "MLNX-OS-MTBC"
+    when: inventory_hostname == 'arc-switchmtbc01'
 
 - block:
-  - debug: msg={{ device_info.HwSku }}
-  - name: build fanout startup config for MLNX-OS fanout
-    action: apswitch template=mlnx_os.j2
+  - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout arc-switch1039
+    action: apswitch template=mlnx_os_sw1039.j2
     connection: switch
     args: 
       login: "{{ switch_login['MLNX-OS'] }}"
-    when: device_info.HwSku == "MLNX-OS"
+    when: inventory_hostname == 'arc-switch1039'
 
+- block:
+  - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout arc-switch1007
+    action: apswitch template=mlnx_os_sw1007.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switch1007'
+
+- block:
+  - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout arc-switch1003
+    action: apswitch template=mlnx_os_sw1003.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switch1003'
 
