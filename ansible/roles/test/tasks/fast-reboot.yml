@@ -106,7 +106,7 @@
         - verbose=False
         - dut_username=\"{{ ansible_ssh_user }}\"
         - dut_hostname=\"{{ ansible_host }}\"
-        - fast_reboot_limit=30
+        - fast_reboot_limit=60
         - portchannel_ports_file=\"/tmp/portchannel_interfaces.json\"
         - vlan_ports_file=\"/tmp/vlan_interfaces.json\"
         - ports_file=\"/tmp/ports.json\"
