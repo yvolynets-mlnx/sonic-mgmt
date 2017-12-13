@@ -8,19 +8,19 @@ qos_params:
     ACS-MSN2700:
         xoff_1:
             dscp: 3
-            ecn: 0
+            ecn: 1
             pg: 3
         xoff_2:
             dscp: 4
-            ecn: 0
+            ecn: 1
             pg: 4
         xon_1:
             dscp: 3
-            ecn: 0
+            ecn: 1
             pg: 3
         xon_2:
             dscp: 4
-            ecn: 0
+            ecn: 1
             pg: 4
         ecn_1:
             dscp: 8
@@ -63,19 +63,19 @@ qos_params:
     ACS-MSN2740:
         xoff_1:
             dscp: 3
-            ecn: 0
+            ecn: 1
             pg: 3
         xoff_2:
             dscp: 4
-            ecn: 0
+            ecn: 1
             pg: 4
         xon_1:
             dscp: 3
-            ecn: 0
+            ecn: 1
             pg: 3
         xon_2:
             dscp: 4
-            ecn: 0
+            ecn: 1
             pg: 4
         ecn_1:
             dscp: 8

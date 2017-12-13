@@ -68,6 +68,8 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
         src_port_id = int(self.test_params['src_port_id'])
         src_port_ip = self.test_params['src_port_ip']
         src_port_mac = self.dataplane.get_mac(0, src_port_id)
+        exp_ip_id = 101
+        exp_ttl = 63
 
         ## Clear Switch Counters
         sai_thrift_clear_all_counters(self.client)
@@ -81,18 +83,26 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
                                         ip_src=src_port_ip,
                                         ip_dst=dst_port_ip,
                                         ip_tos=tos,
-                                        ip_id=101,
+                                        ip_id=exp_ip_id,
                                         ip_ttl=64)
 
-                exp_pkt = simple_tcp_packet(eth_dst=dst_port_mac,
-                                        eth_src=router_mac,
-                                        ip_src=src_port_ip,
-                                        ip_dst=dst_port_ip,
-                                        ip_tos=tos,
-                                        ip_id=101,
-                                        ip_ttl=63)
-                send_packet(self, src_port_id, pkt)
-                verify_packet(self, exp_pkt, dst_port_id)
+                testutils.send_packet(self, src_port_id, pkt)
+
+                dscp_received = False
+
+                while not dscp_received:
+                    result = self.dataplane.poll(device_number=0, port_number=dst_port_id, timeout=3)
+                    if isinstance(result, self.dataplane.PollFailure):
+                        self.fail("Expected packet was not received on port %d.\n%s"
+                            % (dst_port_id, result.format()))
+                    recv_pkt = scapy.Ether(result.packet)
+
+                    # Verify dscp flag
+                    try:
+                        dscp_received = recv_pkt.payload.tos == tos and recv_pkt.payload.src == src_port_ip and recv_pkt.payload.dst == dst_port_ip and \
+                            recv_pkt.payload.ttl == exp_ttl and recv_pkt.payload.id == exp_ip_id
+                    except AttributeError:
+                        continue
 
             ## Read Counters
             port_results, queue_results = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
@@ -140,7 +150,8 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         ttl = 64        
         default_packet_length = 128
         # Calculate the max number of packets which port buffer can consists
-        pkts_max = max_buffer_size / default_packet_length + 1
+        # Increase the number of packets on 25% for a oversight of translating packet size to cells
+        pkts_max = (max_buffer_size / default_packet_length + 1) * 1.25
             
         # Clear Counters
         sai_thrift_clear_all_counters(self.client)
@@ -187,7 +198,8 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             
             # Send the packages till ingress drop on src port
             pkts_bunch_size = 200
-            pkts_max = (max_buffer_size + max_queue_size) / default_packet_length
+            # Increase the number of packets on 25% for a oversight of translating packet size to cells
+            pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.25
             src_port_index = xoff_src_ports_id.index(str(drop_src_port_id))
             port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[drop_src_port_id])
             ingress_counter = port_counters[INGRESS_DROP]            
@@ -453,6 +465,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
         src_port_ip = self.test_params['src_port_ip']
         src_port_mac = self.dataplane.get_mac(0, src_port_id)
         default_packet_length = 1500
+        exp_ip_id = 110
         queue_0_num_of_pkts = int(self.test_params['q0_num_of_pkts'])
         queue_1_num_of_pkts = int(self.test_params['q1_num_of_pkts'])
         queue_3_num_of_pkts = int(self.test_params['q3_num_of_pkts'])
@@ -479,7 +492,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_src=src_port_ip,
                             ip_dst=dst_port_ip,
                             ip_tos=tos,
-                            ip_id=i,
+                            ip_id=exp_ip_id,
                             ip_ttl=64)
                 send_packet(self, src_port_id, pkt)
 
@@ -493,7 +506,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_src=src_port_ip,
                             ip_dst=dst_port_ip,
                             ip_tos=tos,
-                            ip_id=i,
+                            ip_id=exp_ip_id,
                             ip_ttl=64)
                 send_packet(self, src_port_id, pkt)
 
@@ -507,7 +520,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_src=src_port_ip,
                             ip_dst=dst_port_ip,
                             ip_tos=tos,
-                            ip_id=i,
+                            ip_id=exp_ip_id,
                             ip_ttl=64)
                 send_packet(self, src_port_id, pkt)
 
@@ -521,7 +534,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
                             ip_src=src_port_ip,
                             ip_dst=dst_port_ip,
                             ip_tos=tos,
-                            ip_id=i,
+                            ip_id=exp_ip_id,
                             ip_ttl=64)
                 send_packet(self, src_port_id, pkt)
 
@@ -537,11 +550,21 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
 
             cnt = 0
             pkts = []
-            for i in xrange(queue_0_num_of_pkts+queue_1_num_of_pkts+queue_3_num_of_pkts+queue_4_num_of_pkts):
-                (rcv_device, rcv_port, rcv_pkt, pkt_time) = dp_poll(self, device_number=0, port_number=dst_port_id, timeout=0.2)
-                if rcv_pkt is not None:
-                    cnt += 1
-                    pkts.append(rcv_pkt)
+            recv_pkt = scapy.Ether()
+
+            while recv_pkt:
+                received = self.dataplane.poll(device_number=0, port_number=dst_port_id, timeout=2)
+                if isinstance(received, self.dataplane.PollFailure):
+                    recv_pkt = None
+                    break
+                recv_pkt = scapy.Ether(received.packet)
+
+                try:
+                    if recv_pkt.payload.src == src_port_ip and recv_pkt.payload.dst == dst_port_ip and recv_pkt.payload.id == exp_ip_id:
+                        cnt += 1
+                        pkts.append(recv_pkt)
+                except AttributeError:
+                    continue
 
             queue_pkt_counters = [0,0,0,0,0,0,0,0,0]
             queue_num_of_pkts  = [queue_0_num_of_pkts, 0, 0, queue_3_num_of_pkts, queue_4_num_of_pkts, 0, 0, 0, 0, queue_1_num_of_pkts]
@@ -549,8 +572,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
             limit = self.test_params['limit']
 
             for pkt_to_inspect in pkts:
-                pkt_str = hex_dump_buffer(pkt_to_inspect)
-                dscp_of_pkt = int ( ( (int(pkt_str[DSCP_INDEX_IN_HEADER],16) << 4) | int(pkt_str[ECN_INDEX_IN_HEADER],16)) >> 2 )
+                dscp_of_pkt = pkt_to_inspect.payload.tos >> 2
                 total_pkts += 1
 
                 # Count packet oredering
@@ -611,8 +633,8 @@ class LossyQueueTest(sai_base_test.ThriftInterfaceDataPlane):
             ttl=64
             default_packet_length = 64
             # Calculate the max number of packets which port buffer can consists
-            pkts_max = max_buffer_size / default_packet_length
-            pkts_bunch_size = 50 # Number of packages to send to DST port
+            pkts_max = (max_buffer_size / default_packet_length) * 1.25
+            pkts_bunch_size = 200 # Number of packages to send to DST port
             pkts_count = 0 # Total number of shipped packages
             egress_drop_counter = 0
             recv_port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
@@ -644,7 +666,7 @@ class LossyQueueTest(sai_base_test.ThriftInterfaceDataPlane):
                                     ip_dst=dst_port_2_ip,
                                     ip_tos=tos,
                                     ip_ttl=ttl)
-            no_drop_pkts_max = headroom_size / default_packet_length - 1
+            no_drop_pkts_max = headroom_size / default_packet_length * 0.9
 
             if no_drop_pkts_max > 0:
                 testutils.send_packet(self, src_port_id, pkt, no_drop_pkts_max)
