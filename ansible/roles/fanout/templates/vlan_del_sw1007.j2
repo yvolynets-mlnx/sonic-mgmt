@@ -1,0 +1,45 @@
+config t
+
+{% for i in range(1,32) %}
+{% set ifindex = '1/' + i|string %}
+{% set vlanid = (100+i)|string %}
+interface ethernet {{ ifindex }} switchport mode access
+interface ethernet {{ ifindex }} switchport access vlan {{ vlanid }}
+{% endfor %}
+
+{% for i in range(156,187) %}
+{% set flowindex = i|string %}
+openflow del-flows {{ flowindex }}
+{% endfor %}
+
+openflow add-flows 156 table=0,priority=101,dl_type=0x0806,in_port=125,actions=mod_vlan_vid:101,output:95
+openflow add-flows 157 table=0,priority=101,dl_type=0x0806,in_port=127,actions=mod_vlan_vid:102,output:95
+openflow add-flows 158 table=0,priority=101,dl_type=0x0806,in_port=121,actions=mod_vlan_vid:103,output:95
+openflow add-flows 159 table=0,priority=101,dl_type=0x0806,in_port=123,actions=mod_vlan_vid:104,output:95
+openflow add-flows 160 table=0,priority=101,dl_type=0x0806,in_port=117,actions=mod_vlan_vid:105,output:95
+openflow add-flows 161 table=0,priority=101,dl_type=0x0806,in_port=119,actions=mod_vlan_vid:106,output:95
+openflow add-flows 162 table=0,priority=101,dl_type=0x0806,in_port=113,actions=mod_vlan_vid:107,output:95
+openflow add-flows 163 table=0,priority=101,dl_type=0x0806,in_port=115,actions=mod_vlan_vid:108,output:95
+openflow add-flows 164 table=0,priority=101,dl_type=0x0806,in_port=109,actions=mod_vlan_vid:109,output:95
+openflow add-flows 165 table=0,priority=101,dl_type=0x0806,in_port=111,actions=mod_vlan_vid:110,output:95
+openflow add-flows 166 table=0,priority=101,dl_type=0x0806,in_port=105,actions=mod_vlan_vid:111,output:95
+openflow add-flows 167 table=0,priority=101,dl_type=0x0806,in_port=107,actions=mod_vlan_vid:112,output:95
+openflow add-flows 168 table=0,priority=101,dl_type=0x0806,in_port=101,actions=mod_vlan_vid:113,output:95
+openflow add-flows 169 table=0,priority=101,dl_type=0x0806,in_port=103,actions=mod_vlan_vid:114,output:95
+openflow add-flows 170 table=0,priority=101,dl_type=0x0806,in_port=97,actions=mod_vlan_vid:115,output:95
+openflow add-flows 171 table=0,priority=101,dl_type=0x0806,in_port=99,actions=mod_vlan_vid:116,output:95
+openflow add-flows 172 table=0,priority=101,dl_type=0x0806,in_port=65,actions=mod_vlan_vid:117,output:95
+openflow add-flows 173 table=0,priority=101,dl_type=0x0806,in_port=67,actions=mod_vlan_vid:118,output:95
+openflow add-flows 174 table=0,priority=101,dl_type=0x0806,in_port=69,actions=mod_vlan_vid:119,output:95
+openflow add-flows 175 table=0,priority=101,dl_type=0x0806,in_port=71,actions=mod_vlan_vid:120,output:95
+openflow add-flows 176 table=0,priority=101,dl_type=0x0806,in_port=73,actions=mod_vlan_vid:121,output:95
+openflow add-flows 177 table=0,priority=101,dl_type=0x0806,in_port=75,actions=mod_vlan_vid:122,output:95
+openflow add-flows 178 table=0,priority=101,dl_type=0x0806,in_port=77,actions=mod_vlan_vid:123,output:95
+openflow add-flows 179 table=0,priority=101,dl_type=0x0806,in_port=79,actions=mod_vlan_vid:124,output:95
+openflow add-flows 180 table=0,priority=101,dl_type=0x0806,in_port=81,actions=mod_vlan_vid:125,output:95
+openflow add-flows 181 table=0,priority=101,dl_type=0x0806,in_port=83,actions=mod_vlan_vid:126,output:95
+openflow add-flows 182 table=0,priority=101,dl_type=0x0806,in_port=85,actions=mod_vlan_vid:127,output:95
+openflow add-flows 183 table=0,priority=101,dl_type=0x0806,in_port=87,actions=mod_vlan_vid:128,output:95
+openflow add-flows 184 table=0,priority=101,dl_type=0x0806,in_port=89,actions=mod_vlan_vid:129,output:95
+openflow add-flows 185 table=0,priority=101,dl_type=0x0806,in_port=91,actions=mod_vlan_vid:130,output:95
+openflow add-flows 186 table=0,priority=101,dl_type=0x0806,in_port=93,actions=mod_vlan_vid:131,output:95

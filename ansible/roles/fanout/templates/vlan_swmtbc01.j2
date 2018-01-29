@@ -1,0 +1,47 @@
+config t
+
+{% for i in range(0,31) %}
+{% set ifindex = '1/' + (9 + (i//4)*2)|string + '/' + (i%4 + 1)|string %}
+{% set vlanid = (101+i)|string %}
+interface ethernet {{ ifindex }} switchport mode dot1q-tunnel
+interface ethernet {{ ifindex }} switchport access vlan {{ vlanid }}
+{% endfor %}
+
+{% for i in range(156,187) %}
+{% set flowindex = i|string %}
+openflow del-flows {{ flowindex }}
+{% endfor %}
+
+openflow add-flows 156 table=0,priority=101,dl_type=0x0806,in_port=109,actions=output:95
+openflow add-flows 157 table=0,priority=101,dl_type=0x0806,in_port=110,actions=output:95
+openflow add-flows 158 table=0,priority=101,dl_type=0x0806,in_port=111,actions=output:95
+openflow add-flows 159 table=0,priority=101,dl_type=0x0806,in_port=112,actions=output:95
+openflow add-flows 160 table=0,priority=101,dl_type=0x0806,in_port=105,actions=output:95
+openflow add-flows 161 table=0,priority=101,dl_type=0x0806,in_port=106,actions=output:95
+openflow add-flows 162 table=0,priority=101,dl_type=0x0806,in_port=107,actions=output:95
+openflow add-flows 163 table=0,priority=101,dl_type=0x0806,in_port=108,actions=output:95
+openflow add-flows 164 table=0,priority=101,dl_type=0x0806,in_port=101,actions=output:95
+openflow add-flows 165 table=0,priority=101,dl_type=0x0806,in_port=102,actions=output:95
+openflow add-flows 166 table=0,priority=101,dl_type=0x0806,in_port=103,actions=output:95
+openflow add-flows 167 table=0,priority=101,dl_type=0x0806,in_port=104,actions=output:95
+openflow add-flows 168 table=0,priority=101,dl_type=0x0806,in_port=97,actions=output:95
+openflow add-flows 169 table=0,priority=101,dl_type=0x0806,in_port=98,actions=output:95
+openflow add-flows 170 table=0,priority=101,dl_type=0x0806,in_port=99,actions=output:95
+openflow add-flows 171 table=0,priority=101,dl_type=0x0806,in_port=100,actions=output:95
+openflow add-flows 172 table=0,priority=101,dl_type=0x0806,in_port=65,actions=output:95
+openflow add-flows 173 table=0,priority=101,dl_type=0x0806,in_port=66,actions=output:95
+openflow add-flows 174 table=0,priority=101,dl_type=0x0806,in_port=67,actions=output:95
+openflow add-flows 175 table=0,priority=101,dl_type=0x0806,in_port=68,actions=output:95
+openflow add-flows 176 table=0,priority=101,dl_type=0x0806,in_port=69,actions=output:95
+openflow add-flows 177 table=0,priority=101,dl_type=0x0806,in_port=70,actions=output:95
+openflow add-flows 178 table=0,priority=101,dl_type=0x0806,in_port=71,actions=output:95
+openflow add-flows 179 table=0,priority=101,dl_type=0x0806,in_port=72,actions=output:95
+openflow add-flows 180 table=0,priority=101,dl_type=0x0806,in_port=73,actions=output:95
+openflow add-flows 181 table=0,priority=101,dl_type=0x0806,in_port=74,actions=output:95
+openflow add-flows 182 table=0,priority=101,dl_type=0x0806,in_port=75,actions=output:95
+openflow add-flows 183 table=0,priority=101,dl_type=0x0806,in_port=76,actions=output:95
+openflow add-flows 184 table=0,priority=101,dl_type=0x0806,in_port=77,actions=output:95
+openflow add-flows 185 table=0,priority=101,dl_type=0x0806,in_port=78,actions=output:95
+openflow add-flows 186 table=0,priority=101,dl_type=0x0806,in_port=79,actions=output:95
+
+
