@@ -38,6 +38,10 @@
   tags: always
   when: skip_interface_check is undefined
 
+- name: VLAN test
+  include: vlantb.yml
+  tags: vlan
+
 - name: BGP facts test
   include: bgp_fact.yml
   tags: bgp_fact

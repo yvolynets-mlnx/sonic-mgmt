@@ -26,6 +26,7 @@ def get_mac(iff):
 
 class Interface(object):
     ETH_P_ALL = 0x03
+    ETH_P_ARP = 0x806
     RCV_TIMEOUT = 1000
     RCV_SIZE = 4096
 
@@ -39,7 +40,7 @@ class Interface(object):
             self.socket.close()
 
     def bind(self):
-        self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(self.ETH_P_ALL))
+        self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(self.ETH_P_ARP))
         self.socket.bind((self.iface, 0))
         self.socket.settimeout(self.RCV_TIMEOUT)
 
@@ -86,8 +87,8 @@ class ARPResponder(object):
 
     def action(self, interface):
         data = interface.recv()
-        if len(data) != self.ARP_PKT_LEN:
-            return
+        # if len(data) != self.ARP_PKT_LEN:
+        #    return
 
         remote_mac, remote_ip, request_ip = self.extract_arp_info(data)
 
@@ -135,7 +136,7 @@ def main():
                 counter += 1
         else:
             for ip in ip_dict:
-                ip_sets[str(iface)][str(ip)] = get_mac(iface)
+                ip_sets[str(iface)][str(ip)] = get_mac(str(iface))
 
     ifaces = []
     for iface_name in ip_sets.keys():
