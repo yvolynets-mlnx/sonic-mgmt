@@ -184,47 +184,11 @@ class VlanTest(BaseTest):
             self.log("Check on " + str(dst_ports) + "...")
             verify_no_packet_any(self, masked_invalid_tagged_pkt, dst_ports)
 
-
-        # Test case #5
-        # Send ICMP packets to VLAN interfaces. 
-        # Verify ICMP reply packets can be received from ingress port.
-        self.log("Test case #5 starting ...")
-        for vlan_port in vlan_ports_list:
-            src_port = vlan_port["port_index"]
-            src_mac = self.dataplane.get_mac(0, src_port)
-            dst_mac = self.router_mac
-            for vlan_id in map(int, vlan_port["permit_vlanid"].keys()):
-                src_ip = vlan_port["permit_vlanid"][str(vlan_id)]["peer_ip"]
-                for vlan_intf in vlan_intf_list:
-                    if int(vlan_intf["vlan_id"]) != vlan_id:
-                        continue
-                    dst_ip = vlan_intf["ip"].split("/")[0]
-                    pkt = self.build_icmp_packet(vlan_id if vlan_id != vlan_port["pvid"] else 0,
-                                          src_mac, dst_mac, src_ip, dst_ip)
-                    self.log("Send {} packet from {} ...".format("untagged" if vlan_id == 0 else "tagged(%d)"%vlan_id, src_port))
-                    self.log(pkt.sprintf("%Ether.src% %IP.src% -> %Ether.dst% %IP.dst%"))
-                    send(self, src_port, pkt)
-                    exp_pkt = simple_icmp_packet(eth_src=self.router_mac,
-                                           eth_dst=src_mac,
-                                           dl_vlan_enable=True if vlan_id != vlan_port["pvid"] else False,
-                                           vlan_vid=vlan_id if vlan_id != vlan_port["pvid"] else 0,
-                                           vlan_pcp=0,
-                                           ip_dst=src_ip,
-                                           ip_src=dst_ip,
-                                           icmp_type=0,
-                                           icmp_code=0)
-
-                    masked_exp_pkt = Mask(exp_pkt)
-                    masked_exp_pkt.set_do_not_care_scapy(scapy.IP, "id")
-
-                    verify_packets(self, masked_exp_pkt, list(str(src_port)))
-                    self.log("Verify packet from port " + str(src_port))
-
         # Test case #4
         # Send packets over VLAN interfaces. 
         # Verify packets can be receive on the egress port.
         self.log("Test case #4 starting ...")
-        
+
         target_list = []
         for vlan_port in vlan_ports_list:
             for vlan_id in vlan_port["permit_vlanid"].keys():
@@ -269,5 +233,39 @@ class VlanTest(BaseTest):
                                                                  target["vlan_id"] if target["vlan_id"] != target["pvid"] else 0,
                                                                  dst_mac, self.dataplane.get_mac(0, target["port_index"]),
                                                                  src_ip, target["remote_ip"], 63)
-        
+
+        # Test case #5
+        # Send ICMP packets to VLAN interfaces. 
+        # Verify ICMP reply packets can be received from ingress port.
+        self.log("Test case #5 starting ...")
+        for vlan_port in vlan_ports_list:
+            src_port = vlan_port["port_index"]
+            src_mac = self.dataplane.get_mac(0, src_port)
+            dst_mac = self.router_mac
+            for vlan_id in map(int, vlan_port["permit_vlanid"].keys()):
+                src_ip = vlan_port["permit_vlanid"][str(vlan_id)]["peer_ip"]
+                for vlan_intf in vlan_intf_list:
+                    if int(vlan_intf["vlan_id"]) != vlan_id:
+                        continue
+                    dst_ip = vlan_intf["ip"].split("/")[0]
+                    pkt = self.build_icmp_packet(vlan_id if vlan_id != vlan_port["pvid"] else 0,
+                                          src_mac, dst_mac, src_ip, dst_ip)
+                    self.log("Send {} packet from {} ...".format("untagged" if vlan_id == 0 else "tagged(%d)"%vlan_id, src_port))
+                    self.log(pkt.sprintf("%Ether.src% %IP.src% -> %Ether.dst% %IP.dst%"))
+                    send(self, src_port, pkt)
+                    exp_pkt = simple_icmp_packet(eth_src=self.router_mac,
+                                           eth_dst=src_mac,
+                                           dl_vlan_enable=True if vlan_id != vlan_port["pvid"] else False,
+                                           vlan_vid=vlan_id if vlan_id != vlan_port["pvid"] else 0,
+                                           vlan_pcp=0,
+                                           ip_dst=src_ip,
+                                           ip_src=dst_ip,
+                                           icmp_type=0,
+                                           icmp_code=0)
+
+                    masked_exp_pkt = Mask(exp_pkt)
+                    masked_exp_pkt.set_do_not_care_scapy(scapy.IP, "id")
+
+                    verify_packets(self, masked_exp_pkt, list(str(src_port)))
+                    self.log("Verify packet from port " + str(src_port))
     #--------------------------------------------------------------------------

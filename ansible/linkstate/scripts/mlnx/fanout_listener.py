@@ -31,6 +31,7 @@ def log(message, output_on_console=False):
         g_log_fp.write("%s : %s\n" % (current_time, message))
         g_log_fp.flush()
 
+
 class PtfHostConn(object):
     def __init__(self):
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,6 +50,7 @@ class PtfHostConn(object):
         fp = self.conn.makefile('wb', 1024)
         pickle.dump(data, fp, pickle.HIGHEST_PROTOCOL)
         fp.close()
+
 
 class IntfMonitor():
     def __init__(self):
@@ -152,6 +154,7 @@ class IntfMonitor():
         data = conn.read()
         log("Received reply: %s" % str(data))
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("ptf_host", type=str, help="ip address of ptf host")
@@ -169,6 +172,7 @@ def main():
         signal.signal(signal.SIGTERM, intfMonitor.stop())
     finally:
         intfMonitor.stop()
+
 
 if __name__ == '__main__':
     main()
