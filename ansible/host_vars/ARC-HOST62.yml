@@ -1,4 +1,4 @@
 mgmt_bridge: br0
 mgmt_prefixlen: 24
 mgmt_gw: 10.224.34.254
-external_iface: eth2
+external_iface: eth0
