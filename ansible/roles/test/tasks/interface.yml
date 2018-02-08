@@ -23,11 +23,11 @@
     interface_facts: up_ports={{minigraph_ports}}
 
   when:
-    - ansible_interface_link_down_ports | length > 0
+    - ansible_interface_link_down_ports | length > 1
     - recover is defined
 
 - debug: msg="Found link down ports {{ansible_interface_link_down_ports}}"
-  when: ansible_interface_link_down_ports | length > 0
+  when: ansible_interface_link_down_ports | length > 1
 
 - name: Verify interfaces are up correctly
 # Hack for 31 port connected
