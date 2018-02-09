@@ -45,8 +45,8 @@
         peer_device: "{{ neighbors[pfc_wd_test_port]['peerdevice'] }}"
       include: roles/test/tasks/pfc_wd/functional_test/functional_test.yml
 
-  always:
-    - name: General cleanup.
-      file:
-        path: "{{ run_dir }}"
-        state: absent
+#  always:
+#    - name: General cleanup.
+#      file:
+#        path: "{{ run_dir }}"
+#        state: absent
