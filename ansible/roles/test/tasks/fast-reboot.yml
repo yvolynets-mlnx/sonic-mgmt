@@ -2,6 +2,16 @@
 # ansible-playbook sonic-test.yml -i str --limit device_1 --become --vault-password-file ~/password  --tags fast_reboot -e "ptf_host=10.0.0.21" -e "vm_hosts=['10.0.0.200','10.0.0.201','10.0.0.202','10.0.0.203']"
 
 - block:
+    - name: figure out fast reboot vm hosts
+      testbed_vm_info: base_vm={{ vm }} topo={{ testbed_type }}
+      connection: local
+
+    - set_fact:
+        vm_hosts: "{{ neighbor_eosvm_mgmt.values() }}"
+  when: testbed_type is defined and vm is defined
+
+
+- block:
     - fail: msg="Please set ptf_host variable"
       when: ptf_host is not defined
 
@@ -124,3 +134,42 @@
     - name: Remove existing ip from ptf host
       script: roles/test/files/helpers/remove_ip.sh
       delegate_to: "{{ ptf_host }}"
+
+    - name: Extract all syslog entries since the last reboot
+      extract_log:
+        directory: '/var/log'
+        file_prefix: 'syslog'
+        start_string: 'Initializing cgroup subsys cpuset'
+        target_filename: '/tmp/syslog'
+
+    - name: Copy the exctracted syslog entries to the local machine
+      fetch:
+        src: '/tmp/syslog'
+        dest: '/tmp/'
+        flat: yes
+
+    - name: Extract all sairedis.rec entries since the last reboot
+      extract_log:
+        directory: '/var/log/swss'
+        file_prefix: 'sairedis.rec'
+        start_string: 'recording on:'
+        target_filename: '/tmp/sairedis.rec'
+
+    - name: Copy the exctracted sairedis.rec entries to the local machine
+      fetch:
+        src: '/tmp/sairedis.rec'
+        dest: '/tmp/'
+        flat: yes
+
+    - name: Extract all swss.rec entries since the last reboot
+      extract_log:
+        directory: '/var/log/swss'
+        file_prefix: 'swss.rec'
+        start_string: 'recording started'
+        target_filename: '/tmp/swss.rec'
+
+    - name: Copy the exctracted swss.rec entries to the local machine
+      fetch:
+        src: '/tmp/swss.rec'
+        dest: '/tmp/'
+        flat: yes
