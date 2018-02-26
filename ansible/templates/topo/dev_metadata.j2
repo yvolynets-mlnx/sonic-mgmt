@@ -25,7 +25,11 @@
 {% if  port_speed[index] != ""  %}
           <Speed>{{ port_speed[index] }}</Speed>
 {% else %}
+{% if (inventory_hostname == "arc-switch1026" or inventory_hostname == "arc-switch1041") and index >= 30 %}
+          <Speed>50000</Speed>
+{% else %}
           <Speed>{{ iface_speed }}</Speed>
+{% endif %}
 {% endif %}	  
 {% endif %}
         </a:EthernetInterface>
