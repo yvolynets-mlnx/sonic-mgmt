@@ -148,10 +148,10 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         tos = dscp << 2
         tos |= ecn
         ttl = 64        
-        default_packet_length = 128
+        default_packet_length = 80
         # Calculate the max number of packets which port buffer can consists
         # Increase the number of packets on 25% for a oversight of translating packet size to cells
-        pkts_max = (max_buffer_size / default_packet_length + 1) * 1.25
+        pkts_max = (max_buffer_size / default_packet_length + 1) * 1.4
             
         # Clear Counters
         sai_thrift_clear_all_counters(self.client)
@@ -199,7 +199,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             # Send the packages till ingress drop on src port
             pkts_bunch_size = 200
             # Increase the number of packets on 25% for a oversight of translating packet size to cells
-            pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.25
+            pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.4
             src_port_index = xoff_src_ports_id.index(str(drop_src_port_id))
             port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[drop_src_port_id])
             ingress_counter = port_counters[INGRESS_DROP]            

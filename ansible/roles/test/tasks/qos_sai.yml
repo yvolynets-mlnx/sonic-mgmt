@@ -107,38 +107,38 @@
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ ports_ip[src_port_id|int] }}'
        
-    #XOFF limit
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: xoff limit ptf test dscp = {{ qp.xoff_1.dscp }}, ecn = {{ qp.xoff_1.ecn }}
-        test_path: sai_qos_tests.PFCtest
-        test_params: 
-        - dscp='{{ qp.xoff_1.dscp }}'
-        - ecn='{{ qp.xoff_1.ecn }}'
-        - pg='{{ qp.xoff_1.pg }}'
-        - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
-        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
-        - queue_max_size='{{ lossless_queue_max_size|int }}'
-        - drop_src_port_id='{{ src_port_id }}'
-        - xoff_src_ports_id='{{ xoff_src_ports_ptf_intf|join('@') }}'
-        - xoff_src_ports_ip='{{ xoff_src_ports_ip|join('@') }}'
+#    #XOFF limit
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: xoff limit ptf test dscp = {{ qp.xoff_1.dscp }}, ecn = {{ qp.xoff_1.ecn }}
+#        test_path: sai_qos_tests.PFCtest
+#        test_params:
+#        - dscp='{{ qp.xoff_1.dscp }}'
+#        - ecn='{{ qp.xoff_1.ecn }}'
+#        - pg='{{ qp.xoff_1.pg }}'
+#        - dst_port_id='{{ dst_port_id }}'
+#        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+#        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
+#        - queue_max_size='{{ lossless_queue_max_size|int }}'
+#        - drop_src_port_id='{{ src_port_id }}'
+#        - xoff_src_ports_id='{{ xoff_src_ports_ptf_intf|join('@') }}'
+#        - xoff_src_ports_ip='{{ xoff_src_ports_ip|join('@') }}'
         
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
-        test_path: sai_qos_tests.PFCtest
-        test_params: 
-        - dscp='{{ qp.xoff_2.dscp }}'
-        - ecn='{{ qp.xoff_2.ecn }}'
-        - pg='{{ qp.xoff_2.pg }}'
-        - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
-        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
-        - queue_max_size='{{ lossless_queue_max_size|int }}'
-        - drop_src_port_id='{{ src_port_id }}'
-        - xoff_src_ports_id='{{ xoff_src_ports_ptf_intf|join('@') }}'
-        - xoff_src_ports_ip='{{ xoff_src_ports_ip|join('@') }}'
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
+#        test_path: sai_qos_tests.PFCtest
+#        test_params:
+#        - dscp='{{ qp.xoff_2.dscp }}'
+#        - ecn='{{ qp.xoff_2.ecn }}'
+#        - pg='{{ qp.xoff_2.pg }}'
+#        - dst_port_id='{{ dst_port_id }}'
+#        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+#        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
+#        - queue_max_size='{{ lossless_queue_max_size|int }}'
+#        - drop_src_port_id='{{ src_port_id }}'
+#        - xoff_src_ports_id='{{ xoff_src_ports_ptf_intf|join('@') }}'
+#        - xoff_src_ports_ip='{{ xoff_src_ports_ip|join('@') }}'
 
     #DSCP MAPPING
     - include: qos_sai_ptf.yml
