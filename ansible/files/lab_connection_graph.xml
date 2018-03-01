@@ -178,7 +178,7 @@
       <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/1" StartDevice="arc-mtbc-1001" StartPort="Ethernet112"/>
       <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/2" StartDevice="arc-mtbc-1001" StartPort="Ethernet116"/>
       <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/3" StartDevice="arc-mtbc-1001" StartPort="Ethernet120"/>
-      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/32" StartDevice="arc-mtbc-1001" StartPort="Ethernet124"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/4" StartDevice="arc-mtbc-1001" StartPort="Ethernet124"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-host60" EndPort="p4p1" StartDevice="str-7260-11" StartPort="Ethernet19"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sai-host-3" EndPort="p4p1" StartDevice="str-7260-11" StartPort="Ethernet19"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1007" EndPort="Ethernet64" StartDevice="str-7260-11" StartPort="Ethernet30"/>
@@ -374,7 +374,8 @@
       <InterfaceVlan mode="Access" portname="ethernet 1/23/1" vlanids="129"/>
       <InterfaceVlan mode="Access" portname="ethernet 1/23/2" vlanids="130"/>
       <InterfaceVlan mode="Access" portname="ethernet 1/23/3" vlanids="131"/>
-      <InterfaceVlan mode="Trunk" portname="ethernet 1/32" vlanids="101-131"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/23/4" vlanids="132"/>
+      <InterfaceVlan mode="Trunk" portname="ethernet 1/32" vlanids="101-132"/>
     </DevicesL2Info>
     <DevicesL3Info Hostname="str-7260-11">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.251.0.234/23"/>
