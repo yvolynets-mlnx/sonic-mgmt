@@ -118,7 +118,7 @@
     
 - name: Set lossless MAX buffer size
   set_fact:
-    lossless_buffer_max_size: "{{ buffer_max_size }}"
+    lossless_buffer_max_size: "{{ buffer_headroom.stdout|int + buffer_pool_size.stdout|int }}"
     
 - include: roles/test/tasks/qos_get_max_buff_size.yml
   vars:
