@@ -54,7 +54,7 @@ class ReleaseAllPorts(sai_base_test.ThriftInterfaceDataPlane):
         sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
         attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
         attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-        for port in port_list:
+        for port in sai_port_list:
             self.client.sai_thrift_set_port_attribute(port, attr)
 
 class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
@@ -148,7 +148,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         tos = dscp << 2
         tos |= ecn
         ttl = 64        
-        default_packet_length = 80
+        default_packet_length = 72
         # Calculate the max number of packets which port buffer can consists
         # Increase the number of packets on 25% for a oversight of translating packet size to cells
         pkts_max = (max_buffer_size / default_packet_length + 1) * 1.4
@@ -165,7 +165,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         #send packets
         try:
             src_port_index = -1
-            pkts_bunch_size = 200 # Number of packages to send to DST port
+            pkts_bunch_size = 70 # Number of packages to send to DST port
             pkts_count = 0 # Total number of shipped packages
             port_pg_counter = 0
             
@@ -184,7 +184,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
                                         ip_ttl=ttl)                 
                 testutils.send_packet(self, src_port, pkt, pkts_bunch_size)                    
                 pkts_count += pkts_bunch_size
-                time.sleep(5)
+                time.sleep(8)
 
                 drop_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
                 assert (drop_counters[EGRESS_DROP] == 0)
@@ -197,7 +197,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             assert(port_counters[INGRESS_DROP] == 0)
             
             # Send the packages till ingress drop on src port
-            pkts_bunch_size = 200
+            pkts_bunch_size = 70
             # Increase the number of packets on 25% for a oversight of translating packet size to cells
             pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.4
             src_port_index = xoff_src_ports_id.index(str(drop_src_port_id))
@@ -213,7 +213,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
                                         ip_ttl=ttl)                
                 testutils.send_packet(self, drop_src_port_id, pkt, pkts_bunch_size)                                    
                 pkts_count += pkts_bunch_size
-                time.sleep(5)
+                time.sleep(8)
                 
                 port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[drop_src_port_id])
                 ingress_counter = port_counters[INGRESS_DROP]    
@@ -264,10 +264,10 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             tos = dscp << 2
             tos |= ecn
             ttl=64
-            default_packet_length = 128
+            default_packet_length = 72
             # Calculate the max number of packets which port buffer can consists
             pkts_max = max_buffer_size / default_packet_length
-            pkts_bunch_size = 100 # Number of packages to send to DST port
+            pkts_bunch_size = 70 # Number of packages to send to DST port
             pkts_count = 0 # Total number of shipped packages
             port_pg_counter = 0
             recv_port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
@@ -283,7 +283,7 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             while port_pg_counter == 0 and pkts_count < pkts_max:                
                 testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
                 pkts_count += pkts_bunch_size
-                time.sleep(5)
+                time.sleep(8)
                 
                 recv_port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
                 port_pg_counter = recv_port_counters[pg]
