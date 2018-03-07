@@ -49,10 +49,10 @@
     - name: Choose random port for testing
       include: roles/test/tasks/pfc_wd/choose_test_port.yml
 
-    - name: Test PFC WD configuration validation.
-      vars:
-        pfc_wd_template: roles/test/templates/pfc_wd_config.j2
-      include: roles/test/tasks/pfc_wd/config_test/config_test.yml
+#    - name: Test PFC WD configuration validation.
+#      vars:
+#        pfc_wd_template: roles/test/templates/pfc_wd_config.j2
+#      include: roles/test/tasks/pfc_wd/config_test/config_test.yml
 
     - name: Test PFC WD Functional tests.
       vars:
@@ -60,8 +60,8 @@
         peer_device: "{{ neighbors[pfc_wd_test_port]['peerdevice'] }}"
       include: roles/test/tasks/pfc_wd/functional_test/functional_test.yml
 
-    - name: Test PFC WD extreme case when all ports have storm
-      include: roles/test/tasks/pfc_wd/functional_test/storm_all_test.yml
+#    - name: Test PFC WD extreme case when all ports have storm
+#      include: roles/test/tasks/pfc_wd/functional_test/storm_all_test.yml
 
   always:
     - name: General cleanup.

@@ -42,6 +42,9 @@
 - name: Deploy pfc packet generater file to fanout switch
   include: roles/test/tasks/pfc_wd/functional_test/deploy_pfc_pktgen.yml
 
+- fail:
+    msg: "STOP-STOP-STOP"
+
 - name: copy the test to ptf container
   copy: src=roles/test/files/ptftests dest=/root
   delegate_to: "{{ ptf_host }}"
