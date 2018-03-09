@@ -95,17 +95,14 @@ class FibTest(BaseTest):
         self.balancing_test_ratio = self.test_params.get('balancing_test_ratio', self.DEFAULT_BALANCING_TEST_RATIO)
 
         if self.test_params['testbed_type'] == 't1' or self.test_params['testbed_type'] == 't1-lag':
-            self.src_ports = range(0, 31)
+            self.src_ports = range(0, 32)
         if self.test_params['testbed_type'] == 't0':
-            self.src_ports = range(1, 25) + range(28, 31)
+            self.src_ports = range(1, 25) + range(28, 32)
         if self.test_params['testbed_type'] == 't0-64':
             self.src_ports = range(0, 2) + range(4, 18) + range(20, 33) + range(36, 43) + range(48, 49) + range(52, 59)
         if self.test_params['testbed_type'] == 't0-116':
             self.src_ports = range(0, 120)
     #---------------------------------------------------------------------
-
-    def filter_port_range(self, port_range):
-        return [p for p in port_range if p != 31]
 
     def check_ip_range(self, ipv4=True):
         if ipv4:
@@ -116,7 +113,7 @@ class FibTest(BaseTest):
         for ip_range in ip_ranges:
 
             # Get the expected list of ports that would receive the packets
-            exp_port_list = self.filter_port_range(self.fib[ip_range.get_first_ip()].get_next_hop_list())
+            exp_port_list = self.fib[ip_range.get_first_ip()].get_next_hop_list()
             # Choose random one source port from all ports excluding the expected ones
             src_port = random.choice([port for port in self.src_ports if port not in exp_port_list])
 
@@ -142,7 +139,7 @@ class FibTest(BaseTest):
                 for i in range(0, self.BALANCING_TEST_TIMES):
                     (matched_index, received) = self.check_ip_route(src_port, dst_ip, exp_port_list, ipv4)
                     hit_count_map[matched_index] = hit_count_map.get(matched_index, 0) + 1
-                self.check_balancing(self.filter_port_range(self.fib[dst_ip].get_next_hop()), hit_count_map)
+                self.check_balancing(self.fib[dst_ip].get_next_hop(), hit_count_map)
 
     def check_ip_route(self, src_port, dst_ip_addr, dst_port_list, ipv4=True):
         if ipv4:

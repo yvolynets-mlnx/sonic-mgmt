@@ -115,7 +115,7 @@
 {% for index in range(4) %}
         <PortChannel>
           <Name>PortChannel{{ ((index+1)|string).zfill(4) }}</Name>
-          <AttachTo>{{ port_alias[27+index] }}</AttachTo>
+          <AttachTo>{{ port_alias[28+index] }}</AttachTo>
           <SubInterface/>
         </PortChannel>
 {% endfor %}
@@ -183,7 +183,7 @@
         <EndDevice>ARISTA0{{ index+1 }}T1</EndDevice>
         <EndPort>Ethernet1</EndPort>
         <StartDevice>{{ inventory_hostname }}</StartDevice>
-        <StartPort>{{ port_alias[27+index] }}</StartPort>
+        <StartPort>{{ port_alias[28+index] }}</StartPort>
       </DeviceLinkBase>
 {% endfor %}
     </DeviceInterfaceLinks>

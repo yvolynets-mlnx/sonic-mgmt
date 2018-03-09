@@ -27,23 +27,23 @@ topology:
     - 24
     - 25
     - 26
-    - 31
+    - 27
   VMs:
     ARISTA01T1:
       vlans:
-        - 27
+        - 28
       vm_offset: 0
     ARISTA02T1:
       vlans:
-        - 28
+        - 29
       vm_offset: 1
     ARISTA03T1:
       vlans:
-        - 29
+        - 30
       vm_offset: 2
     ARISTA04T1:
       vlans:
-        - 30
+        - 31
       vm_offset: 3
 
 configuration_properties:
