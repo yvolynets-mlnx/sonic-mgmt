@@ -12,9 +12,9 @@ no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind
 {% for i in range(1,32) %}
 {% set ifindex = '1/' + i|string %}
 {% if i > 30 %}
-{% set portspeed = '50000' %}
-{% elif i > 28 %}
 {% set portspeed = '40000' %}
+{% elif i > 28 %}
+{% set portspeed = '50000' %}
 {% else %}
 {% set portspeed = '10000' %}
 {% endif %}

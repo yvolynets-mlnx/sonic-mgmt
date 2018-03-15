@@ -1,4 +1,3 @@
-# Arista
 - name: Create pfc generater file in case it doesn't exist.
   file: path=/mnt/flash/{{pfc_gen_file}} state=touch
   delegate_to: "{{peer_mgmt}}"
@@ -10,58 +9,3 @@
   delegate_to: "{{peer_mgmt}}"
   become: true
   when: peer_hwsku | search("Arista") or peer_hwsku | search("arista")
-
-# Mellanox
-# works, disabling temp
-#- name: Build docker container
-#  shell: docker build -t pfc_storm .
-#  args:
-#    chdir: roles/test/files/mlnx/docker-tests-pfcgen
-#  delegate_to: 127.0.0.1
-#  when: peer_hwsku == "MLNX-OS"
-#  become: true
-
-# works, disabling temp
-#- name: Save docker container
-#  shell: docker save pfc_storm:latest | gzip >pfc_storm.tgz
-#  args:
-#    chdir: roles/test/files/mlnx/docker-tests-pfcgen
-#  delegate_to: 127.0.0.1
-#  when: peer_hwsku == "MLNX-OS"
-#  become: true
-
-- name: Copy container to the fanout
-  shell: sshpass -p {{ peer_login['passwd'][0] }} scp roles/test/files/mlnx/docker-tests-pfcgen/pfc_storm.tgz {{peer_login['user']}}@{{ peer_mgmt }}:/var/opt/tms/images/
-  delegate_to: 127.0.0.1
-
-- name: Load image on fanout
-  action: apswitch template="roles/test/files/mlnx/docker-tests-pfcgen/docker_load"
-  args:
-    host: "{{peer_mgmt}}"
-    login: "{{peer_login}}"
-  connection: switch
-  when: peer_hwsku == "MLNX-OS"
-
-#- name: Remove container
-#  file: path=roles/test/files/mlnx/docker-tests-pfcgen/pfc_storm.tgz state=absent
-#  delegate_to: 127.0.0.1
-
-
-
-- block:
-    - set_fact:
-        pfc_frames_number: 100000000
-
-    - name: Generate PFC storm on fanout switch
-      action: apswitch template="{{pfc_wd_storm_template}}"
-      args:
-        host: "{{peer_mgmt}}"
-        login: "{{peer_login}}"
-      connection: switch
-  always:
-    - name: Stop PFC storm on fanout switch
-      action: apswitch template="{{pfc_wd_storm_stop_template}}"
-      args:
-        host: "{{peer_mgmt}}"
-        login: "{{peer_login}}"
-      connection: switch
