@@ -47,7 +47,7 @@
     - name: Deploy minigraph file.
       copy:
         src: "minigraph/{{ dut_minigraph }}"
-        dest: "/host/minigraph.xml"
+        dest: "/etc/sonic/minigraph.xml"
 
     - name: Get platform name.
       shell: show platform summary | grep -o "x86_64-mlnx_.*"
@@ -63,17 +63,23 @@
       command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
       when: ansible_ssh_host != 'arc-mtbc-1001'
 
-    - name: Restore firsttime
-      shell: 'touch /host/image-$(cat /etc/sonic/sonic_version.yml | grep build_version | cut -f2 -d" ")/platform/firsttime'
+    - name: Reload minigraph.
+      shell: yes | config load_minigraph
 
-    - name: Reboot device.
-      command: /sbin/shutdown -r
-      async: 0
-      poll: 0
-      ignore_errors: true
+    - name: Save config.
+      shell: yes | config save
 
-    - name: Wait for device to come back.
-      local_action: wait_for host={{ ansible_ssh_host }} state=started
+#    - name: Restore firsttime
+#      shell: 'touch /host/image-$(cat /etc/sonic/sonic_version.yml | grep build_version | cut -f2 -d" ")/platform/firsttime'
+
+#    - name: Reboot device.
+#      command: /sbin/shutdown -r
+#      async: 0
+#      poll: 0
+#      ignore_errors: true
+
+#    - name: Wait for device to come back.
+#      local_action: wait_for host={{ ansible_ssh_host }} state=started
 
   when: dut_minigraph is defined
 
@@ -88,7 +94,7 @@
       path: /sys/class/net/{{ item }}/operstate
       search_regex: up
   with_items: "{{ minigraph_ports }}"
-  when: (sonic_hwsku == 'ACS-MSN2700' and item != 'Ethernet124') or (sonic_hwsku == 'ACS-MSN2100' and item != 'Ethernet36')
+#  when: (sonic_hwsku == 'ACS-MSN2700' and item != 'Ethernet124') or (sonic_hwsku == 'ACS-MSN2100' and item != 'Ethernet36')
 
 - name: Workaround. Wait for LAG interfaces.
   pause:
