@@ -31,9 +31,9 @@ fanout
 [fanout]
 str-7260-10       ansible_host=10.251.0.13
 str-7260-11       ansible_host=10.251.0.234
+str-msn2700-02    ansible_host=10.251.0.235 os=sonic
 arc-switch1007    ansible_host=10.224.22.207
 mts-sai-fanout-sw-1 ansible_host=10.12.74.45
 arc-switch1039    ansible_host=10.224.34.39
 arc-switch1003    ansible_host=10.224.22.191
 arc-switchmtbc01  ansible_host=10.12.67.34
-

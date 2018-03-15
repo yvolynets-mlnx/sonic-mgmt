@@ -179,3 +179,7 @@
 - name: Test QoS using SAI thrift
   include: qos_sai.yml
   tags: qos
+
+- name: CRM test
+  include: crm.yml
+  tags: crm
