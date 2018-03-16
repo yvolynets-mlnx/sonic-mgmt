@@ -49,14 +49,10 @@
         src: "minigraph/{{ dut_minigraph }}"
         dest: "/etc/sonic/minigraph.xml"
 
-    - name: Get platform name.
-      shell: show platform summary | grep -o "x86_64-mlnx_.*"
-      register: platform_output
-
     - name: Deploy port config file.
       copy:
-        src: "roles/sonicv2/files/ssw/{{ sonic_hwsku }}/port_config.ini"
-        dest: "/usr/share/sonic/device/{{ platform_output.stdout }}/{{ sonic_hwsku }}/port_config.ini"
+        src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
+        dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
       when: sonic_hwsku == 'ACS-MSN2100'
 
     - name: Change default GW address.
