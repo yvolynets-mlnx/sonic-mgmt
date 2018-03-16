@@ -310,24 +310,23 @@
           - wd_action='drop'
         ptf_extra_options: "--relax --debug info --log-file /tmp/pfc_wd.PfcWdTest.{{lookup('pipe','date +%Y-%m-%d-%H:%M:%S')}}.log "
 
-    # Temporary workaround till SAI fixes setting buffer size to 1 instead of 0
-    # - name: "Send 10K packets to {{pfc_wd_test_port}}"
-    #   include: roles/test/tasks/ptf_runner.yml
-    #   vars:
-    #     ptf_test_name: PFC WD test
-    #     ptf_test_dir: ptftests
-    #     ptf_test_path: pfc_wd.PfcWdTest
-    #     ptf_platform: remote
-    #     ptf_test_params:
-    #       - testbed_type='{{testbed_type}}'
-    #       - router_mac='{{ansible_Ethernet0['macaddress']}}'
-    #       - queue_index='{{pfc_queue_index}}'
-    #       - pkt_count='{{pfc_wd_test_pkt_count}}'
-    #       - port_src='{{pfc_wd_test_port_id}}'
-    #       - ip_src='{{pfc_wd_test_neighbor_addr}}'
-    #       - ip_dst='{{pfc_wd_rx_neighbor_addr}}'
-    #       - wd_action='drop'
-    #     ptf_extra_options: "--relax --debug info --log-file /tmp/pfc_wd.PfcWdTest.{{lookup('pipe','date +%Y-%m-%d-%H:%M:%S')}}.log "
+    - name: "Send 10K packets to {{pfc_wd_test_port}}"
+      include: roles/test/tasks/ptf_runner.yml
+      vars:
+        ptf_test_name: PFC WD test
+        ptf_test_dir: ptftests
+        ptf_test_path: pfc_wd.PfcWdTest
+        ptf_platform: remote
+        ptf_test_params:
+          - testbed_type='{{testbed_type}}'
+          - router_mac='{{ansible_Ethernet0['macaddress']}}'
+          - queue_index='{{pfc_queue_index}}'
+          - pkt_count='{{pfc_wd_test_pkt_count}}'
+          - port_src='{{pfc_wd_test_port_id}}'
+          - ip_src='{{pfc_wd_test_neighbor_addr}}'
+          - ip_dst='{{pfc_wd_rx_neighbor_addr}}'
+          - wd_action='drop'
+        ptf_extra_options: "--relax --debug info --log-file /tmp/pfc_wd.PfcWdTest.{{lookup('pipe','date +%Y-%m-%d-%H:%M:%S')}}.log "
 
     - name: "Send 10K packets via {{pfc_wd_test_port}} to verify that other queue is not affected"
       include: roles/test/tasks/ptf_runner.yml
@@ -410,21 +409,19 @@
       shell: "docker exec -i database redis-cli -n 2 HGET COUNTERS:{{ queue_oid.stdout }} PFC_WD_QUEUE_STATS_RX_DROPPED_PACKETS"
       register: pfc_wd_rx_drop_after
 
-    # Temporary workaround till SAI fixes setting buffer size to 1 instead of 0
-    # - name: Verify rx drop counter
-    #   fail:
-    #     msg: "Number of rx dropped packets is not equal to {{ pfc_wd_test_pkt_count }}"
-    #   when: "{{ pfc_wd_rx_drop_after.stdout | int - pfc_wd_rx_drop_before.stdout | int != pfc_wd_test_pkt_count }}"
+    - name: Verify rx drop counter
+      fail:
+        msg: "Number of rx dropped packets is not equal to {{ pfc_wd_test_pkt_count }}"
+      when: "{{ pfc_wd_rx_drop_after.stdout | int - pfc_wd_rx_drop_before.stdout | int != pfc_wd_test_pkt_count }}"
 
     - name: Get PFC_WD_QUEUE_STATS_RX_DROPPED_PACKETS_LAST after test
       shell: "docker exec -i database redis-cli -n 2 HGET COUNTERS:{{ queue_oid.stdout }} PFC_WD_QUEUE_STATS_RX_DROPPED_PACKETS_LAST"
       register: pfc_wd_rx_drop_last
 
-    # Temporary workaround till SAI fixes setting buffer size to 1 instead of 0
-    # - name: Verify last rx drop counter
-    #   fail:
-    #     msg: "Number of last rx dropped packets is not equal to {{ pfc_wd_test_pkt_count }}"
-    #   when: "{{ pfc_wd_rx_drop_last.stdout | int != pfc_wd_test_pkt_count }}"
+    - name: Verify last rx drop counter
+      fail:
+        msg: "Number of last rx dropped packets is not equal to {{ pfc_wd_test_pkt_count }}"
+      when: "{{ pfc_wd_rx_drop_last.stdout | int != pfc_wd_test_pkt_count }}"
 
   always:
     - name: Stop PFC storm on fanout switch
@@ -664,6 +661,5 @@
     - name: Clean up config
       vars:
         command_to_run: "pfcwd stop"
-        test_ignore_file: ignore_pfc_wd_messages
         errors_expected: false
       include: roles/test/tasks/run_command_with_log_analyzer.yml
