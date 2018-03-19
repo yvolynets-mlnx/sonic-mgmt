@@ -137,12 +137,9 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         dst_port_mac = self.dataplane.get_mac(0, dst_port_id)
         max_buffer_size = int(self.test_params['buffer_max_size'])
         max_queue_size = int(self.test_params['queue_max_size']) 
-        drop_src_port_id = int(self.test_params['drop_src_port_id'])
-        xoff_src_ports_id = self.test_params['xoff_src_ports_id'].split('@')
-        xoff_src_ports_ip = self.test_params['xoff_src_ports_ip'].split('@')
-        xoff_src_ports_mac = []
-        for port in xoff_src_ports_id:
-            xoff_src_ports_mac.append(self.dataplane.get_mac(0, int(port)))
+        src_port_id = int(self.test_params['src_port_id'])
+        src_port_ip = self.test_params['src_port_ip']
+        src_port_mac = self.dataplane.get_mac(0, src_port_id)
         
         # Prepare TCP packet data
         tos = dscp << 2
@@ -151,7 +148,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         default_packet_length = 72
         # Calculate the max number of packets which port buffer can consists
         # Increase the number of packets on 25% for a oversight of translating packet size to cells
-        pkts_max = (max_buffer_size / default_packet_length + 1) * 1.4
+        pkts_max = (max_buffer_size / default_packet_length + 1) * 1.3
             
         # Clear Counters
         sai_thrift_clear_all_counters(self.client)
@@ -170,26 +167,22 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             port_pg_counter = 0
             
             # Send the packets untill PFC counter will be trigerred or max pkts reached
+            pkt = simple_tcp_packet(pktlen=default_packet_length,
+                                    eth_dst=router_mac,
+                                    eth_src=src_port_mac,
+                                    ip_src=src_port_ip,
+                                    ip_dst=dst_port_ip,
+                                    ip_tos=tos,
+                                    ip_ttl=ttl)
             while port_pg_counter == 0 and pkts_count < pkts_max:
-                
-                src_port_index = (src_port_index + 1) if (src_port_index + 1) < len(xoff_src_ports_id) else 0
-                src_port = int(xoff_src_ports_id[src_port_index])
-                
-                pkt = simple_tcp_packet(pktlen=default_packet_length,
-                                        eth_dst=router_mac,
-                                        eth_src=xoff_src_ports_mac[src_port_index],
-                                        ip_src=xoff_src_ports_ip[src_port_index],
-                                        ip_dst=dst_port_ip,
-                                        ip_tos=tos,
-                                        ip_ttl=ttl)                 
-                testutils.send_packet(self, src_port, pkt, pkts_bunch_size)                    
+                testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
                 pkts_count += pkts_bunch_size
                 time.sleep(8)
 
                 drop_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
                 assert (drop_counters[EGRESS_DROP] == 0)
                 
-                port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port])
+                port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
                 port_pg_counter = port_counters[pg]
 
             assert(port_counters[pg] != 0)
@@ -199,23 +192,22 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             # Send the packages till ingress drop on src port
             pkts_bunch_size = 70
             # Increase the number of packets on 25% for a oversight of translating packet size to cells
-            pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.4
-            src_port_index = xoff_src_ports_id.index(str(drop_src_port_id))
-            port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[drop_src_port_id])
+            pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.3
+            port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
             ingress_counter = port_counters[INGRESS_DROP]            
             while ingress_counter == 0 and pkts_count < pkts_max:               
                 pkt = simple_tcp_packet(pktlen=default_packet_length,
                                         eth_dst=router_mac,
-                                        eth_src=xoff_src_ports_mac[src_port_index],
-                                        ip_src=xoff_src_ports_ip[src_port_index],
+                                        eth_src=src_port_mac,
+                                        ip_src=src_port_ip,
                                         ip_dst=dst_port_ip,
                                         ip_tos=tos,
-                                        ip_ttl=ttl)                
-                testutils.send_packet(self, drop_src_port_id, pkt, pkts_bunch_size)                                    
+                                        ip_ttl=ttl)
+                testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
                 pkts_count += pkts_bunch_size
                 time.sleep(8)
                 
-                port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[drop_src_port_id])
+                port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
                 ingress_counter = port_counters[INGRESS_DROP]    
                     
             assert(port_counters[EGRESS_DROP] == 0)
@@ -266,7 +258,7 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             ttl=64
             default_packet_length = 72
             # Calculate the max number of packets which port buffer can consists
-            pkts_max = max_buffer_size / default_packet_length
+            pkts_max = (max_buffer_size / default_packet_length) * 1.3
             pkts_bunch_size = 70 # Number of packages to send to DST port
             pkts_count = 0 # Total number of shipped packages
             port_pg_counter = 0

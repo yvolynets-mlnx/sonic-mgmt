@@ -78,6 +78,9 @@
         test_path: sai_qos_tests.ARPpopulate
         test_params: []
 
+    - name: Set testing buffer profile for PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_test_profile.json --write-to-db
+
     #XON limit
     - include: qos_sai_ptf.yml
       vars:
@@ -89,9 +92,9 @@
         - pg='{{ qp.xon_1.pg }}'
         - buffer_max_size='{{ lossless_buffer_max_size|int }}'
         - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+        - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
-        - src_port_ip='{{ ports_ip[src_port_id|int] }}'
+        - src_port_ip='{{ src_port_ip }}'
 
     - include: qos_sai_ptf.yml
       vars:
@@ -103,9 +106,9 @@
         - pg='{{ qp.xon_2.pg }}'
         - buffer_max_size='{{ lossless_buffer_max_size|int }}'
         - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+        - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
-        - src_port_ip='{{ ports_ip[src_port_id|int] }}'
+        - src_port_ip='{{ src_port_ip }}'
        
     #XOFF limit
     - include: qos_sai_ptf.yml
@@ -116,13 +119,13 @@
         - dscp='{{ qp.xoff_1.dscp }}'
         - ecn='{{ qp.xoff_1.ecn }}'
         - pg='{{ qp.xoff_1.pg }}'
-        - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
         - buffer_max_size='{{ lossless_buffer_max_size|int }}'
         - queue_max_size='{{ lossless_queue_max_size|int }}'
-        - drop_src_port_id='{{ src_port_id }}'
-        - xoff_src_ports_id='{{ xoff_src_ports_ptf_intf|join('@') }}'
-        - xoff_src_ports_ip='{{ xoff_src_ports_ip|join('@') }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
         
     - include: qos_sai_ptf.yml
       vars:
@@ -132,13 +135,15 @@
         - dscp='{{ qp.xoff_2.dscp }}'
         - ecn='{{ qp.xoff_2.ecn }}'
         - pg='{{ qp.xoff_2.pg }}'
-        - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
         - buffer_max_size='{{ lossless_buffer_max_size|int }}'
         - queue_max_size='{{ lossless_queue_max_size|int }}'
-        - drop_src_port_id='{{ src_port_id }}'
-        - xoff_src_ports_id='{{ xoff_src_ports_ptf_intf|join('@') }}'
-        - xoff_src_ports_ip='{{ xoff_src_ports_ip|join('@') }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - name: Restore origin buffer profile after PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
 
     #DSCP MAPPING
     - include: qos_sai_ptf.yml
@@ -147,9 +152,9 @@
         test_path: sai_qos_tests.DscpMappingPB
         test_params:
         - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+        - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
-        - src_port_ip='{{ ports_ip[src_port_id|int] }}'
+        - src_port_ip='{{ src_port_ip }}'
 
     #ECN limit
  #   - include: qos_sai_ptf.yml
@@ -235,12 +240,11 @@
         - buffer_max_size='{{ lossy_buffer_max_size|int }}'
         - headroom_size='{{ lossy_headroom_size }}'
         - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+        - dst_port_ip='{{ dst_port_ip }}'
         - dst_port_2_id='{{ dst_port_2_id }}'
-        - dst_port_2_ip='{{ ports_ip[dst_port_2_id|int] }}'
+        - dst_port_2_ip='{{ dst_port_2_ip }}'
         - src_port_id='{{ src_port_id }}'
-        - src_port_ip='{{ ports_ip[src_port_id|int] }}'
-
+        - src_port_ip='{{ src_port_ip }}'
     #WRR test
     - include: qos_sai_ptf.yml
       vars:
@@ -249,9 +253,9 @@
         test_params:
         - ecn='{{ qp.wrr.ecn }}'
         - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
+        - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
-        - src_port_ip='{{ ports_ip[src_port_id|int] }}'
+        - src_port_ip='{{ src_port_ip }}'
         - q0_num_of_pkts='{{ qp.wrr.q0_num_of_pkts }}'
         - q1_num_of_pkts='{{ qp.wrr.q1_num_of_pkts }}'
         - q3_num_of_pkts='{{ qp.wrr.q3_num_of_pkts }}'

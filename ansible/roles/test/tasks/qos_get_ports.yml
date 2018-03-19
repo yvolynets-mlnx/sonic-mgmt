@@ -4,12 +4,7 @@
       dut_switch_ports: []
       ptf_lag_interfaces: []
       dut_switch_lag_members: []
-      ports_info: []
-      ports_ip: []
-      lags_ip: []
       testing_ptf_interfaces: []
-      xoff_src_ports_ptf_intf: []
-      xoff_src_ports_ip: []
 
 - name: Getting minigraph facts
   minigraph_facts: host={{ inventory_hostname }}
@@ -42,31 +37,8 @@
   with_items: "{{ minigraph_portchannels.values() }}"  
 
 - name: Print LAG members
-  debug: msg="ptf_lag_interfaces={{ ptf_lag_interfaces }} dut_switch_lag_members={{ dut_switch_lag_members }}"
+  debug: msg="ptf_lag_interfaces={{ ptf_lag_interfaces }} dut_switch_lag_members={{ dut_switch_lag_members }}" 
   
-- name: Set LAG ip addresses
-  set_fact:
-    lags_ip: "{{ lags_ip + [ item[1]['peer_addr'] ] }}"
-  with_nested: 
-    - "{{ minigraph_portchannels.keys() }}"
-    - "{{ minigraph_portchannel_interfaces }}"
-  when:
-    - item[0] in item[1]['attachto']
-    - item[1]['peer_addr']|ipv4   
-  
-- name: Get ports info.
-  set_fact:
-    ports_info: "{{ ports_info + [item[1]] }}"
-  when: item[1]['name'] == minigraph_neighbors[item[0]]['name'] and item[1]['addr']|ipv4
-  with_nested: 
-    - "{{ dut_switch_ports }}"
-    - "{{ minigraph_bgp }}"
-    
-- name: Get IP address for ports
-  set_fact: 
-    ports_ip: "{{ ports_ip + [item['addr']] }}"
-  with_items: "{{ ports_info }}"  
-
 - name: Init testing port count
   set_fact:
     testing_ports_count: 0
@@ -92,38 +64,52 @@
   set_fact:
     src_port_id: "{{ testing_ports_id[2] }}"
 
-- name: Init SRC ports for XOFF test
+- name: Get DST port 1 IP
   set_fact:
-    xoff_src_ports_ptf_intf: []
-    xoff_src_ports_ip: []
-  
-- name: Set SRC ports ID for XOFF test
+    dst_port_ip: "{{ item['addr'] }}"
+  when: item['name'] == minigraph_neighbors[ dut_switch_ports[dst_port_id|int] ]['name'] and item['addr']|ipv4
+  with_items:
+    - "{{ minigraph_bgp }}"
+
+- name: Get DST port 2 IP
   set_fact:
-    xoff_src_ports_ptf_intf: "{{ xoff_src_ports_ptf_intf + [item] }}"
-  with_items: "{{ testing_ports_id }}"
-  when: 
-    - "item != '31'" # The last port is user for the feedback from DUT switch 
-    - "item|int != dst_port_id|int"
-    
-- name: Set SRC ports IP addresses for XOFF test
+    dst_port_2_ip: "{{ item['addr'] }}"
+  when: item['name'] == minigraph_neighbors[ dut_switch_ports[dst_port_2_id|int] ]['name'] and item['addr']|ipv4
+  with_items:
+    - "{{ minigraph_bgp }}"
+
+- name: Get SRC port IP
   set_fact:
-    xoff_src_ports_ip: "{{ xoff_src_ports_ip + [ports_ip[item|int]] }}"
-  with_items: "{{ xoff_src_ports_ptf_intf }}"
-    
+    src_port_ip: "{{ item['addr'] }}"
+  when: item['name'] == minigraph_neighbors[ dut_switch_ports[src_port_id|int] ]['name'] and item['addr']|ipv4
+  with_items:
+    - "{{ minigraph_bgp }}"
+
+# Get buffers size
 - include: roles/test/tasks/qos_get_max_buff_size.yml
   vars:
     target_table: 'BUFFER_PG'
-    target_port_name: "{{ dut_switch_ports[dst_port_id|int] }}"
+    target_port_name: "{{ dut_switch_ports[src_port_id|int] }}"
     target_pg: '3-4'
-    
+
 - name: Set lossless MAX buffer size
   set_fact:
-    lossless_buffer_max_size: "{{ buffer_headroom.stdout|int + buffer_pool_size.stdout|int }}"
+    lossless_buffer_max_size: "{{ buffer_headroom.stdout|int }}"
+
+- name: Store current buffer profile
+  template: src=qos_pfc_profile.j2 dest=/tmp/pfc_lossless_base_profile.json
+  vars:
+    - pfc_generate_buffer_profile: 'False'
+
+- name: Generate testing buffer profile
+  template: src=qos_pfc_profile.j2 dest=/tmp/pfc_lossless_test_profile.json
+  vars:
+    - pfc_generate_buffer_profile: 'True'
     
 - include: roles/test/tasks/qos_get_max_buff_size.yml
   vars:
     target_table: 'BUFFER_PG'
-    target_port_name: "{{ dut_switch_ports[dst_port_id|int] }}"
+    target_port_name: "***{{ dut_switch_ports[dst_port_id|int] }}***"
     target_pg: '0-1'
     
 - name: Set lossy MAX buffer size
@@ -137,14 +123,12 @@
 - include: roles/test/tasks/qos_get_max_buff_size.yml
   vars:
     target_table: 'BUFFER_QUEUE'
-    target_port_name: "{{ dut_switch_ports[src_port_id|int] }}"
+    target_port_name: "***{{ dut_switch_ports[src_port_id|int] }}***"
     target_pg: '3-4'
     
 - name: Set MAX queue size for {{ dut_switch_ports[src_port_id|int] }}
   set_fact:
     lossless_queue_max_size: "{{ buffer_max_size }}"
-
-# !Uncomment below for ECN tests
 
 - name: Get the WRED profile key for "{{ dut_switch_ports[dst_port_id|int] }}"
   shell: docker exec database redis-cli -n 4 KEYS "QUEUE|*{{ dut_switch_ports[dst_port_id|int] }}*|0-1"
