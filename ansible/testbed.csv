@@ -13,6 +13,7 @@ arc-switch1041-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.224.34.237/24,server_3,VM0
 arc-switch1041-t0,vm-t1,t0,docker-ptf-mlnx,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
 arc-switch1029-t0,vm-t1,t0,docker-ptf-mlnx,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
 arc-switch1029-t1,vm-t1,t1,docker-ptf-mlnx,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
+arc-switch1029-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
 arc-mtbc-1001-t0,vm-t1,t0,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1,vm-t1,t1,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1-lag,vm-t1,t1-lag,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
