@@ -19,6 +19,12 @@ no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind
 interface ethernet {{ ifindex }} module-type qsfp-split-4 force
 {% endfor %}
 
+{% for i in range(1, eth_ports|length) %}
+interface ethernet {{ eth_ports[i] }} shutdown
+interface ethernet {{ eth_ports[i] }} mtu 9216
+interface ethernet {{ eth_ports[i] }} no shutdown
+{% endfor %}
+
 interface ethernet 1/32 switchport mode trunk
 
 vlan 101-132

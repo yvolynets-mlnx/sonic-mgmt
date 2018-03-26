@@ -19,6 +19,12 @@ interface ethernet {{ eth_ports[i] }} speed 40000 force
 interface ethernet 1/31/1 speed 50000 force
 interface ethernet 1/31/2 speed 50000 force
 
+{% for i in range(1, eth_ports|length) %}
+interface ethernet {{ eth_ports[i] }} shutdown
+interface ethernet {{ eth_ports[i] }} mtu 9216
+interface ethernet {{ eth_ports[i] }} no shutdown
+{% endfor %}
+
 interface ethernet 1/32 switchport mode trunk
 
 vlan 101-132
