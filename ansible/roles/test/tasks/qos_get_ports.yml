@@ -96,12 +96,12 @@
   set_fact:
     lossless_buffer_max_size: "{{ buffer_headroom.stdout|int }}"
 
-- name: Store current buffer profile
+- name: Store current lossless buffer profile
   template: src=qos_pfc_profile.j2 dest=/tmp/pfc_lossless_base_profile.json
   vars:
     - pfc_generate_buffer_profile: 'False'
 
-- name: Generate testing buffer profile
+- name: Generate testing lossless buffer profile
   template: src=qos_pfc_profile.j2 dest=/tmp/pfc_lossless_test_profile.json
   vars:
     - pfc_generate_buffer_profile: 'True'
@@ -109,7 +109,7 @@
 - include: roles/test/tasks/qos_get_max_buff_size.yml
   vars:
     target_table: 'BUFFER_PG'
-    target_port_name: "***{{ dut_switch_ports[dst_port_id|int] }}***"
+    target_port_name: "***{{ dut_switch_ports[src_port_id|int] }}***"
     target_pg: '0-1'
     
 - name: Set lossy MAX buffer size
@@ -119,6 +119,16 @@
 - name: Set lossy headroom size
   set_fact:
     lossy_headroom_size: "{{ buffer_headroom.stdout|int }}"
+
+- name: Store current lossless buffer profile
+  template: src=qos_lossy_profile.j2 dest=/tmp/pfc_lossy_base_profile.json
+  vars:
+    - pfc_generate_buffer_profile: 'False'
+
+- name: Generate testing lossless buffer profile
+  template: src=qos_lossy_profile.j2 dest=/tmp/pfc_lossy_test_profile.json
+  vars:
+    - pfc_generate_buffer_profile: 'True'
     
 - include: roles/test/tasks/qos_get_max_buff_size.yml
   vars:

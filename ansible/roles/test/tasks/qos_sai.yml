@@ -228,7 +228,10 @@
  #       - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
  #       - src_port_id='{{ src_port_id }}'
  #       - src_port_ip='{{ ports_ip[src_port_id|int] }}'
-        
+
+    - name: Set testing buffer profile for lossy test
+      shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
+
     #Lossy queue
     - include: qos_sai_ptf.yml
       vars:
@@ -245,6 +248,10 @@
         - dst_port_2_ip='{{ dst_port_2_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
+
+    - name: Restore origin buffer profile after lossy tests
+      shell: sonic-cfggen -j /tmp/pfc_lossy_base_profile.json --write-to-db
+
     #WRR test
     - include: qos_sai_ptf.yml
       vars:
@@ -282,6 +289,12 @@
       vars:
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i bgp python
+
+    - name: Restore origin buffer profile after PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
+
+    - name: Restore origin buffer profile after lossy tests
+      shell: sonic-cfggen -j /tmp/pfc_lossy_base_profile.json --write-to-db
 
     - meta: flush_handlers
 
