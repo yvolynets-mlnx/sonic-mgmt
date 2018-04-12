@@ -198,7 +198,7 @@ function deploy
     # Set topology on server side
     reset_topo ${switch} ${switch}-${topo} veos  >/tmp/${switch}-${topo}.reset_topo.log  &
 
-    ANSIBLE_SCP_IF_SSH=y ansible-playbook  -i inventory --limit ${switch}-${topo} update_sonic.yml --tags update -b -vvvvv -e "image_url=${image_url}" -e "dut_minigraph=${switch}-${topo}.xml" -e topo="${topo}"
+    ANSIBLE_SCP_IF_SSH=y ansible-playbook  -i inventory --limit ${switch}-${topo} update_sonic.yml --tags update -b -vvvvv -e "image_url=${image_url}" -e "dut_minigraph=${switch}.${topo}.xml" -e topo="${topo}"
 
     echo "Deploy finished. Waiting for topology change."
     wait ${!}
