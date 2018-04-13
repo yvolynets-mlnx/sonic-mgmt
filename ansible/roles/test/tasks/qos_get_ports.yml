@@ -8,7 +8,6 @@
 
 - name: Getting minigraph facts
   minigraph_facts: host={{ inventory_hostname }}
-  connection: local
   become: no
       
 - name: Get PTF interfaces from map
@@ -120,12 +119,12 @@
   set_fact:
     lossy_headroom_size: "{{ buffer_headroom.stdout|int }}"
 
-- name: Store current lossless buffer profile
+- name: Store current lossy buffer profile
   template: src=qos_lossy_profile.j2 dest=/tmp/pfc_lossy_base_profile.json
   vars:
     - pfc_generate_buffer_profile: 'False'
 
-- name: Generate testing lossless buffer profile
+- name: Generate testing lossy buffer profile
   template: src=qos_lossy_profile.j2 dest=/tmp/pfc_lossy_test_profile.json
   vars:
     - pfc_generate_buffer_profile: 'True'

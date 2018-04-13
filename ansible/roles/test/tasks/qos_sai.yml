@@ -9,7 +9,6 @@
 - block:
     - name: Getting minigraph facts
       minigraph_facts: host={{ inventory_hostname }}
-      connection: local
       become: no
 
     - name: check if the device has configured qos parameters
