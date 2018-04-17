@@ -6,12 +6,12 @@ arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-M
 arc-switch1027  ansible_host=arc-switch1027  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7030 10.224.2.81"
 arc-switch1028  ansible_host=arc-switch1028  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7021 10.224.2.81" ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
-# MTR testbed arc-switch1026 topologies
-arc-switch1026  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81"
-arc-switch1026-t0  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81" ptf_host=ptf-fib rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-arc-switch1026-t0-64-32  ansible_host=arc-switch1026  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7031 10.224.2.81" rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-arc-switch1026-t1  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
-arc-switch1026-t1-lag  ansible_host=arc-switch1026 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7031 10.224.2.81"
+# MTR testbed arc-switch1038 topologies
+arc-switch1038  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7001 10.224.2.81"
+arc-switch1038-t0  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7001 10.224.2.81" ptf_host=ptf-fib rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1038-t0-64-32  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7001 10.224.2.81" rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1038-t1  ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
+arc-switch1038-t1-lag  ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
 
 # MTR testbed arc-switch1041 topologies
 arc-switch1041 ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81"
@@ -45,12 +45,12 @@ arc-switchmtbc01 ansible_host=arc-switchmtbc01 ansible_ssh_user=admin ansible_ss
 sonic_latest
 
 [leaf_topo_1]
-# MTR arc-switch1026 topologies
-arc-switch1026
-arc-switch1026-t0
-arc-switch1026-t0-64-32 
-arc-switch1026-t1
-arc-switch1026-t1-lag
+# MTR arc-switch1038 topologies
+arc-switch1038
+arc-switch1038-t0
+arc-switch1038-t0-64-32
+arc-switch1038-t1
+arc-switch1038-t1-lag
 
 # MTR arc-switch1041 topologies
 arc-switch1041
@@ -77,12 +77,12 @@ arc-mtbc-1001-t1
 arc-mtbc-1001-t1-lag
 
 [lab]
-# MTR arc-switch1026 topologies
-arc-switch1026
-arc-switch1026-t0
-arc-switch1026-t0-64-32 
-arc-switch1026-t1
-arc-switch1026-t1-lag
+# MTR arc-switch1038 topologies
+arc-switch1038
+arc-switch1038-t0
+arc-switch1038-t0-64-32
+arc-switch1038-t1
+arc-switch1038-t1-lag
 
 # MTR arc-switch1029 topologies
 arc-switch1029
@@ -113,7 +113,7 @@ podset_number=200
 
 
 [ptf]
-# MTR arc-switch1026 PTF host
+# MTR arc-switch1038 PTF host
 ptf-fib ansible_host=10.224.23.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTS mts-sai-test-sw-1-t1 PTF host
 mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
