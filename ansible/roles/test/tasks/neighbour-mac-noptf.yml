@@ -160,3 +160,7 @@
         name:  swss
         state: restarted
       become: yes
+
+    - name: pause and wait for the interfaces to restore
+      pause: seconds=60
+
