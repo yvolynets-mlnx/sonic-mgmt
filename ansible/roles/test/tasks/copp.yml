@@ -43,7 +43,7 @@
         - ARPTest
         - DHCPTest
         - LLDPTest
-        - BGPTest
+#        - BGPTest   Disabling temporarily
         - LACPTest
         - SNMPTest
         - SSHTest
