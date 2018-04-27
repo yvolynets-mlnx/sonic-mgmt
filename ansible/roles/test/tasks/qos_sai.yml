@@ -42,6 +42,7 @@
 
     - name: Disable Mellanox packet aging
       script: roles/test/files/mlnx/disable_packet_aging.sh
+      become: yes
       when: minigraph_hwsku is defined and (minigraph_hwsku == 'ACS-MSN2700' or minigraph_hwsku == 'ACS-MSN2740')
 
     - name: copy sai tests
