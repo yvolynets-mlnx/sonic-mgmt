@@ -40,9 +40,16 @@
 
     - meta: flush_handlers
 
-    - name: Disable Mellanox packet aging
-      script: roles/test/files/mlnx/disable_packet_aging.sh
-      become: yes
+    - block:
+        - name: Deploy script to DUT/syncd
+          template: src=roles/test/files/mlnx/packets_aging.py dest=/root/packets_aging.py
+
+        - name: Disable Mellanox packet aging
+          shell: python /root/packets_aging.py disable
+
+      vars:
+        ansible_shell_type: docker
+        ansible_python_interpreter: docker exec -i syncd python
       when: minigraph_hwsku is defined and (minigraph_hwsku == 'ACS-MSN2700' or minigraph_hwsku == 'ACS-MSN2740')
 
     - name: copy sai tests
@@ -295,6 +302,16 @@
 
     - name: Restore origin buffer profile after lossy tests
       shell: sonic-cfggen -j /tmp/pfc_lossy_base_profile.json --write-to-db
+
+    - name: Remove extra record for lossy pg profile
+      shell: redis-cli -n 4 del 'BUFFER_PG|{{dut_switch_ports[src_port_id|int]}}|0-1'
+
+    - name: Disable Mellanox packet aging
+      shell: python /root/packets_aging.py enable
+      vars:
+        ansible_shell_type: docker
+        ansible_python_interpreter: docker exec -i syncd python
+      when: minigraph_hwsku is defined and (minigraph_hwsku == 'ACS-MSN2700' or minigraph_hwsku == 'ACS-MSN2740')
 
     - meta: flush_handlers
 
