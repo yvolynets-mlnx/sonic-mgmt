@@ -13,10 +13,10 @@
 
     - name: check if the device has configured qos parameters
       fail: msg="device doesn't have configured qos parameters"
-      when: minigraph_hwsku is not defined or qos_params[minigraph_hwsku] is not defined
+      when: sonic_hwsku is not defined or qos_params[sonic_hwsku] is not defined
 
     - name: set qos parameters for the device
-      set_fact: qp={{ qos_params[minigraph_hwsku] }}
+      set_fact: qp={{ qos_params[sonic_hwsku] }}
 
     - name: Ensure LLDP Daemon stopped
       become: yes
@@ -50,7 +50,7 @@
       vars:
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i syncd python
-      when: minigraph_hwsku is defined and (minigraph_hwsku == 'ACS-MSN2700' or minigraph_hwsku == 'ACS-MSN2740')
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
 
     - name: copy sai tests
       copy: src=roles/test/files/saitests dest=/root
@@ -59,7 +59,7 @@
     - name: copy portmap
       copy: src={{ ptf_portmap }} dest=/root
       delegate_to: "{{ ptf_host }}"
-      when: minigraph_hwsku is defined and (minigraph_hwsku == 'ACS-MSN2700' or minigraph_hwsku == 'ACS-MSN2740')
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
 
     - name: Init PTF base test parameters
       set_fact: 
@@ -299,19 +299,23 @@
 
     - name: Restore origin buffer profile after PFC tests
       shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
+      ignore_errors: yes
 
     - name: Restore origin buffer profile after lossy tests
       shell: sonic-cfggen -j /tmp/pfc_lossy_base_profile.json --write-to-db
+      ignore_errors: yes
 
     - name: Remove extra record for lossy pg profile
       shell: redis-cli -n 4 del 'BUFFER_PG|{{dut_switch_ports[src_port_id|int]}}|0-1'
+      ignore_errors: yes
 
     - name: Disable Mellanox packet aging
       shell: python /root/packets_aging.py enable
+      ignore_errors: yes
       vars:
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i syncd python
-      when: minigraph_hwsku is defined and (minigraph_hwsku == 'ACS-MSN2700' or minigraph_hwsku == 'ACS-MSN2740')
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
 
     - meta: flush_handlers
 
