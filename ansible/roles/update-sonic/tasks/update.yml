@@ -60,10 +60,10 @@
       when: ansible_ssh_host != 'arc-mtbc-1001'
 
     - name: Reload minigraph.
-      shell: yes | config load_minigraph
+      shell: config load_minigraph -y
 
     - name: Save config.
-      shell: yes | config save
+      shell: config save -y
 
 #    - name: Restore firsttime
 #      shell: 'touch /host/image-$(cat /etc/sonic/sonic_version.yml | grep build_version | cut -f2 -d" ")/platform/firsttime'
