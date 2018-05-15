@@ -125,6 +125,7 @@ class BgpModule(object):
                     message_stats = {}
                     n = "BGP neighbor is" + n
                     lines = n.splitlines()
+                    neighbor['admin'] = 'up'
                     neighbor['accepted prefixes'] = 0
 
                     for line in lines:
