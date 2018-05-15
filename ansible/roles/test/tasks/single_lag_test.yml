@@ -74,7 +74,7 @@
   connection: switch
 
 - pause: 
-    seconds: 5
+    seconds: 20
  
 - name: test lacp packet sending rate is 1 seconds
   include: lag_lacp_timing_test.yml
@@ -91,10 +91,13 @@
   connection: switch
 
 - pause: 
-    seconds: 5
+    seconds: 20
  
 - name: test lacp packet sending rate is 30 seconds
   include: lag_lacp_timing_test.yml
   vars: 
     vm_name: "{{ peer_device }}"
     lacp_timer: 30
+
+- pause: 
+    seconds: 20
