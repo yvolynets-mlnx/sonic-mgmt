@@ -62,7 +62,3 @@
 - name: test each lag interface minimum links and rate 
   include: single_lag_test.yml
   with_items: lag_facts.names
-
-# sometimes the portchannel on switch does not come up in time for the post-check
-- pause:
-    seconds: 5
