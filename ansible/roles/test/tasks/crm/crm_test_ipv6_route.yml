@@ -10,12 +10,17 @@
       register: out
     - set_fact: crm_stats_ipv6_route_available={{out.stdout}}
 
+    - name: Get NH IP
+      command: ip -6 neigh show dev {{crm_intf}}
+      register: out
+    - set_fact: nh_ip="{{out.stdout.split()[0]}}"
+
     - name: Add IPv6 route
-      command: ip -6 route add 2001::/126 via fc00::72
+      command: ip -6 route add 2001::/126 via {{nh_ip}}
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds=1
+      pause: seconds=2
 
     - name: Get new "crm_stats_ipv6_route_used" counter value
       command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv6_route_used
@@ -34,11 +39,11 @@
       assert: {that: "{{crm_stats_ipv6_route_available|int - new_crm_stats_ipv6_route_available|int == 1}}"}
 
     - name: Remove IPv6 route
-      command: ip -6 route del 2001::/126 via fc00::72
+      command: ip -6 route del 2001::/126 via {{nh_ip}}
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds=1
+      pause: seconds=2
 
     - name: Get new "crm_stats_ipv6_route_used" counter value
       command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv6_route_used
