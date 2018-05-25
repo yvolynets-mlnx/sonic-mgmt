@@ -59,6 +59,14 @@
       command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
       when: ansible_ssh_host != 'arc-mtbc-1001'
 
+    - name: Wait for fw update to finish
+      command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
+      register: output
+      until: output.rc == 0
+      retries: 12
+      delay: 10
+      ignore_errors: true
+
     - name: Reload minigraph.
       shell: config load_minigraph -y
 
