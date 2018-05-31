@@ -13,13 +13,16 @@ ARC-HOST62 ansible_host=arc-host62
 [vm_host_5]
 DEV-R730-01 ansible_host=dev-r730-01
 
+[vm_host_6]
+ARC-HOST121 ansible_host=arc-host121
+
 [vm_host:children]
 vm_host_1
 vm_host_2
 vm_host_3
 vm_host_4
 vm_host_5
-
+vm_host_6
 
 [vms_1]
 VM0101 ansible_host=10.224.23.180
@@ -191,12 +194,47 @@ VM0530 ansible_host=10.12.206.210
 VM0531 ansible_host=10.12.206.211
 VM0532 ansible_host=10.12.206.212
 
+[vms_6]
+VM0601 ansible_host=10.224.34.43
+VM0602 ansible_host=10.224.34.44
+VM0603 ansible_host=10.224.34.45
+VM0604 ansible_host=10.224.34.46
+VM0605 ansible_host=10.224.34.47
+VM0606 ansible_host=10.224.34.48
+VM0607 ansible_host=10.224.34.49
+VM0608 ansible_host=10.224.34.50
+VM0609 ansible_host=10.224.34.51
+VM0610 ansible_host=10.224.34.52
+VM0611 ansible_host=10.224.34.53
+VM0612 ansible_host=10.224.34.57
+VM0613 ansible_host=10.224.34.60
+VM0614 ansible_host=10.224.34.61
+VM0615 ansible_host=10.224.34.62
+VM0616 ansible_host=10.224.34.63
+VM0617 ansible_host=10.224.34.64
+VM0618 ansible_host=10.224.34.65
+VM0619 ansible_host=10.224.34.66
+VM0620 ansible_host=10.224.34.67
+VM0621 ansible_host=10.224.34.68
+VM0622 ansible_host=10.224.34.69
+VM0623 ansible_host=10.224.34.70
+VM0624 ansible_host=10.224.34.71
+VM0625 ansible_host=10.224.34.72
+VM0626 ansible_host=10.224.34.73
+VM0627 ansible_host=10.224.34.74
+VM0628 ansible_host=10.224.34.75
+VM0629 ansible_host=10.224.34.76
+VM0630 ansible_host=10.224.34.77
+VM0631 ansible_host=10.224.34.78
+VM0632 ansible_host=10.224.34.79
+
 [eos:children]
 vms_1
 vms_2
 vms_3
 vms_4
 vms_5
+vms_6
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -234,12 +272,20 @@ vms_5
 [server_5:vars]
 host_var_file=host_vars/DEV-R730-01.yml
 
+[server_6:children]
+vm_host_6
+vms_6
+
+[server_6:vars]
+host_var_file=host_vars/ARC-HOST121.yml
+
 [servers:children]
 server_1
 server_2
 server_3
 server_4
 server_5
+server_6
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't0', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']

@@ -78,12 +78,32 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout arc-switch1035
+    action: apswitch template=mlnx_os_sw1035.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switch1035'
+    tags: deploy
+
+- block:
+  - debug: msg={{ inventory_hostname }}
   - name: build fanout startup config for fanout arc-switch1003
     action: apswitch template=mlnx_os_sw1003.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switch1003'
+    tags: deploy
+
+- block:
+  - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout sonic-fanout (MTS)
+    action: apswitch template=mlnx_os_mts_sonic-fanout.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'sonic-fanout'
     tags: deploy
 
  ###################################################################
@@ -122,12 +142,32 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
+  - name: build special vlan trunk test config for fanout arc-switch1035
+    action: apswitch template=vlan_sw1035.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switch1035'
+    tags: vlan_trunk
+
+- block:
+  - debug: msg={{ inventory_hostname }}
   - name: build special vlan trunk test config for fanout arc-switch1003
     action: apswitch template=vlan_sw1003.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switch1003'
+    tags: vlan_trunk
+
+- block:
+  - debug: msg={{ inventory_hostname }}
+  - name: build special vlan trunk test config for fanout sonic-fanout
+    action: apswitch template=vlan_mts_sonic-fanout.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'sonic-fanout'
     tags: vlan_trunk
 
  #############################################################
@@ -166,6 +206,16 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
+  - name: remove special vlan trunk test config for fanout arc-switch1035
+    action: apswitch template=vlan_del_sw1035.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switch1035'
+    tags: del_vlan_trunk
+
+- block:
+  - debug: msg={{ inventory_hostname }}
   - name: remove special vlan trunk test config for fanout arc-switch1003
     action: apswitch template=vlan_del_sw1003.j2
     connection: switch
@@ -174,14 +224,24 @@
     when: inventory_hostname == 'arc-switch1003'
     tags: del_vlan_trunk
 
-- set_fact: os='eos'
-  when: os is not defined
+- block:
+  - debug: msg={{ inventory_hostname }}
+  - name: remove special vlan trunk test config for fanout sonic-fanout (MTS)
+    action: apswitch template=vlan_del_mts_sonic-fanout.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'sonic-fanout'
+    tags: del_vlan_trunk
 
-- include: fanout_eos.yml
-  when: os == 'eos'
+#- set_fact: os='eos'
+#  when: os is not defined
 
-- include: fanout_sonic.yml
-  when: os == 'sonic'
+#- include: fanout_eos.yml
+#  when: os == 'eos'
+
+#- include: fanout_sonic.yml
+#  when: os == 'sonic'
 
 #- block:
 #  - set_fact:

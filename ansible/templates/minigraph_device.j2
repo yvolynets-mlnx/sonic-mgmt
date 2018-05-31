@@ -26,7 +26,7 @@
     {%- if  port_speed[index] != ""  %}
           <Speed>{{ port_speed[index] }}</Speed>
     {%- else %}
-        {%- if (inventory_hostname == "arc-switch1038" or inventory_hostname == "arc-switch1041") and index >= 30 %}
+        {%- if (inventory_hostname == "arc-switch1038" or inventory_hostname == "arc-switch1041" or inventory_hostname == "arc-switch1025" or inventory_hostname == "mts-sonic-dut") and index >= 30 %}
           <Speed>50000</Speed>
         {%- else %}
           <Speed>{{ iface_speed }}</Speed>
