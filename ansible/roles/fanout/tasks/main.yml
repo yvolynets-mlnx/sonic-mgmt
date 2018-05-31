@@ -1,9 +1,9 @@
 ##############################################################################################
-### playbook to deploy the fanout swtich 
+### playbook to deploy the fanout swtich
 ### Use this playbook to deploy the VLAN configurations of fanout leaf switch in SONiC testbed
 ### This playbook will run based on hardware flatform. Each fanout switch hardware type has its
 ### own unique feature and configuration command or format. Unless you use the hardware swtich
-### specified in this playbook, you would need to come up with your own fanout switch deployment 
+### specified in this playbook, you would need to come up with your own fanout switch deployment
 ### playbook
 ################################################################################################
   # Gather minigraph facts
@@ -15,18 +15,18 @@
 - name: prepare fanout switch admin login info
   set_fact: ansible_ssh_user={{ fanout_admin_user }} ansible_ssh_pass={{ fanout_admin_password }}
   tags: always
-  
+
  ##########################################################
  # deploy tasks to deploy default configuration on fanout #
  ##########################################################
- 
+
 - block:
   - name: build fanout startup config for Arista Fanout leaf
     template: src=arista_7260_deploy.j2
               dest=/mnt/flash/startup-config
     notify:
       - Restart the box
-  when: device_info.HwSku == "Arista-7260QX-64" 
+  when: device_info.HwSku == "Arista-7260QX-64"
   tags: deploy
 
 - name: build fanout startup config
@@ -51,7 +51,7 @@
   - name: build fanout startup config for fanout arc-switchmtbc01
     action: apswitch template=mlnx_os_swmtbc01.j2
     connection: switch
-    args: 
+    args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switchmtbc01'
     tags: deploy
@@ -61,7 +61,7 @@
   - name: build fanout startup config for fanout arc-switch1039
     action: apswitch template=mlnx_os_sw1039.j2
     connection: switch
-    args: 
+    args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switch1039'
     tags: deploy
@@ -89,13 +89,13 @@
  ###################################################################
  # vlan_trunk task to apply special config for the vlan trunk test #
  ###################################################################
- 
+
 - block:
   - debug: msg={{ inventory_hostname }}
   - name: build special vlan trunk test config for fanout arc-switchmtbc01
     action: apswitch template=vlan_swmtbc01.j2
     connection: switch
-    args: 
+    args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switchmtbc01'
     tags: vlan_trunk
@@ -105,7 +105,7 @@
   - name: build special vlan trunk test config for fanout arc-switch1039
     action: apswitch template=vlan_sw1039.j2
     connection: switch
-    args: 
+    args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switch1039'
     tags: vlan_trunk
@@ -129,17 +129,17 @@
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switch1003'
     tags: vlan_trunk
-    
+
  #############################################################
  # del_vlan_trunk task to del vlan trunk test special config #
  #############################################################
- 
+
 - block:
   - debug: msg={{ inventory_hostname }}
   - name: remove special vlan trunk test config for fanout arc-switchmtbc01
     action: apswitch template=vlan_del_swmtbc01.j2
     connection: switch
-    args: 
+    args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switchmtbc01'
     tags: del_vlan_trunk
@@ -149,7 +149,7 @@
   - name: remove special vlan trunk test config for fanout arc-switch1039
     action: apswitch template=vlan_del_sw1039.j2
     connection: switch
-    args: 
+    args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switch1039'
     tags: del_vlan_trunk
