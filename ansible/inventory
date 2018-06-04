@@ -139,7 +139,7 @@ podset_number=200
 # MTR arc-switch1038 PTF host
 ptf-fib ansible_host=10.224.23.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1025 PTF host
-ptf-fib ansible_host=10.224.34.80 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-1025 ansible_host=10.224.34.80 ansible_ssh_user=root ansible_ssh_pass=root
 # MTS mts-sonic-dut-t1 PTF host
 mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1041 PTF host
