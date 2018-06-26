@@ -22,7 +22,7 @@
   local_action: file path={{ filename }} state=absent
 
 - name: Update SONiC image.
-  command: sh {{ filename }}
+  command: sonic_installer install {{ filename }} -y
   register: update_output
   ignore_errors: yes
 
