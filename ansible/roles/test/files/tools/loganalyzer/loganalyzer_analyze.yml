@@ -39,6 +39,7 @@
   until: output.rc == 1
   retries: 12
   delay: 10
+  ignore_errors: yes
 
 - name: Extract all syslog entries since the latest start marker
   extract_log:
