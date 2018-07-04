@@ -34,7 +34,7 @@
   become: yes
 
 - name: Wait for logrotate from previous job to finish
-  command: bash -c 'ps aux | grep "logrotate"'
+  command: pgrep -f logrotate
   register: output
   until: output.rc == 1
   retries: 12
