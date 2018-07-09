@@ -1,30 +1,30 @@
 # conf-name,group-name,topo,ptf_image_name,ptf_ip,server,vm_base,dut,comment
-arc-switch1038-t1,vm-t1,t1,docker-ptf-mlnx,10.224.23.237/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
-arc-switch1038-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.224.23.237/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
-arc-switch1038-t0-64-32,vm-t1,t0-64-32,docker-ptf-mlnx,10.224.23.237/24,server_1,,arc-switch1038,Mellanox MTR testbed
-arc-switch1038-t0,vm-t1,t0,docker-ptf-mlnx,10.224.23.237/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
-arc-switch1038-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.224.23.237/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
+arc-switch1038-t1,vm-t1,t1,docker-ptf-mlnx,10.213.84.41/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
+arc-switch1038-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.84.41/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
+arc-switch1038-t0-64-32,vm-t1,t0-64-32,docker-ptf-mlnx,10.213.84.41/24,server_1,,arc-switch1038,Mellanox MTR testbed
+arc-switch1038-t0,vm-t1,t0,docker-ptf-mlnx,10.213.84.41/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
+arc-switch1038-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.84.41/24,server_1,VM0101,arc-switch1038,Mellanox MTR testbed
 mts-sonic-dut-t1,vm-t1,t1,docker-ptf-mlnx,10.12.78.237/24,server_2,VM0201,mts-sonic-dut,Mellanox MTS testbed
-arc-switch1041-t1,vm-t1,t1,docker-ptf-mlnx,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
-arc-switch1041-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
-arc-switch1041-t0,vm-t1,t0,docker-ptf-mlnx,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
-arc-switch1029-t0,vm-t1,t0,docker-ptf-mlnx,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
-arc-switch1029-t1,vm-t1,t1,docker-ptf-mlnx,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
-arc-switch1029-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
+arc-switch1041-t1,vm-t1,t1,docker-ptf-mlnx,10.213.86.92/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
+arc-switch1041-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.86.92/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
+arc-switch1041-t0,vm-t1,t0,docker-ptf-mlnx,10.213.86.92/24,server_3,VM0301,arc-switch1041,Mellanox MTS testbed
+arc-switch1029-t0,vm-t1,t0,docker-ptf-mlnx,10.213.84.97/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
+arc-switch1029-t1,vm-t1,t1,docker-ptf-mlnx,10.213.84.97/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
+arc-switch1029-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.84.97/24,server_4,VM0401,arc-switch1029,Mellanox MTS testbed
 arc-mtbc-1001-t0,vm-t1,t0,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1,vm-t1,t1,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1-lag,vm-t1,t1-lag,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-ptf32,vm-t1,ptf32,docker-ptf,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
-arc-switch1025-t1,vm-t1,t1,docker-ptf-mlnx,10.224.34.80/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
-arc-switch1025-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.224.34.80/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
-arc-switch1025-t0-64-32,vm-t1,t0-64-32,docker-ptf-mlnx,10.224.34.80/24,server_6,,arc-switch1025,Mellanox MTR testbed
-arc-switch1025-t0,vm-t1,t0,docker-ptf-mlnx,10.224.34.80/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
-arc-switch1025-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.224.34.80/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
-ptf1,ptf1,ptf32,docker-ptf,10.224.23.237/24,server_1,,arc-switch1038,Tests ptf
-arc-switch1029-fastreboot,ptf-1029,t0,vm-t1,10.224.34.166/24,server_4,VM0401,arc-switch1029,Mellanox testbed
-arc-switch1041-fastreboot,ptf-1041,t0,vm-t1,10.224.34.237/24,server_3,VM0301,arc-switch1041,Mellanox testbed
-arc-switch1038-fastreboot,ptf-1038,t0,vm-t1,10.224.23.237/24,server_1,VM0101,arc-switch1038,Mellanox testbed
-arc-switch1025-fastreboot,ptf-1025,t0,vm-t1,10.224.34.80/24,server_6,VM0601,arc-switch1025,Mellanox testbed
+arc-switch1025-t1,vm-t1,t1,docker-ptf-mlnx,10.213.84.213/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
+arc-switch1025-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.84.213/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
+arc-switch1025-t0-64-32,vm-t1,t0-64-32,docker-ptf-mlnx,10.213.84.213/24,server_6,,arc-switch1025,Mellanox MTR testbed
+arc-switch1025-t0,vm-t1,t0,docker-ptf-mlnx,10.213.84.213/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
+arc-switch1025-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.84.213/24,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
+ptf1,ptf1,ptf32,docker-ptf,10.213.84.41/24,server_1,,arc-switch1038,Tests ptf
+arc-switch1029-fastreboot,ptf-1029,t0,vm-t1,10.213.84.97/24,server_4,VM0401,arc-switch1029,Mellanox testbed
+arc-switch1041-fastreboot,ptf-1041,t0,vm-t1,10.213.86.92/24,server_3,VM0301,arc-switch1041,Mellanox testbed
+arc-switch1038-fastreboot,ptf-1038,t0,vm-t1,10.213.84.41/24,server_1,VM0101,arc-switch1038,Mellanox testbed
+arc-switch1025-fastreboot,ptf-1025,t0,vm-t1,10.213.84.213/24,server_6,VM0601,arc-switch1025,Mellanox testbed
 
 ptf1-m,ptf1,ptf32,docker-ptf-sai-mlnx,10.255.0.188/24,server_1,,str-msn2700-01,Test ptf Mellanox
 ptf2-b,ptf2,ptf64,docker-ptf-sai-brcm,10.255.0.189/24,server_1,,lab-s6100-01,Test ptf Broadcom

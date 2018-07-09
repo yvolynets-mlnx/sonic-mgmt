@@ -31,15 +31,6 @@
     - update_output.rc != 0
     - "'Running SONiC has the same version' not in update_output.stdout"
 
-- name: Workaround. Remove old config to avoid issue with invalid default gateway.
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /host/old_config
-    - /etc/sonic/old_config
-  become: yes
-
 - block:
     - name: Reboot device.
       command: /sbin/shutdown -r
@@ -63,10 +54,6 @@
         src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
       when: sonic_hwsku == 'ACS-MSN2100'
-
-    - name: Change default GW address.
-      command: "sed -i \"s/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 1)/gwaddr = ipaddress.IPAddress(int(mgmtipn.network) + 254)/\" /usr/local/lib/python2.7/dist-packages/minigraph.py"
-      when: ansible_ssh_host != 'arc-mtbc-1001'
 
     - name: Wait for fw update to finish
       command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
