@@ -143,9 +143,9 @@ ptf-1025 ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
 # MTS mts-sonic-dut-t1 PTF host
 mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1041 PTF host
-ptf-1041 ansible_host=10.213.86.92 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-1041 ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1029 PTF host
-ptf-1029 ansible_host=10.213.84.97 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-1029 ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR dev setup PTF host
 ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=12345
 # MTBC arc-mtbc-1001 PTF host
