@@ -3,8 +3,8 @@ str-msn2700-01,10.251.0.188/23,Mellanox-2700,DevSonic
 str-7260-10,10.251.0.13/23,Arista-7260QX-64,FanoutLeaf
 str-7260-11,10.251.0.234/23,Arista-7260QX-64,FanoutRoot
 str-acs-serv-01,10.251.0.245/23,TestServ,Server
-arc-switch1003,10.224.34.166/24,Mellanox-2700,DevSonic
-arc-switch1039,10.224.34.39/24,Mellanox-2700,DevSonic
-arc-switch1007,10.224.22.207/24,Mellanox-2700,DevSonic
-arc-switch1035,10.224.34.10/24,Mellanox-2700,DevSonic
+arc-switch1003,10.210.25.43/24,Mellanox-2700,DevSonic
+arc-switch1039,10.210.25.47/24,Mellanox-2700,DevSonic
+arc-switch1007,10.210.25.42/24,Mellanox-2700,DevSonic
+arc-switch1035,10.210.25.46/24,Mellanox-2700,DevSonic
 sonic-fanout,10.9.103.91/24,Mellanox-2700,FanoutLeaf

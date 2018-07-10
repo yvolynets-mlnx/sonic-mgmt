@@ -225,19 +225,19 @@
   </PhysicalNetworkGraphDeclaration>
   <DataPlaneGraph>
     <DevicesL3Info Hostname="arc-switch1007">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.224.22.207/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.42/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch1035">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.224.34.10/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.46/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="sonic-fanout">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.9.103.91/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch1039">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.224.34.39/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.47/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch1003">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.224.22.191/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.43/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switchmtbc01">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.34/24"/>
