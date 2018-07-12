@@ -61,7 +61,7 @@ str-7260-11       ansible_host=10.251.0.234
 str-msn2700-02    ansible_host=10.251.0.235 os=sonic
 arc-switch1007    ansible_host=10.210.25.42
 arc-switch1035    ansible_host=10.210.25.46
-sonic-fanout      ansible_host=10.12.74.64
+mts-sonic-fanout  ansible_host=10.12.74.64
 arc-switch1039    ansible_host=10.210.25.47
 arc-switch1003    ansible_host=10.210.25.43
 arc-switchmtbc01  ansible_host=10.12.67.34

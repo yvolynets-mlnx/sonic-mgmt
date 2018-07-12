@@ -98,12 +98,12 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
-  - name: build fanout startup config for fanout sonic-fanout (MTS)
+  - name: build fanout startup config for fanout mts-sonic-fanout (MTS)
     action: apswitch template=mlnx_os_mts_sonic-fanout.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
-    when: inventory_hostname == 'sonic-fanout'
+    when: inventory_hostname == 'mts-sonic-fanout'
     tags: deploy
 
  ###################################################################
@@ -162,12 +162,12 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
-  - name: build special vlan trunk test config for fanout sonic-fanout
+  - name: build special vlan trunk test config for fanout mts-sonic-fanout
     action: apswitch template=vlan_mts_sonic-fanout.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
-    when: inventory_hostname == 'sonic-fanout'
+    when: inventory_hostname == 'mts-sonic-fanout'
     tags: vlan_trunk
 
  #############################################################
@@ -226,12 +226,12 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
-  - name: remove special vlan trunk test config for fanout sonic-fanout (MTS)
+  - name: remove special vlan trunk test config for fanout mts-sonic-fanout (MTS)
     action: apswitch template=vlan_del_mts_sonic-fanout.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
-    when: inventory_hostname == 'sonic-fanout'
+    when: inventory_hostname == 'mts-sonic-fanout'
     tags: del_vlan_trunk
 
 #- set_fact: os='eos'
