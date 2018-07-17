@@ -45,7 +45,7 @@ arc-mtbc-1001-t1-lag  ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=
 arc-mtbc-1001-ptf32   ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208" ptf_host=ptf-mtbc01
 
 # MTR Lab devices info
-arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=12345
+arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=3tango
 arc-switch1007 ansible_host=arc-switch1007 ansible_ssh_user=admin ansible_ssh_pass=admin
 arc-switch1035 ansible_host=arc-switch1035 ansible_ssh_user=admin ansible_ssh_pass=admin
 arc-switchmtbc01 ansible_host=arc-switchmtbc01 ansible_ssh_user=admin ansible_ssh_pass=admin
@@ -147,7 +147,7 @@ ptf-1041 ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1029 PTF host
 ptf-1029 ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR dev setup PTF host
-ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=12345
+ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=3tango
 # MTBC arc-mtbc-1001 PTF host
 ptf-mtbc01 ansible_host=10.12.206.220 ansible_ssh_user=root ansible_ssh_pass=root
 
