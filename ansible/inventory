@@ -34,8 +34,10 @@ arc-switch1029-t0  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=AC
 arc-switch1029-t1-lag  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTS testbed mts-sonic-dut topologies
-mts-sonic-dut-t1  ansible_host=mts-sonic-dut  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-
+mts-sonic-dut ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mts-sonic-dut-t1 ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mts-sonic-dut-t0 ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mts-sonic-dut-t1-lag ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTBC testbed arc-mtbc-1001 topologies
 arc-mtbc-1001 ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208"
@@ -81,7 +83,10 @@ arc-switch1029-t0
 arc-switch1029-t1-lag
 
 # MTS testbed mts-sonic-dut topologies
+mts-sonic-dut
+mts-sonic-dut-t0
 mts-sonic-dut-t1
+mts-sonic-dut-t1-lag
 
 # MTR dev setup switches
 arc-switch1028
@@ -120,7 +125,10 @@ arc-switch1041-t1-lag
 arc-switch1041-t0
 
 # MTS testbed mts-sonic-dut topologies
+mts-sonic-dut
+mts-sonic-dut-t0
 mts-sonic-dut-t1
+mts-sonic-dut-t1-lag
 
 # MTR dev setup switches
 arc-switch1028
