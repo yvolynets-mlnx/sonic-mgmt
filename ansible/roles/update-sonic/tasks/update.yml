@@ -54,7 +54,7 @@
 
     - name: Wait for switch initialization to finish
       pause:
-        minutes: 1
+        minutes: 5
 
     - name: Deploy minigraph file.
       copy:
