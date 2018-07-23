@@ -14,6 +14,7 @@
 {% endfor %}
 {% endfor %}
 {% if 'host_interfaces' in vm_topo_config %}
+{% if vlan_intfs is defined %}
 {% for host_index in range(vlan_intfs | length) %}
       <DeviceLinkBase>
         <ElementType>DeviceInterfaceLink</ElementType>
@@ -23,6 +24,7 @@
         <StartPort>eth0</StartPort>
       </DeviceLinkBase>
 {% endfor %}
+{% endif %}
 {% endif %}
     </DeviceInterfaceLinks>
     <Devices>
