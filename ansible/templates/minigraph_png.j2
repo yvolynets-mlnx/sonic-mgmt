@@ -13,6 +13,15 @@
       </DeviceLinkBase>
 {% endfor %}
 {% endfor %}
+{% for iface in vlan_intfs %}
+      <DeviceLinkBase>
+        <ElementType>DeviceInterfaceLink</ElementType>
+        <EndDevice>ptf</EndDevice>
+        <EndPort>{{ 'eth%d' % loop.index }}</EndPort>
+        <StartDevice>{{ inventory_hostname }}</StartDevice>
+        <StartPort>{{ iface }}</StartPort>
+      </DeviceLinkBase>
+{% endfor %}
     </DeviceInterfaceLinks>
     <Devices>
       <Device i:type="{{ vm_topo_config['dut_type'] }}">
