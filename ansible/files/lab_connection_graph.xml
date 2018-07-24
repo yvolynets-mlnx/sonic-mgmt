@@ -116,8 +116,8 @@
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sonic-fanout" EndPort="ethernet 1/28" StartDevice="mts-sonic-dut" StartPort="Ethernet108"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sonic-fanout" EndPort="ethernet 1/29" StartDevice="mts-sonic-dut" StartPort="Ethernet112"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sonic-fanout" EndPort="ethernet 1/30" StartDevice="mts-sonic-dut" StartPort="Ethernet116"/>
-      <DeviceInterfaceLink BandWidth="50000"  EndDevice="mts-sonic-fanout" EndPort="ethernet 1/31/1" StartDevice="arc-switch1025" StartPort="Ethernet120"/>
-      <DeviceInterfaceLink BandWidth="50000"  EndDevice="mts-sonic-fanout" EndPort="ethernet 1/31/2" StartDevice="arc-switch1025" StartPort="Ethernet124"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="mts-sonic-fanout" EndPort="ethernet 1/31/1" StartDevice="mts-sonic-dut" StartPort="Ethernet120"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="mts-sonic-fanout" EndPort="ethernet 1/31/2" StartDevice="mts-sonic-dut" StartPort="Ethernet124"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1039" EndPort="ethernet 1/1" StartDevice="arc-switch1041" StartPort="Ethernet0"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1039" EndPort="ethernet 1/2" StartDevice="arc-switch1041" StartPort="Ethernet4"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1039" EndPort="ethernet 1/3" StartDevice="arc-switch1041" StartPort="Ethernet8"/>
