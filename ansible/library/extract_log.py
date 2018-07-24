@@ -83,7 +83,7 @@ from ansible.module_utils.basic import *
 from pprint import pprint
 
 
-def extract_line(directory, filename, target_string):
+def extract_lines(directory, filename, target_string):
     path = os.path.join(directory, filename)
     file = None
     if 'gz' in path:
@@ -145,8 +145,10 @@ def comparator(l, r):
 
 
 def filename_comparator(l, r):
-    """Compares log filenames (older > newer), assumes file with greater number is
-    older, e.g syslog.2 is older than syslog.1. This is how logrotate is currently configured"""
+    """Compares log filenames, assumes file with greater number is
+    older, e.g syslog.2 is older than syslog.1. This is how logrotate is currently configured.
+    Returns 0 if log files l and r are the same,
+    1 if log file l is older then r and -1 if l is newer then r"""
 
     nl = extract_number(l)
     nr = extract_number(r)
@@ -159,10 +161,11 @@ def filename_comparator(l, r):
 
 
 def list_files(directory, prefixname):
-    """Returns a sorted list of files in @directory starting with @prefixname
+    """Returns a sorted list(sort order is from newer to older)
+    of files in @directory starting with @prefixname
     (Comparator used is @filename_comparator)"""
 
-    return sorted([filename for filename in os.listdir(directory) 
+    return sorted([filename for filename in os.listdir(directory)
         if filename.startswith(prefixname)], cmp=filename_comparator)
 
 
@@ -172,7 +175,7 @@ def extract_latest_line_with_string(directory, filenames, start_string):
 
     target_lines = []
     for filename in filenames:
-        extracted_lines = extract_line(directory, filename, start_string)
+        extracted_lines = extract_lines(directory, filename, start_string)
         if extracted_lines:
             # found lines are the lates since we start from the newest file
             # assignt to target_lines and break the loop
