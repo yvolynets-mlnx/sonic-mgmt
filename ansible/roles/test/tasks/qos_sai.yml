@@ -50,7 +50,7 @@
       vars:
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i syncd python
-      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740' or sonic_hwsku == 'ACS-MSN2410')
 
     - name: copy sai tests
       copy: src=roles/test/files/saitests dest=/root
@@ -59,7 +59,7 @@
     - name: copy portmap
       copy: src={{ ptf_portmap }} dest=/root
       delegate_to: "{{ ptf_host }}"
-      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740' or sonic_hwsku == 'ACS-MSN2410')
 
     - name: Init PTF base test parameters
       set_fact: 
