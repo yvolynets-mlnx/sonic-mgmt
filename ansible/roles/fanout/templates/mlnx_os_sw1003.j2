@@ -8,6 +8,7 @@ no lldp
 no spanning-tree 
 ip routing
 license install LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFN5-488A-2AKD-6QCD-96
+username {{ fanout_root_user }} password {{ fanout_root_pass }}
 
 no fae trap-group TRAP_GROUP_LLDP policer bind
 no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind

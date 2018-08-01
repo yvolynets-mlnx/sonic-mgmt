@@ -13,8 +13,12 @@
   tags: always
 
 - name: prepare fanout switch admin login info
-  set_fact: ansible_ssh_user={{ fanout_admin_user }} ansible_ssh_pass={{ fanout_admin_password }}
+  set_fact: ansible_ssh_user={{ fanout_admin_user }} ansible_ssh_pass={{ fanout_admin_password }} peer_hwsku={{device_info['HwSku']}}
   tags: always
+
+- set_fact:
+    fanout_root_user: "root"
+    fanout_root_pass: "3tango"
 
  ##########################################################
  # deploy tasks to deploy default configuration on fanout #
@@ -116,6 +120,13 @@
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'mts-sonic-fanout'
     tags: deploy
+
+ ###################################################################
+ # build, deploy and start docker images for the PFC WD test       #
+ ###################################################################
+- include: mlnx_deploy_pfcwd_fanout.yml
+  when: peer_hwsku == "MLNX-OS"
+  tags: deploy
 
  ###################################################################
  # vlan_trunk task to apply special config for the vlan trunk test #

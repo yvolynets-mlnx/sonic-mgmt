@@ -10,6 +10,7 @@ ip routing
 license install LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-REA1-288A-4QWL-0PW5-U7
 interface mgmt0 dhcp
 hostname arc-switchmtbc01
+username {{ fanout_root_user }} password {{ fanout_root_pass }}
 
 no fae trap-group TRAP_GROUP_LLDP policer bind
 no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind

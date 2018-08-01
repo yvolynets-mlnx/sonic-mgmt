@@ -7,7 +7,8 @@ config t
 no lldp
 no spanning-tree
 ip routing
-license install LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YU2D-E88A-7KLT-FWFY-MB
+license install LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-M6ER-X88A-0TA4-M3RG-7B
+username {{ fanout_root_user }} password {{ fanout_root_pass }}
 
 no fae trap-group TRAP_GROUP_LLDP policer bind
 no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind
