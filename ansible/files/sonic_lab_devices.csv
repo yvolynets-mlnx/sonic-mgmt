@@ -6,5 +6,6 @@ str-acs-serv-01,10.251.0.245/23,TestServ,Server
 arc-switch1003,10.210.25.43/24,Mellanox-2700,DevSonic
 arc-switch1039,10.210.25.47/24,Mellanox-2700,DevSonic
 arc-switch1007,10.210.25.42/24,Mellanox-2700,DevSonic
+arc-switch1005,10.210.24.23/24,Mellanox-2700,DevSonic
 arc-switch1035,10.210.25.46/24,Mellanox-2700,DevSonic
 mts-sonic-fanout,10.12.74.64/24,Mellanox-2700,FanoutLeaf

@@ -16,6 +16,9 @@ DEV-R730-01 ansible_host=dev-r730-01
 [vm_host_6]
 ARC-HOST121 ansible_host=arc-host121
 
+[vm_host_7]
+ARC-HOST26 ansible_host=arc-host26
+
 [vm_host:children]
 vm_host_1
 vm_host_2
@@ -23,6 +26,7 @@ vm_host_3
 vm_host_4
 vm_host_5
 vm_host_6
+vm_host_7
 
 [vms_1]
 VM0101 ansible_host=10.213.84.17
@@ -228,6 +232,40 @@ VM0630 ansible_host=10.213.84.210
 VM0631 ansible_host=10.213.84.211
 VM0632 ansible_host=10.213.84.212
 
+[vms_7]
+VM0701 ansible_host=10.213.80.121
+VM0702 ansible_host=10.213.80.122
+VM0703 ansible_host=10.213.80.123
+VM0704 ansible_host=10.213.80.124
+VM0705 ansible_host=10.213.80.125
+VM0706 ansible_host=10.213.80.126
+VM0707 ansible_host=10.213.80.127
+VM0708 ansible_host=10.213.80.128
+VM0709 ansible_host=10.213.80.129
+VM0710 ansible_host=10.213.80.130
+VM0711 ansible_host=10.213.80.131
+VM0712 ansible_host=10.213.80.132
+VM0713 ansible_host=10.213.80.133
+VM0714 ansible_host=10.213.80.134
+VM0715 ansible_host=10.213.80.135
+VM0716 ansible_host=10.213.80.136
+VM0717 ansible_host=10.213.80.137
+VM0718 ansible_host=10.213.80.138
+VM0719 ansible_host=10.213.80.139
+VM0720 ansible_host=10.213.80.140
+VM0721 ansible_host=10.213.80.141
+VM0722 ansible_host=10.213.80.142
+VM0723 ansible_host=10.213.80.143
+VM0724 ansible_host=10.213.80.144
+VM0725 ansible_host=10.213.80.145
+VM0726 ansible_host=10.213.80.146
+VM0727 ansible_host=10.213.80.147
+VM0728 ansible_host=10.213.80.148
+VM0729 ansible_host=10.213.80.149
+VM0730 ansible_host=10.213.80.150
+VM0731 ansible_host=10.213.80.151
+VM0732 ansible_host=10.213.80.152
+
 [eos:children]
 vms_1
 vms_2
@@ -235,6 +273,7 @@ vms_3
 vms_4
 vms_5
 vms_6
+vms_7
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -279,6 +318,13 @@ vms_6
 [server_6:vars]
 host_var_file=host_vars/ARC-HOST121.yml
 
+[server_7:children]
+vm_host_7
+vms_7
+
+[server_7:vars]
+host_var_file=host_vars/ARC-HOST26.yml
+
 [servers:children]
 server_1
 server_2
@@ -286,6 +332,7 @@ server_3
 server_4
 server_5
 server_6
+server_7
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't0', 't0-16', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']
