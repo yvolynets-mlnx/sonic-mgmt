@@ -67,6 +67,11 @@
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
       when: sonic_hwsku == 'ACS-MSN2100'
 
+    - name: Workaround. Deploy port config file for ACS-MSN2700 platform.
+      shell: sed -i -r -e '1s/\S+//4' -e '2,$s/\S+//3' /usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini
+      become: yes
+      when: sonic_hwsku == 'ACS-MSN2700'
+
     - name: Reload minigraph.
       shell: config load_minigraph -y
 
