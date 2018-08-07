@@ -1,5 +1,7 @@
 ##############################################################################################
 ### sub-playbook to deploy the docker images needed for the pfcwd test to fanout swtich
+### to run separately:
+### ansible-playbook -i lab fanout.yml -l ${FANOUT} --become --tags pfcwd_config -vvvv
 ################################################################################################
 
 - set_fact:
