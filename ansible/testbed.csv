@@ -31,6 +31,7 @@ arc-switch1025-fastreboot,ptf-1025,t0,vm-t1,10.213.84.213/16,server_6,VM0601,arc
 arc-switch1004-t1,vm-t1,t1,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
 arc-switch1004-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
 arc-switch1004-t0,vm-t1,t0,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
+arc-switch1004-ptf32, vm-t1,ptf32,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
 
 ptf1-m,ptf1,ptf32,docker-ptf-sai-mlnx,10.255.0.188/24,server_1,,str-msn2700-01,Test ptf Mellanox
 ptf2-b,ptf2,ptf64,docker-ptf-sai-brcm,10.255.0.189/24,server_1,,lab-s6100-01,Test ptf Broadcom
