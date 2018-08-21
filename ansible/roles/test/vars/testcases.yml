@@ -144,7 +144,7 @@ testcases:
 
     qos:
       filename: qos_sai.yml
-      topologies: [t1, t1-lag]
+      topologies: [t1, t1-lag, ptf32]
     
     reboot:
       filename: reboot.yml
