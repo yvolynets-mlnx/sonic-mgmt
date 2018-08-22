@@ -130,7 +130,7 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-       
+
     #XOFF limit
     - include: qos_sai_ptf.yml
       vars:
@@ -147,7 +147,7 @@
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
 
-        
+
     - include: qos_sai_ptf.yml
       vars:
         test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
@@ -178,77 +178,73 @@
         - src_port_ip='{{ src_port_ip }}'
 
     #ECN limit
- #   - include: qos_sai_ptf.yml
- #     vars:
- #       test_name: ECN threshold. dscp = {{ qp.ecn_1.dscp }}, ecn = {{ qp.ecn_1.ecn }}
- #       test_path: sai_qos_tests.DscpEcnSend
- #       test_params:
- #       - dscp='{{ qp.ecn_1.dscp }}'
- #       - ecn='{{  qp.ecn_1.ecn }}'
- #       - limit='{{ red_max_threshold }}'
- #       - min_limit='{{ green_max_threshold }}'
- #       - num_of_pkts='{{ qp.ecn_1.num_of_pkts }}'
- #       - limit='{{ qp.ecn_1.limit }}'
- #       - min_limit='{{ qp.ecn_1.min_limit }}'
- #       - cell_size='{{ qp.ecn_1.cell_size }}'
- #       - dst_port_id='{{ dst_port_id }}'
- #       - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
- #       - src_port_id='{{ src_port_id }}'
- #       - src_port_ip='{{ ports_ip[src_port_id|int] }}'
-        
- #   - include: qos_sai_ptf.yml
- #     vars:
- #       test_name: ECN threshold. dscp = {{ qp.ecn_2.dscp }}, ecn = {{ qp.ecn_2.ecn }}
- #       test_path: sai_qos_tests.DscpEcnSend
- #       test_params:
- #       - dscp='{{ qp.ecn_2.dscp }}'
- #       - ecn='{{  qp.ecn_2.ecn }}'
- #       - limit='{{ red_max_threshold }}'
- #       - min_limit='{{ green_max_threshold }}'
- #       - num_of_pkts='{{ qp.ecn_2.num_of_pkts }}'
- #       - limit='{{ qp.ecn_2.limit }}'
- #       - min_limit='{{ qp.ecn_2.min_limit }}'
- #       - cell_size='{{ qp.ecn_2.cell_size }}'
- #       - dst_port_id='{{ dst_port_id }}'
- #       - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
- #       - src_port_id='{{ src_port_id }}'
- #       - src_port_ip='{{ ports_ip[src_port_id|int] }}'
-        
- #   - include: qos_sai_ptf.yml
- #     vars:
- #       test_name: ECN threshold. dscp = {{ qp.ecn_3.dscp }}, ecn = {{ qp.ecn_3.ecn }}
- #       test_path: sai_qos_tests.DscpEcnSend
- #       test_params:
- #       - dscp='{{ qp.ecn_3.dscp }}'
- #       - ecn='{{  qp.ecn_3.ecn }}'
- #       - limit='{{ red_max_threshold }}'
- #       - min_limit='{{ green_max_threshold }}'
- #       - num_of_pkts='{{ qp.ecn_3.num_of_pkts }}'
- #       - limit='{{ qp.ecn_3.limit }}'
- #       - min_limit='{{ qp.ecn_3.min_limit }}'
- #       - cell_size='{{ qp.ecn_3.cell_size }}'
- #       - dst_port_id='{{ dst_port_id }}'
- #       - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
- #       - src_port_id='{{ src_port_id }}'
- #       - src_port_ip='{{ ports_ip[src_port_id|int] }}'
-       
- #   - include: qos_sai_ptf.yml
- #     vars:
- #       test_name: ECN threshold. dscp = {{ qp.ecn_4.dscp }}, ecn = {{ qp.ecn_4.ecn }}
- #       test_path: sai_qos_tests.DscpEcnSend
- #       test_params:
- #       - dscp='{{ qp.ecn_4.dscp }}'
- #       - ecn='{{  qp.ecn_4.ecn }}'
- #       - limit='{{ red_max_threshold }}'
- #       - min_limit='{{ green_max_threshold }}'
- #       - num_of_pkts='{{ qp.ecn_4.num_of_pkts }}'
- #       - limit='{{ qp.ecn_4.limit }}'
- #       - min_limit='{{ qp.ecn_4.min_limit }}'
- #       - cell_size='{{ qp.ecn_4.cell_size }}'
- #       - dst_port_id='{{ dst_port_id }}'
- #       - dst_port_ip='{{ ports_ip[dst_port_id|int] }}'
- #       - src_port_id='{{ src_port_id }}'
- #       - src_port_ip='{{ ports_ip[src_port_id|int] }}'
+    - include: qos_sai_ptf.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_1.dscp }}, ecn = {{ qp.ecn_1.ecn }}
+        test_path: sai_qos_tests.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_1.dscp }}'
+        - ecn='{{  qp.ecn_1.ecn }}'
+        - limit='{{ red_max_threshold }}'
+        - min_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_1.num_of_pkts }}'
+        - cell_size='{{ qp.ecn_1.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
+
+    - include: qos_sai_ptf.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_2.dscp }}, ecn = {{ qp.ecn_2.ecn }}
+        test_path: sai_qos_tests.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_2.dscp }}'
+        - ecn='{{  qp.ecn_2.ecn }}'
+        - limit='{{ red_max_threshold }}'
+        - min_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_2.num_of_pkts }}'
+        - cell_size='{{ qp.ecn_2.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
+
+    - include: qos_sai_ptf.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_3.dscp }}, ecn = {{ qp.ecn_3.ecn }}
+        test_path: sai_qos_tests.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_3.dscp }}'
+        - ecn='{{  qp.ecn_3.ecn }}'
+        - limit='{{ red_max_threshold }}'
+        - min_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_3.num_of_pkts }}'
+        - cell_size='{{ qp.ecn_3.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
+
+    - include: qos_sai_ptf.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_4.dscp }}, ecn = {{ qp.ecn_4.ecn }}
+        test_path: sai_qos_tests.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_4.dscp }}'
+        - ecn='{{  qp.ecn_4.ecn }}'
+        - limit='{{ red_max_threshold }}'
+        - min_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_4.num_of_pkts }}'
+        - cell_size='{{ qp.ecn_4.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
 
     - name: Set testing buffer profile for lossy test
       shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
@@ -376,6 +372,7 @@
     - name: Remove populate ARP entries on DUT
       shell: /bin/bash /tmp/arp_populate_delete.sh
       become: true
+      ignore_errors: yes
 
     - meta: flush_handlers
 

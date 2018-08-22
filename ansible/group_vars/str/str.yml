@@ -26,29 +26,21 @@ qos_params:
             dscp: 8
             ecn: 0
             num_of_pkts: 5000
-            limit: 182000
-            min_limit: 180000
             cell_size: 96
         ecn_2:
             dscp: 8
             ecn: 1
-            num_of_pkts: 2047
-            limit: 182320
-            min_limit: 0
+            num_of_pkts: 1023
             cell_size: 96
         ecn_3:
             dscp: 0
             ecn: 0
             num_of_pkts: 5000
-            limit: 182000
-            min_limit: 180000
             cell_size: 96
         ecn_4:
             dscp: 0
             ecn: 1
-            num_of_pkts: 2047
-            limit: 182320
-            min_limit: 0
+            num_of_pkts: 1023
             cell_size: 96
         lossy_queue:
             dscp: 8
@@ -105,29 +97,21 @@ qos_params:
             dscp: 8
             ecn: 0
             num_of_pkts: 5000
-            limit: 182000
-            min_limit: 180000
             cell_size: 96
         ecn_2:
             dscp: 8
             ecn: 1
-            num_of_pkts: 2047
-            limit: 182320
-            min_limit: 0
+            num_of_pkts: 1023
             cell_size: 96
         ecn_3:
             dscp: 0
             ecn: 0
             num_of_pkts: 5000
-            limit: 182000
-            min_limit: 180000
             cell_size: 96
         ecn_4:
             dscp: 0
             ecn: 1
-            num_of_pkts: 2047
-            limit: 182320
-            min_limit: 0
+            num_of_pkts: 1023
             cell_size: 96
         lossy_queue:
             dscp: 8
@@ -184,29 +168,21 @@ qos_params:
             dscp: 8
             ecn: 0
             num_of_pkts: 5000
-            limit: 182000
-            min_limit: 180000
             cell_size: 96
         ecn_2:
             dscp: 8
             ecn: 1
-            num_of_pkts: 2047
-            limit: 182320
-            min_limit: 0
+            num_of_pkts: 1023
             cell_size: 96
         ecn_3:
             dscp: 0
             ecn: 0
             num_of_pkts: 5000
-            limit: 182000
-            min_limit: 180000
             cell_size: 96
         ecn_4:
             dscp: 0
             ecn: 1
-            num_of_pkts: 2047
-            limit: 182320
-            min_limit: 0
+            num_of_pkts: 1023
             cell_size: 96
         lossy_queue:
             dscp: 8
