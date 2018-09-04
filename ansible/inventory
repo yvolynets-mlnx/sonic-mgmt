@@ -55,11 +55,20 @@ arc-mtbc-1001-t1  ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-
 arc-mtbc-1001-t1-lag  ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208" ptf_host=ptf-mtbc01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 arc-mtbc-1001-ptf32   ansible_host=arc-mtbc-1001  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2001 10.12.68.208" ptf_host=ptf-mtbc01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
+
+# MTBC testbed mtbc-sonic-01-2410 topologies
+mtbc-sonic-01-2410 ansible_host=mtbc-sonic-01-2410  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2022 10.12.68.208" ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-sonic-01-2410-t0  ansible_host=mtbc-sonic-01-2410  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2022 10.12.68.208" ptf_host=ptf-mtbc02 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-sonic-01-2410-t1  ansible_host=mtbc-sonic-01-2410  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2022 10.12.68.208" ptf_host=ptf-mtbc02 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-sonic-01-2410-t1-lag  ansible_host=mtbc-sonic-01-2410  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2022 10.12.68.208" ptf_host=ptf-mtbc02 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-sonic-01-2410-ptf32   ansible_host=mtbc-sonic-01-2410  sonic_version=v2  sonic_hwsku=ACS-MSN2410 serial_console="ssh -l rcon:2022 10.12.68.208" ptf_host=ptf-mtbc02 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+
 # MTR Lab devices info
 arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=3tango
 arc-switch1007 ansible_host=arc-switch1007 ansible_ssh_user=admin ansible_ssh_pass=admin
 arc-switch1035 ansible_host=arc-switch1035 ansible_ssh_user=admin ansible_ssh_pass=admin
 arc-switchmtbc01 ansible_host=arc-switchmtbc01 ansible_ssh_user=admin ansible_ssh_pass=admin
+arc-switchmtbc02 ansible_host=arc-switchmtbc02 ansible_ssh_user=admin ansible_ssh_pass=admin
 
 [sonic:children]
 sonic_latest
@@ -114,6 +123,12 @@ arc-mtbc-1001-t0
 arc-mtbc-1001-t1
 arc-mtbc-1001-t1-lag
 
+#MTBC mtbc-sonic-01-2410 topologies
+mtbc-sonic-01-2410
+mtbc-sonic-01-2410-t0
+mtbc-sonic-01-2410-t1
+mtbc-sonic-01-2410-t1-lag
+
 [lab]
 # MTR arc-switch1038 topologies
 arc-switch1038
@@ -164,6 +179,12 @@ arc-mtbc-1001-t0
 arc-mtbc-1001-t1
 arc-mtbc-1001-t1-lag
 
+#MTBC mtbc-sonic-01-2410 topologies
+mtbc-sonic-01-2410
+mtbc-sonic-01-2410-t0
+mtbc-sonic-01-2410-t1
+mtbc-sonic-01-2410-t1-lag
+
 [leaf_topo_1:vars]
 podset_number=200
 
@@ -185,4 +206,6 @@ ptf-1029 ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=3tango
 # MTBC arc-mtbc-1001 PTF host
 ptf-mtbc01 ansible_host=10.12.206.220 ansible_ssh_user=root ansible_ssh_pass=root
+# MTBC mtbc-sonic-01-2410 PTF host
+ptf-mtbc02 ansible_host=10.12.207.41 ansible_ssh_user=root ansible_ssh_pass=root
 

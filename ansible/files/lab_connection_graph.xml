@@ -8,12 +8,14 @@
       <Device Hostname="arc-switch1029" HwSku="Mellanox-2100" Type="DevSonic"/>
       <Device Hostname="mts-sonic-dut" HwSku="Mellanox-2700" Type="DevSonic"/>
       <Device Hostname="arc-mtbc-1001" HwSku="Mellanox-2410" Type="DevSonic"/>
+      <Device Hostname="mtbc-sonic-01-2410" HwSku="Mellanox-2410" Type="DevSonic"/>
       <Device Hostname="arc-switch1005" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1007" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1035" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1039" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1003" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switchmtbc01" HwSku="MLNX-OS" Type="FanoutLeaf"/>
+      <Device Hostname="arc-switchmtbc02" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="mts-sonic-fanout" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="str-7260-11" HwSku="Arista-7260QX-64" Type="FanoutRoot"/>
       <Device Hostname="arc-host60" HwSku="TestServ" Type="Server"/>
@@ -23,6 +25,7 @@
       <Device Hostname="arc-host62" HwSku="TestServ" Type="Server"/>
       <Device Hostname="arc-host26" HwSku="TestServ" Type="Server"/>
       <Device Hostname="dev-r730-01" HwSku="TestServ" Type="Server"/>
+      <Device Hostname="dev-r730-02" HwSku="TestServ" Type="Server"/>
     </Devices>
     <DeviceInterfaceLinks>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1007" EndPort="ethernet 1/1" StartDevice="arc-switch1038" StartPort="Ethernet0"/>
@@ -249,6 +252,38 @@
       <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/2" StartDevice="arc-mtbc-1001" StartPort="Ethernet116"/>
       <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/3" StartDevice="arc-mtbc-1001" StartPort="Ethernet120"/>
       <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc01" EndPort="ethernet 1/23/4" StartDevice="arc-mtbc-1001" StartPort="Ethernet124"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/1/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet0"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/1/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet4"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/1/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet8"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/1/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet12"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/3/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet16"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/3/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet20"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/3/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet24"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/3/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet28"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/5/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet32"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/5/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet36"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/5/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet40"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/5/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet44"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/7/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet48"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/7/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet52"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/7/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet56"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/7/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet60"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/9/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet64"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/9/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet68"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/9/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet72"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/9/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet76"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/11/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet80"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/11/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet84"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/11/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet88"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/11/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet92"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/13/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet96"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/13/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet100"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/13/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet104"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/13/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet108"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/15/1" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet112"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/15/2" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet116"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/15/3" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet120"/>
+      <DeviceInterfaceLink BandWidth="25000" EndDevice="arc-switchmtbc02" EndPort="ethernet 1/15/4" StartDevice="mtbc-sonic-01-2410" StartPort="Ethernet124"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-host60" EndPort="p4p1" StartDevice="str-7260-11" StartPort="Ethernet19"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sai-host-3" EndPort="p4p1" StartDevice="str-7260-11" StartPort="Ethernet19"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1007" EndPort="Ethernet64" StartDevice="str-7260-11" StartPort="Ethernet30"/>
@@ -279,6 +314,9 @@
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switchmtbc01">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.34/24"/>
+    </DevicesL3Info>
+    <DevicesL3Info Hostname="arc-switchmtbc02">
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.41/24"/>
     </DevicesL3Info>
     <DevicesL2Info Hostname="arc-switch1005">
       <InterfaceVlan mode="Access" portname="ethernet 1/1" vlanids="101"/>
@@ -523,6 +561,41 @@
       <InterfaceVlan mode="Access" portname="ethernet 1/23/2" vlanids="130"/>
       <InterfaceVlan mode="Access" portname="ethernet 1/23/3" vlanids="131"/>
       <InterfaceVlan mode="Access" portname="ethernet 1/23/4" vlanids="132"/>
+      <InterfaceVlan mode="Trunk" portname="ethernet 1/32" vlanids="101-132"/>
+    </DevicesL2Info>
+    <DevicesL2Info Hostname="arc-switchmtbc02">
+      <InterfaceVlan mode="Access" portname="ethernet 1/1/1" vlanids="101"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/1/2" vlanids="102"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/1/3" vlanids="103"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/1/4" vlanids="104"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/3/1" vlanids="105"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/3/2" vlanids="106"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/3/3" vlanids="107"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/3/4" vlanids="108"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/5/1" vlanids="109"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/5/2" vlanids="110"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/5/3" vlanids="111"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/5/4" vlanids="112"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/7/1" vlanids="113"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/7/2" vlanids="114"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/7/3" vlanids="115"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/7/4" vlanids="116"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/9/1" vlanids="117"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/9/2" vlanids="118"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/9/3" vlanids="119"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/9/4" vlanids="120"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/11/1" vlanids="121"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/11/2" vlanids="122"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/11/3" vlanids="123"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/11/4" vlanids="124"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/13/1" vlanids="125"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/13/2" vlanids="126"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/13/3" vlanids="127"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/13/4" vlanids="128"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/15/1" vlanids="129"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/15/2" vlanids="130"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/15/3" vlanids="131"/>
+      <InterfaceVlan mode="Access" portname="ethernet 1/15/4" vlanids="132"/>
       <InterfaceVlan mode="Trunk" portname="ethernet 1/32" vlanids="101-132"/>
     </DevicesL2Info>
     <DevicesL3Info Hostname="str-7260-11">

@@ -17,9 +17,11 @@
           <PortName>0</PortName>
           <Priority>0</Priority>
 {% if hwsku == 'ACS-MSN2410' %}
-    {% if index >= 48 %}
+    {% if (inventory_hostname == "mtbc-sonic-01-2410" and (index == 0 or index == 1 or index == 2 or index == 3 or index == 12 or index == 13 or index == 14 or index == 15)) %}
+          <Speed>10000</Speed>
+    {% elif index >= 48 %}
           <Speed>100000</Speed>
-    {% elif index < 48 %}
+    {% else %}
           <Speed>25000</Speed>
     {% endif %}
 {% else %}

@@ -63,6 +63,16 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
+  - name: build fanout startup config for fanout arc-switchmtbc02
+    action: apswitch template=mlnx_os_swmtbc02.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switchmtbc02'
+    tags: deploy
+
+- block:
+  - debug: msg={{ inventory_hostname }}
   - name: build fanout startup config for fanout arc-switch1039
     action: apswitch template=mlnx_os_sw1039.j2
     connection: switch
@@ -145,6 +155,16 @@
 
 - block:
   - debug: msg={{ inventory_hostname }}
+  - name: build special vlan trunk test config for fanout arc-switchmtbc02
+    action: apswitch template=vlan_swmtbc01.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switchmtbc02'
+    tags: vlan_trunk
+
+- block:
+  - debug: msg={{ inventory_hostname }}
   - name: build special vlan trunk test config for fanout arc-switch1039
     action: apswitch template=vlan_sw1039.j2
     connection: switch
@@ -215,6 +235,16 @@
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
     when: inventory_hostname == 'arc-switchmtbc01'
+    tags: del_vlan_trunk
+
+- block:
+  - debug: msg={{ inventory_hostname }}
+  - name: remove special vlan trunk test config for fanout arc-switchmtbc02
+    action: apswitch template=vlan_del_swmtbc01.j2
+    connection: switch
+    args:
+      login: "{{ switch_login['MLNX-OS'] }}"
+    when: inventory_hostname == 'arc-switchmtbc02'
     tags: del_vlan_trunk
 
 - block:
