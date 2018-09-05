@@ -156,7 +156,7 @@
 - block:
   - debug: msg={{ inventory_hostname }}
   - name: build special vlan trunk test config for fanout arc-switchmtbc02
-    action: apswitch template=vlan_swmtbc01.j2
+    action: apswitch template=vlan_swmtbc02.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
@@ -240,7 +240,7 @@
 - block:
   - debug: msg={{ inventory_hostname }}
   - name: remove special vlan trunk test config for fanout arc-switchmtbc02
-    action: apswitch template=vlan_del_swmtbc01.j2
+    action: apswitch template=vlan_del_swmtbc02.j2
     connection: switch
     args:
       login: "{{ switch_login['MLNX-OS'] }}"
