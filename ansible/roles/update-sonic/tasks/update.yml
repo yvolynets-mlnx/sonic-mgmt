@@ -61,12 +61,6 @@
         src: "minigraph/{{ dut_minigraph }}"
         dest: "/etc/sonic/minigraph.xml"
 
-    - name: Deploy port config file.
-      copy:
-        src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
-        dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
-      when: sonic_hwsku == 'ACS-MSN2100'
-
     - name: Reload minigraph.
       shell: config load_minigraph -y
 

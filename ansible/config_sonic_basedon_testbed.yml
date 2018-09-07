@@ -35,6 +35,13 @@
   tasks:
 
   - block:
+    - name: Deploy port config file.
+      copy:
+        src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
+        dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
+      become: true
+      when: hwsku == 'ACS-MSN2100'
+
     - name: Gathering testbed information
       test_facts: testbed_name="{{ testbed_name }}"
       connection: local
