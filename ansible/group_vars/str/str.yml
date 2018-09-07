@@ -60,6 +60,30 @@ qos_params:
            q3_num_of_pkts: 500
            q4_num_of_pkts: 500
            limit: 80
+        buff_util_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+            cell_size: 96
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+        buff_util_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+            cell_size: 96
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
     ACS-MSN2740:
         xoff_1:
             dscp: 3
@@ -115,6 +139,30 @@ qos_params:
            q3_num_of_pkts: 500
            q4_num_of_pkts: 500
            limit: 80
+        buff_util_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+            cell_size: 96
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+        buff_util_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+            cell_size: 96
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
     ACS-MSN2410:
         xoff_1:
             dscp: 3
@@ -170,4 +218,28 @@ qos_params:
            q3_num_of_pkts: 500
            q4_num_of_pkts: 500
            limit: 80
+        buff_util_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+            cell_size: 96
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+        buff_util_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+            cell_size: 96
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
 

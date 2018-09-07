@@ -3,6 +3,7 @@ ACS Dataplane Qos tests
 """
 
 import time
+import math
 import logging
 import ptf.packet as scapy
 import socket
@@ -680,3 +681,101 @@ class LossyQueueTest(sai_base_test.ThriftInterfaceDataPlane):
             attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
             self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
             self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
+
+class BufferUtilizationTest(sai_base_test.ThriftInterfaceDataPlane):
+    def runTest(self):
+        time.sleep(5)
+        switch_init(self.client)
+
+        # Parse input parameters
+        dscp = int(self.test_params['dscp'])
+        ecn = int(self.test_params['ecn'])
+        router_mac = self.test_params['router_mac']
+        dst_port_id = int(self.test_params['dst_port_id'])
+        dst_port_ip = self.test_params['dst_port_ip']
+        buffer_headroom = int(self.test_params['buffer_headroom'])
+        buffer_alpha = float(self.test_params['buffer_alpha'])
+        buffer_pool_size = int(self.test_params['buffer_pool_size'])
+        cell_size = int(self.test_params['cell_size'])
+        default_port_mtu = int(self.test_params['default_port_mtu'])
+        packet_send_rate = int(self.test_params['packet_send_rate'])
+        src_port_id = int(self.test_params['src_port_id'])
+        src_port_ip = self.test_params['src_port_ip']
+        src_port_mac = self.dataplane.get_mac(0, src_port_id)
+
+        logging.info('Buffer headroom: %d' % buffer_headroom)
+        logging.info('Buffer pool size: %d' % buffer_pool_size)
+        logging.info('Buffer alpha: %d' % buffer_alpha)
+        logging.info('Port MTU: %d' % default_port_mtu)
+        logging.info('Cell size: %d' % cell_size)
+        logging.info('Packet send rate: %d' % packet_send_rate)
+
+        # Prepare TCP packet data
+        tos = dscp << 2
+        tos |= ecn
+        ttl = 64
+
+        # NOTE: below calculation of buffer max packets capacity assumes
+        # packet length is less than the cell size. Specificaly it assumes
+        # one packet can fit into one cell
+        default_packet_length = 72
+
+        assert default_packet_length < cell_size, "Packet length should be less than the cell cise"
+
+        # calculate the exact max packets number that buffer can hold
+        cell_size = float(cell_size)
+        mtu_cells = math.ceil(default_port_mtu / cell_size)
+        headroom_cells = math.ceil(buffer_headroom / cell_size)
+        pool_cells = math.ceil(math.ceil(buffer_pool_size / cell_size) * (buffer_alpha / (buffer_alpha + 1)))
+        buffer_max_pkts_capacity = (headroom_cells - mtu_cells + pool_cells)
+
+        # Send a bit more packets to see whether drops appear after reached max buffer utilization
+        pkts_max = buffer_max_pkts_capacity + 1
+
+        logging.info('Max packets buffer capacity - %d, max packets to send - %d' % (buffer_max_pkts_capacity, pkts_max))
+
+        # Clear Counters
+        sai_thrift_clear_all_counters(self.client)
+
+        # Close DST port
+        sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], STOP_PORT_MAX_RATE)
+
+        #send packets
+        try:
+            pkts_bunch_size = packet_send_rate # Number of packages to send to DST port
+            pkts_count = 0 # Total number of shipped packages
+            ingress_drop_counter = 0
+
+            # Send the packets untill PFC counter will be trigerred or max pkts reached
+            pkt = simple_tcp_packet(pktlen=default_packet_length,
+                                    eth_dst=router_mac,
+                                    eth_src=src_port_mac,
+                                    ip_src=src_port_ip,
+                                    ip_dst=dst_port_ip,
+                                    ip_tos=tos,
+                                    ip_ttl=ttl)
+            while ingress_drop_counter == 0 and pkts_count < pkts_max:
+                testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
+                pkts_count += pkts_bunch_size
+                time.sleep(1)
+
+                port_counters, _ = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
+                ingress_drop_counter = port_counters[INGRESS_DROP]
+
+                logging.info('Sent %d packets, total packet sent %d, ingress drops %d' % (pkts_bunch_size, pkts_count, ingress_drop_counter))
+
+            # wait for INGRESS_DROP counter to be updated
+            time.sleep(7)
+
+            port_counters, _ = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
+            ingress_drop_counter = port_counters[INGRESS_DROP]
+
+            buffer_utilization = pkts_count - ingress_drop_counter
+            logging.info("Result: Buffer utilization %d, calculated %d" % (buffer_utilization, buffer_max_pkts_capacity))
+
+            assert not buffer_utilization < buffer_max_pkts_capacity, "Buffer is under utilized"
+            assert not buffer_utilization > buffer_max_pkts_capacity, "Buffer is over utilized"
+
+        finally:
+            # RELEASE PORT
+            sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], RELEASE_PORT_MAX_RATE)

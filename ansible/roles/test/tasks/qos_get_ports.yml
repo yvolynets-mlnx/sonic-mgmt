@@ -105,6 +105,14 @@
   set_fact:
     lossless_buffer_max_size: "{{ buffer_headroom.stdout|int }}"
 
+- name: Set lossless MAX pool size
+  set_fact:
+    lossless_buffer_pool_size: "{{ buffer_pool_size.stdout|int }}"
+
+- name: Set lossless buffer alpha
+  set_fact:
+    lossless_buffer_alpha: "{{ buffer_alpha }}"
+
 - name: Store current lossless buffer profile
   template: src=qos_pfc_profile.j2 dest=/tmp/pfc_lossless_base_profile.json
   vars:

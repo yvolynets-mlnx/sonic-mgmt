@@ -27,15 +27,15 @@
     
 - name: Get buffer alpha ID for {{ target_port_name }} port
   shell: docker exec database redis-cli -n 4 HGET "{{ buffer_profile }}" dynamic_th
-  register: buffer_alpha
+  register: dynamic_th
         
 - fail:
     msg: "Unable to get the alpha for {{ target_port_name }}"
-  when: buffer_alpha.stdout == ""
+  when: dynamic_th.stdout == ""
   
 - name: Calculate the alpha
   set_fact:
-    buffer_alpha="{{ 2|pow(buffer_alpha.stdout|int) }}"
+    buffer_alpha="{{ 2|pow(dynamic_th.stdout|int) }}"
 
 - name: Get XON for {{ target_port_name }} port
   shell: docker exec database redis-cli -n 4 HGET "{{ buffer_profile }}" xon

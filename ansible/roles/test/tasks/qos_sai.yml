@@ -290,6 +290,48 @@
         - q4_num_of_pkts='{{ qp.wrr.q4_num_of_pkts }}'
         - limit='{{ qp.wrr.limit }}'
 
+    # Buffer utilization
+    - include: qos_sai_ptf.yml
+      vars:
+        test_name: Buffer utilization ptf test dscp = {{ qp.buff_util_1.dscp }}, ecn = {{ qp.buff_util_1.ecn }}
+        test_path: sai_qos_tests.BufferUtilizationTest
+        test_params:
+        - dscp='{{ qp.buff_util_1.dscp }}'
+        - ecn='{{ qp.buff_util_1.ecn }}'
+        - pg='{{ qp.buff_util_1.pg }}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - cell_size='{{ qp.buff_util_1.cell_size }}'
+        - default_port_mtu=9100
+        - packet_send_rate='{{ item }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        extra_options: "--relax --debug info --log-file /tmp/sai_qos_tests.BufferUtilizationTest.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
+      with_items: '{{ qp.buff_util_1.packet_send_rates }}'
+
+    - include: qos_sai_ptf.yml
+      vars:
+        test_name: Buffer utilization ptf test dscp = {{ qp.buff_util_2.dscp }}, ecn = {{ qp.buff_util_2.ecn }}
+        test_path: sai_qos_tests.BufferUtilizationTest
+        test_params:
+        - dscp='{{ qp.buff_util_2.dscp }}'
+        - ecn='{{ qp.buff_util_2.ecn }}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - cell_size='{{ qp.buff_util_2.cell_size }}'
+        - default_port_mtu=9100
+        - packet_send_rate='{{ item }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        extra_options: "--relax --debug info --log-file /tmp/sai_qos_tests.BufferUtilizationTest.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
+      with_items: '{{ qp.buff_util_2.packet_send_rates }}'
+
   always:
     - name: Restore LLDP Daemon
       become: yes
