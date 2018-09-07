@@ -50,7 +50,17 @@
   when:
     - dut_switch_ports[item|int] not in dut_switch_lag_members
     - item != '31' # Only for Mellanox testbed. The last port is used for up link from DUT switch
- 
+
+# Get MAC addresses on PTF host
+- name: Find testing PTF ports MAC addresses
+  shell: bash -c "cat /sys/class/net/eth{0..31}/address"
+  register: lladdrs
+  delegate_to: '{{ ptf_host }}'
+
+- name: Set lladdr list
+  set_fact:
+    lladdr: "{{ lladdrs.stdout_lines }}"
+
 - name: Set DST port ID
   set_fact:
     dst_port_id: "{{ testing_ports_id[0] }}"

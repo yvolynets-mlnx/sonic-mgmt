@@ -78,12 +78,26 @@
         test_path: sai_qos_tests.ReleaseAllPorts
         test_params: []
 
-    # Populate arps
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: populate arp on all ports
-        test_path: sai_qos_tests.ARPpopulate
-        test_params: []
+    - set_fact:
+        cmd: 'replace'
+
+    - name: Generate ARP populate script
+      template:
+        src: roles/test/templates/arp_populate.sh.j2
+        dest: /tmp/arp_populate.sh
+
+    - set_fact:
+        cmd: 'delete'
+
+    - name: Generate ARP delete script
+      template:
+        src: roles/test/templates/arp_populate.sh.j2
+        dest: /tmp/arp_populate_delete.sh
+
+    # Populate permanent ARP entries
+    - name: Populate ARP on DUT
+      shell: /bin/bash /tmp/arp_populate.sh
+      become: true
 
     - name: Set testing buffer profile for PFC tests
       shell: sonic-cfggen -j /tmp/pfc_lossless_test_profile.json --write-to-db
@@ -275,7 +289,7 @@
         - q3_num_of_pkts='{{ qp.wrr.q3_num_of_pkts }}'
         - q4_num_of_pkts='{{ qp.wrr.q4_num_of_pkts }}'
         - limit='{{ qp.wrr.limit }}'
-        
+
   always:
     - name: Restore LLDP Daemon
       become: yes
@@ -316,6 +330,10 @@
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i syncd python
       when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
+
+    - name: Remove populate ARP entries on DUT
+      shell: /bin/bash /tmp/arp_populate_delete.sh
+      become: true
 
     - meta: flush_handlers
 

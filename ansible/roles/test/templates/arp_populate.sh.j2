@@ -1,0 +1,7 @@
+#!/bin/bash
+
+{% for iface in minigraph_interfaces %}
+{%if '10.0.0.' in iface.addr %}
+ip -4 neigh {{ cmd }} {{ iface.peer_addr }} dev {{ iface.attachto }} lladdr {{ lladdr[minigraph_port_indices[iface.attachto]] }} nud permanent
+{%endif%}
+{%endfor%}
