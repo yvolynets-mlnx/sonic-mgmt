@@ -1,0 +1,248 @@
+{% set management_interface = 'mgmt0' %}
+{% set vlanid_offset = 100 %}
+{% set vlan_range = '101-132' %}
+{% set open_flow_tableid = '0' %}
+{% set flowid_offset = 160 %}
+{% set server_to_dut_flow_priority = '100' %}
+{% set dut_to_server_flow_priority = '101' %}
+{% set eth_typ_lldp = '0x88CC' %}
+{% set eth_typ_slow = '0x8809' %}
+{% set eth_typ_arp = '0x0806' %}
+{% set MTU = '9216' %}
+{% set trunk_port = '1/32' %}
+
+{# ----------------------------Start of default port configuration------------------------ #}
+
+{% set default_eth_ports = ['ERR', '1/1', '1/2', '1/3', '1/4', '1/5', '1/6', '1/7', '1/8', '1/9', '1/10', '1/11', '1/12', '1/13', '1/14', '1/15', '1/16', '1/17', '1/18', '1/19', '1/20', '1/21', '1/22', '1/23', '1/24', '1/25', '1/26', '1/27', '1/28', '1/29', '1/30', '1/31/1', '1/31/2', '1/32'] %}
+{% set default_of_ports = [-1, 125, 127, 121, 123, 117, 119, 113, 115, 109, 111, 105, 107, 101, 103, 97, 99, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 94, 95] -%}
+{% set default_eth_ports_qsfp_split_4 = ['ERR', '1/1/1', '1/1/2', '1/1/3', '1/1/4', '1/3/1', '1/3/2', '1/3/3', '1/3/4', '1/5/1', '1/5/2', '1/5/3', '1/5/4', '1/7/1', '1/7/2', '1/7/3', '1/7/4', '1/9/1', '1/9/2', '1/9/3', '1/9/4', '1/11/1', '1/11/2', '1/11/3', '1/11/4', '1/13/1', '1/13/2', '1/13/3', '1/13/4', '1/15/1', '1/15/2', '1/15/3', '1/15/4', '1/32'] %}
+{% set default_of_ports_qsfp_split_4 = [-1, 125, 126, 127, 128, 121, 122, 123, 124, 117, 118, 119, 120, 113, 114, 115, 116, 109, 110, 111, 112, 105, 106, 107, 108, 101, 102, 103, 104, 97, 98, 99, 100, 95] -%}
+{% set uplink_port_id = 33 %}
+{# ----------------------------End of default port configuration-------------------------- #}
+
+{# ----------------------------Start of special port configuration------------------------ #}
+
+{% set arc_switchmtbc01_eth_ports = ['ERR', '1/9/1', '1/9/2', '1/9/3', '1/9/4', '1/11/1', '1/11/2', '1/11/3', '1/11/4', '1/13/1', '1/13/2', '1/13/3', '1/13/4', '1/15/1', '1/15/2', '1/15/3', '1/15/4', '1/17/1', '1/17/2', '1/17/3', '1/17/4', '1/19/1', '1/19/2', '1/19/3', '1/19/4', '1/21/1', '1/21/2', '1/21/3', '1/21/4', '1/23/1', '1/23/2', '1/23/3', '1/23/4', '1/32'] %}
+{% set arc_switchmtbc01_of_ports = [-1, 109, 110, 111, 112, 105, 106, 107, 108, 101, 102, 103, 104, 97, 98, 99, 100, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 95] -%}
+{# ----------------------------End of special port configuration-------------------------- #}
+
+{# ----------------------------Start of port speed configuration-------------------------- #}
+
+{% set arc_switchmtbc01_port_speed = [] %}
+{% set arc_switchmtbc02_port_speed = [-1, 10000, 10000, 10000, 10000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 10000, 10000, 10000, 10000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000, 25000] %}
+{% set arc_switch1003_port_speed = [-1, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 50000, 50000, 50000, 50000] %}
+{% set arc_switch1005_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
+{% set arc_switch1007_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
+{% set arc_switch1035_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
+{% set arc_switch1039_port_speed = [] %}
+{% set mts_sonic_fanout_port_speed = [] %}
+{# -----------------------------End of speed configuration-------------------------------- #}
+
+
+{# -----------------------------Start of params dictionary-------------------------------- #}
+
+{% set eth_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_eth_ports,
+                         'arc-switchmtbc02':default_eth_ports_qsfp_split_4,
+                         'arc-switch1003':default_eth_ports,
+                         'arc-switch1005':default_eth_ports,
+                         'arc-switch1007':default_eth_ports,
+                         'arc-switch1035':default_eth_ports,
+                         'arc-switch1039':default_eth_ports,
+                         'mts-sonic-fanout':default_eth_ports} %}
+
+{% set of_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_of_ports,
+                        'arc-switchmtbc02':default_of_ports_qsfp_split_4,
+                        'arc-switch1003':default_of_ports,
+                        'arc-switch1005':default_of_ports,
+                        'arc-switch1007':default_of_ports,
+                        'arc-switch1035':default_of_ports,
+                        'arc-switch1039':default_of_ports,
+                        'mts-sonic-fanout':default_of_ports} %}
+
+{% set qsfp_split_4_dict = {'arc-switchmtbc01':1,
+                          'arc-switchmtbc02':1,
+                          'arc-switch1003':0,
+                          'arc-switch1005':0,
+                          'arc-switch1007':0,
+                          'arc-switch1035':0,
+                          'arc-switch1039':0,
+                          'mts-sonic-fanout':0} %}
+
+{% set license_dict = {'arc-switchmtbc01':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-REA1-288A-4QWL-0PW5-U7',
+                       'arc-switchmtbc02':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFMB-A88A-0VXP-TUXP-RJ',
+                       'arc-switch1003':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFN5-488A-2AKD-6QCD-96',
+                       'arc-switch1005':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFNC-L88A-5QA1-KKDA-EL',
+                       'arc-switch1007':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YU2D-E88A-7KLT-FWFY-MB',
+                       'arc-switch1035':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-M6ER-X88A-0TA4-M3RG-7B',
+                       'arc-switch1039':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-KY0T-C88A-5CEP-8QUJ-PB',
+                       'mts-sonic-fanout':'LK2-RESTRICTED_CMDS_GEN2-43A7-C1ND-30WG-T88A-1H4M-NBU2-MY'} %}
+
+{% set port_speed_dict = {'arc-switchmtbc01':arc_switchmtbc01_port_speed,
+                          'arc-switchmtbc02':arc_switchmtbc02_port_speed,
+                          'arc-switch1003':arc_switch1003_port_speed,
+                          'arc-switch1005':arc_switch1005_port_speed,
+                          'arc-switch1007':arc_switch1007_port_speed,
+                          'arc-switch1035':arc_switch1035_port_speed,
+                          'arc-switch1039':arc_switch1039_port_speed,
+                          'mts-sonic-fanout':mts_sonic_fanout_port_speed} %}
+
+{% set eth_ports = eth_ports_dict[inventory_hostname] %}
+{% set of_ports = of_ports_dict[inventory_hostname] %}
+{% set qsfp_split_4 = qsfp_split_4_dict[inventory_hostname] %}
+{% set fanout_license = license_dict[inventory_hostname] %}
+{% set port_speed = port_speed_dict[inventory_hostname] %}
+
+{# ------------------------------End of params dictionary-------------------------------------- #}
+
+{# ------------------------------Start of fanout deploy function ------------------------------ #}
+
+{% macro fanout_deploy() %}
+conf t
+no lldp
+no spanning-tree
+ip routing
+license install {{ fanout_license }}
+interface {{ management_interface }} dhcp
+hostname {{ inventory_hostname }}
+username {{ fanout_root_user }} password {{ fanout_root_pass }}
+no fae trap-group TRAP_GROUP_LLDP policer bind
+no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind
+{% if qsfp_split_4 == 0 %}
+interface ethernet 1/31 module-type qsfp-split-2 force
+{% else %}
+{% for i in range(1, eth_ports|length, 4) %}
+{% set list = eth_ports[i].split('/') %}
+{% set ifindex = list[0] + '/' + list[1] %}
+interface ethernet {{ ifindex }} module-type qsfp-split-4 force
+{% endfor %}
+{% endif %}
+
+{% for i in range(1, port_speed|length) %}
+interface ethernet {{ eth_ports[i] }} speed {{ port_speed[i] }} force
+{% endfor %}
+
+{% for i in range(1, eth_ports|length) %}
+interface ethernet {{ eth_ports[i] }} shutdown
+interface ethernet {{ eth_ports[i] }} mtu {{ MTU }}
+interface ethernet {{ eth_ports[i] }} no shutdown
+{% endfor %}
+
+interface ethernet {{ trunk_port }} switchport mode trunk
+vlan {{ vlan_range }}
+ex
+interface ethernet {{ trunk_port }} switchport trunk allowed-vlan none
+
+{% for i in range(1,eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+interface ethernet {{eth_ports[i]}} switchport access vlan {{ vlanid }}
+{% endfor %}
+
+interface ethernet {{ trunk_port }} switchport trunk allowed-vlan add {{ vlan_range }}
+interface ethernet {{ trunk_port }} switchport trunk allowed-vlan remove 1
+
+protocol openflow
+
+{% for i in range(1, eth_ports|length) %}
+interface ethernet {{ eth_ports[i] }} openflow mode hybrid
+{% endfor %}
+
+{% set of_counter = 0 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter  + i }} table={{ open_flow_tableid }},priority={{ server_to_dut_flow_priority }},dl_type={{ eth_typ_lldp }},in_port={{ of_ports[uplink_port_id] }},dl_vlan={{ vlanid }},actions=output:{{ of_ports[i] }}
+{% endfor %}
+
+{% set of_counter = of_counter + eth_ports|length-2 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_lldp }},in_port={{ of_ports[i] }},actions=mod_vlan_vid:{{ vlanid }},output:{{ of_ports[uplink_port_id] }}
+{% endfor %}
+
+{% set of_counter = of_counter + eth_ports|length-2 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ server_to_dut_flow_priority }},dl_type={{ eth_typ_slow }},in_port={{ of_ports[uplink_port_id] }},dl_vlan={{ vlanid }},actions=output:{{ of_ports[i] }}
+{% endfor %}
+
+{% set of_counter = of_counter + eth_ports|length-2 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_slow }},in_port={{ of_ports[i] }},actions=mod_vlan_vid:{{ vlanid }},output:{{ of_ports[uplink_port_id] }}
+{% endfor %}
+
+{% set of_counter = of_counter + eth_ports|length-2 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ server_to_dut_flow_priority }},dl_type={{ eth_typ_arp }},in_port={{ of_ports[uplink_port_id] }},dl_vlan={{ vlanid }},actions=output:{{ of_ports[i] }}
+{% endfor %}
+
+{% set of_counter = of_counter + eth_ports|length-2 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_arp }},in_port={{ of_ports[i] }},actions=mod_vlan_vid:{{ vlanid }},output:{{ of_ports[uplink_port_id] }}
+{% endfor %}
+
+docker
+no shutdown
+exit
+write memory
+
+{% endmacro %}
+{# ------------------------------End of fanout deploy function -------------------------------- #}
+
+{# ------------------------------Start of vlan trunk function --------------------------------- #}
+
+{% macro fanout_vlan_trunk() %}
+config t
+{% for i in range(1,eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+interface ethernet {{eth_ports[i]}} switchport mode dot1q-tunnel
+interface ethernet {{eth_ports[i]}} switchport access vlan {{ vlanid }}
+{% endfor %}
+
+{% for i in range(1,eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+{% set flow_id = (flowid_offset + i)|string %}
+openflow del-flows {{ flow_id }}
+openflow add-flows {{ flow_id }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_arp }},in_port={{ of_ports[i] }},actions=output:{{ of_ports[uplink_port_id] }}
+{% endfor %}
+
+{% endmacro %}
+{# -------------------------------End of vlan trunk function ----------------------------------- #}
+
+{# ------------------------------Start of del vlan trunk function ------------------------------ #}
+
+{% macro fanout_del_vlan_trunk() %}
+
+config t
+{% for i in range(1,eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+interface ethernet {{eth_ports[i]}} switchport mode access
+interface ethernet {{eth_ports[i]}} switchport access vlan {{ vlanid }}
+{% endfor %}
+
+{% for i in range(1,eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+{% set flow_id = (flowid_offset + i)|string %}
+openflow del-flows {{ flow_id }}
+openflow add-flows {{ flow_id }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_arp }},in_port={{ of_ports[i] }},actions=mod_vlan_vid:{{ vlanid }},output:{{ of_ports[uplink_port_id] }}
+{% endfor %}
+
+{% endmacro %}
+{# --------------------------------End of del vlan trunk function ------------------------------- #}
+
+
+{% if action_variable == "deploy" %}
+    {{ fanout_deploy() }}
+{% elif action_variable == "vlan_trunk" %}
+    {{ fanout_vlan_trunk() }}
+{% elif action_variable == "del_vlan_trunk" %}
+    {{ fanout_del_vlan_trunk() }}
+{% else %}
+{% endif %}
