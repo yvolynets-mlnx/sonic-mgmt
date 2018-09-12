@@ -193,7 +193,6 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
 
     - include: qos_sai_ptf.yml
       vars:
@@ -210,7 +209,6 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
 
     - include: qos_sai_ptf.yml
       vars:
@@ -227,7 +225,6 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
 
     - include: qos_sai_ptf.yml
       vars:
@@ -244,7 +241,6 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        extra_options: "--relax --debug info --log-file /tmp/{{ test_path }}.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
 
     - name: Set testing buffer profile for lossy test
       shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
@@ -305,7 +301,6 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        extra_options: "--relax --debug info --log-file /tmp/sai_qos_tests.BufferUtilizationTest.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
       with_items: '{{ qp.buff_util_1.packet_send_rates }}'
 
     - include: qos_sai_ptf.yml
@@ -325,7 +320,6 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        extra_options: "--relax --debug info --log-file /tmp/sai_qos_tests.BufferUtilizationTest.{{ lookup('pipe','date +%Y-%m-%d-%H:%M:%S') }}.log"
       with_items: '{{ qp.buff_util_2.packet_send_rates }}'
 
   always:
