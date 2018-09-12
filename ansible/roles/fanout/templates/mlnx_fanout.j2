@@ -3,8 +3,10 @@
 {% set vlan_range = '101-132' %}
 {% set open_flow_tableid = '0' %}
 {% set flowid_offset = 160 %}
+{% set last_flowid = '193' %}
 {% set server_to_dut_flow_priority = '100' %}
 {% set dut_to_server_flow_priority = '101' %}
+{% set low_priority = '1' %}
 {% set eth_typ_lldp = '0x88CC' %}
 {% set eth_typ_slow = '0x8809' %}
 {% set eth_typ_arp = '0x0806' %}
@@ -187,6 +189,8 @@ openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={
 {% set vlanid = (vlanid_offset + i)|string %}
 openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_arp }},in_port={{ of_ports[i] }},actions=mod_vlan_vid:{{ vlanid }},output:{{ of_ports[uplink_port_id] }}
 {% endfor %}
+
+openflow add-flows {{ last_flowid }} table={{ open_flow_tableid }},priority={{ low_priority }},actions=normal
 
 docker
 no shutdown
