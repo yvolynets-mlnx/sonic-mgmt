@@ -86,6 +86,9 @@ function add_topo
 
   #ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut"
 
+  # Delete the obsoleted arp entry for the PTF IP
+  ip neighbor flush $ptf_ip
+
   echo $1 > /tmp/topo-$dut
   echo Done
 }
