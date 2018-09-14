@@ -89,30 +89,45 @@
 
 - name: Gathering minigraph facts about the device
   minigraph_facts: host={{ inventory_hostname }}
-#  connection: local
   become: no
   tags: always
 
-- name: Verify interfaces are up correctly
-  wait_for:
-      path: /sys/class/net/{{ item }}/operstate
-      search_regex: up
-  with_items: "{{ minigraph_ports }}"
-#  when: (sonic_hwsku == 'ACS-MSN2700' and item != 'Ethernet124') or (sonic_hwsku == 'ACS-MSN2100' and item != 'Ethernet36')
+- block:
 
-- name: Workaround. Wait for LAG interfaces.
-  pause:
-    minutes: 5
-  when: topo == "t0" or topo == "t1-lag"
+    - set_fact:
+        intfs: "{% if minigraph_ports|length > 1 %}{{ '{' }}{% endif %}{{ minigraph_ports.keys() | join(',') }}{% if minigraph_ports|length > 1 %}{{ '}' }}{% endif %}"
 
-- name: Verify PortChannel interfaces are up correctly
-  wait_for:
-      path: /sys/class/net/{{ item }}/operstate
-      search_regex: up
-  with_items: "{{ minigraph_portchannels.keys() }}"
+    - name: Verify interfaces are up correctly
+      command: bash -c "cat /sys/class/net/{{ intfs }}/operstate"
+      register: out
+      until: (out.rc == 0) and (out.stdout.find("down") == -1)
+      retries: 30
+      delay: 10
 
-- name: Verify VLAN interfaces are up correctly
-  wait_for:
-      path: /sys/class/net/{{ item }}/operstate
-      search_regex: up
-  with_items: "{{ minigraph_vlans.keys() }}"
+- block:
+
+    - set_fact:
+        pc_intfs: "{% if minigraph_portchannels|length > 1 %}{{ '{' }}{% endif %}{{ minigraph_portchannels.keys() | join(',') }}{% if minigraph_portchannels|length > 1 %}{{ '}' }}{% endif %}"
+
+    - name: Verify PortChannel interfaces are up correctly
+      command: bash -c "cat /sys/class/net/{{ pc_intfs }}/operstate"
+      register: out
+      until: (out.rc == 0) and (out.stdout.find("down") == -1)
+      retries: 30
+      delay: 10
+
+  when: (topo == "t0") or (topo == "t1-lag")
+
+- block:
+
+    - set_fact:
+        vlan_intfs: "{% if minigraph_vlans|length > 1 %}{{ '{' }}{% endif %}{{ minigraph_vlans.keys() | join(',') }}{% if minigraph_vlans|length > 1 %}{{ '}' }}{% endif %}"
+
+    - name: Verify VLAN interfaces are up correctly
+      command: bash -c "cat /sys/class/net/{{ vlan_intfs }}/operstate"
+      register: out
+      until: (out.rc == 0) and (out.stdout.find("down") == -1)
+      retries: 30
+      delay: 10
+
+  when: topo == "t0"
