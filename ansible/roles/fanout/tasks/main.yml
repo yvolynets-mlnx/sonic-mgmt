@@ -19,7 +19,7 @@
 - set_fact:
     fanout_root_user: "root"
     fanout_root_pass: "3tango"
-  tags: deploy,pfcwd_config
+  tags: deploy,pfcwd_config,check_pfcwd_config
 
  ##########################################################
  # deploy tasks to deploy default configuration on fanout #
@@ -69,6 +69,13 @@
 - include: mlnx_deploy_pfcwd_fanout.yml
   when: peer_hwsku == "MLNX-OS"
   tags: deploy,pfcwd_config
+
+ ###################################################################
+ # check and recover docker images for the PFC WD test             #
+ ###################################################################
+- include: mlnx_check_pfcwd_fanout.yml
+  when: peer_hwsku == "MLNX-OS"
+  tags: check_pfcwd_config
 
  ###################################################################
  # vlan_trunk task to apply special config for the vlan trunk test #
