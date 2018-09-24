@@ -8,21 +8,19 @@
     fanout_addr: "{{device_info['mgmtip']}}"
     ansible_ssh_user: "{{fanout_root_user}}"
     ansible_ssh_pass: "{{fanout_root_pass}}"
+    pfcwd_dockers: "['roles/test/files/mlnx/docker-tests-pfcgen/pfc_storm.tgz', 'roles/test/files/mlnx/docker-tests-saveargs/storm_args.tgz']"
+    fanout_img_path: "/var/opt/tms/images/"
 
 - name: Build containers to save storm arguments and to run storm
   command: make
   args:
-    chdir: "{{item}}"
-  with_items:
-    - roles/test/files/mlnx/docker-tests-pfcgen
-    - roles/test/files/mlnx/docker-tests-saveargs
+    chdir: "{{item | dirname}}"
+  with_items: pfcwd_dockers
   delegate_to: 127.0.0.1
 
 - name: Copy test match and ignore files to switch
-  copy: src="{{ item }}" dest="/var/opt/tms/images/"
-  with_items:
-    - "roles/test/files/mlnx/docker-tests-pfcgen/pfc_storm.tgz"
-    - "roles/test/files/mlnx/docker-tests-saveargs/storm_args.tgz"
+  copy: src="{{ item }}" dest={{fanout_img_path}}
+  with_items: pfcwd_dockers
 
 - name: Run the command if the specified file does not exist.
   command: mount -o remount, rw /
