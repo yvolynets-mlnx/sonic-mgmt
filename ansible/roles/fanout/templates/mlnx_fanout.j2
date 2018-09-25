@@ -13,12 +13,11 @@
 {% set MTU = '9216' %}
 {% set trunk_port = '1/32' %}
 
+
 {# ----------------------------Start of default port configuration------------------------ #}
 
 {% set default_eth_ports = ['ERR', '1/1', '1/2', '1/3', '1/4', '1/5', '1/6', '1/7', '1/8', '1/9', '1/10', '1/11', '1/12', '1/13', '1/14', '1/15', '1/16', '1/17', '1/18', '1/19', '1/20', '1/21', '1/22', '1/23', '1/24', '1/25', '1/26', '1/27', '1/28', '1/29', '1/30', '1/31/1', '1/31/2', '1/32'] %}
 {% set default_of_ports = [-1, 125, 127, 121, 123, 117, 119, 113, 115, 109, 111, 105, 107, 101, 103, 97, 99, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 94, 95] -%}
-{% set default_eth_ports_qsfp_split_4 = ['ERR', '1/1/1', '1/1/2', '1/1/3', '1/1/4', '1/3/1', '1/3/2', '1/3/3', '1/3/4', '1/5/1', '1/5/2', '1/5/3', '1/5/4', '1/7/1', '1/7/2', '1/7/3', '1/7/4', '1/9/1', '1/9/2', '1/9/3', '1/9/4', '1/11/1', '1/11/2', '1/11/3', '1/11/4', '1/13/1', '1/13/2', '1/13/3', '1/13/4', '1/15/1', '1/15/2', '1/15/3', '1/15/4', '1/32'] %}
-{% set default_of_ports_qsfp_split_4 = [-1, 125, 126, 127, 128, 121, 122, 123, 124, 117, 118, 119, 120, 113, 114, 115, 116, 109, 110, 111, 112, 105, 106, 107, 108, 101, 102, 103, 104, 97, 98, 99, 100, 95] -%}
 {% set uplink_port_id = 33 %}
 {# ----------------------------End of default port configuration-------------------------- #}
 
@@ -26,6 +25,11 @@
 
 {% set arc_switchmtbc01_eth_ports = ['ERR', '1/9/1', '1/9/2', '1/9/3', '1/9/4', '1/11/1', '1/11/2', '1/11/3', '1/11/4', '1/13/1', '1/13/2', '1/13/3', '1/13/4', '1/15/1', '1/15/2', '1/15/3', '1/15/4', '1/17/1', '1/17/2', '1/17/3', '1/17/4', '1/19/1', '1/19/2', '1/19/3', '1/19/4', '1/21/1', '1/21/2', '1/21/3', '1/21/4', '1/23/1', '1/23/2', '1/23/3', '1/23/4', '1/32'] %}
 {% set arc_switchmtbc01_of_ports = [-1, 109, 110, 111, 112, 105, 106, 107, 108, 101, 102, 103, 104, 97, 98, 99, 100, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 95] -%}
+{% set arc_switchmtbc02_eth_ports = ['ERR', '1/1/1', '1/1/2', '1/1/3', '1/1/4', '1/3/1', '1/3/2', '1/3/3', '1/3/4', '1/5/1', '1/5/2', '1/5/3', '1/5/4', '1/7/1', '1/7/2', '1/7/3', '1/7/4', '1/9/1', '1/9/2', '1/9/3', '1/9/4', '1/11/1', '1/11/2', '1/11/3', '1/11/4', '1/13/1', '1/13/2', '1/13/3', '1/13/4', '1/15/1', '1/15/2', '1/15/3', '1/15/4', '1/32'] %}
+{% set arc_switchmtbc02_of_ports = [-1, 125, 126, 127, 128, 121, 122, 123, 124, 117, 118, 119, 120, 113, 114, 115, 116, 109, 110, 111, 112, 105, 106, 107, 108, 101, 102, 103, 104, 97, 98, 99, 100, 95] -%}
+{% set r_panther_03_eth_ports = ['ERR', '1/29/1', '1/29/2', '1/29/3', '1/29/4', '1/28', '1/27', '1/26', '1/25', '1/24', '1/23', '1/22', '1/21', '1/20', '1/19', '1/18', '1/17', '1/16', '1/15', '1/14', '1/13', '1/12', '1/11', '1/10', '1/9', '1/8', '1/7', '1/6', '1/5', '1/4', '1/3', '1/2', '1/1', '1/32'] %}
+{% set r_panther_03_of_ports = [-1, 89, 90, 91, 92, 87, 85, 83, 81, 79, 77, 75, 73, 71, 69, 67, 65, 99, 97, 103, 101, 107, 105, 111, 109, 115, 113, 119, 117, 123, 121, 127, 125, 95] -%}
+
 {# ----------------------------End of special port configuration-------------------------- #}
 
 {# ----------------------------Start of port speed configuration-------------------------- #}
@@ -38,37 +42,51 @@
 {% set arc_switch1035_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
 {% set arc_switch1039_port_speed = [] %}
 {% set mts_sonic_fanout_port_speed = [] %}
+{% set r_panther_03_fanout_port_speed = [-1, 25000, 25000, 25000, 25000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000] %}
 {# -----------------------------End of speed configuration-------------------------------- #}
 
 
 {# -----------------------------Start of params dictionary-------------------------------- #}
 
+{% set qsfp_split_2_dict = {'arc-switchmtbc01':[],
+                            'arc-switchmtbc02':[],
+                            'arc-switch1003':['1/31'],
+                            'arc-switch1005':['1/31'],
+                            'arc-switch1007':['1/31'],
+                            'arc-switch1035':['1/31'],
+                            'arc-switch1039':['1/31'],
+                            'mts-sonic-fanout':['1/31'],
+                            'r-panther-03':[]} %}
+
+{% set qsfp_split_4_dict = {'arc-switchmtbc01':['1/9', '1/11', '1/13', '1/15', '1/17', '1/19', '1/21', '1/23'],
+                            'arc-switchmtbc02':['1/1', '1/3', '1/5', '1/7', '1/9', '1/11', '1/13', '1/15'],
+                            'arc-switch1003':[],
+                            'arc-switch1005':[],
+                            'arc-switch1007':[],
+                            'arc-switch1035':[],
+                            'arc-switch1039':[],
+                            'mts-sonic-fanout':[],
+                            'r-panther-03':['1/29']} %}
+
 {% set eth_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_eth_ports,
-                         'arc-switchmtbc02':default_eth_ports_qsfp_split_4,
+                         'arc-switchmtbc02':arc_switchmtbc02_eth_ports,
                          'arc-switch1003':default_eth_ports,
                          'arc-switch1005':default_eth_ports,
                          'arc-switch1007':default_eth_ports,
                          'arc-switch1035':default_eth_ports,
                          'arc-switch1039':default_eth_ports,
-                         'mts-sonic-fanout':default_eth_ports} %}
+                         'mts-sonic-fanout':default_eth_ports,
+                         'r-panther-03':r_panther_03_eth_ports} %}
 
 {% set of_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_of_ports,
-                        'arc-switchmtbc02':default_of_ports_qsfp_split_4,
+                        'arc-switchmtbc02':arc_switchmtbc02_of_ports,
                         'arc-switch1003':default_of_ports,
                         'arc-switch1005':default_of_ports,
                         'arc-switch1007':default_of_ports,
                         'arc-switch1035':default_of_ports,
                         'arc-switch1039':default_of_ports,
-                        'mts-sonic-fanout':default_of_ports} %}
-
-{% set qsfp_split_4_dict = {'arc-switchmtbc01':1,
-                          'arc-switchmtbc02':1,
-                          'arc-switch1003':0,
-                          'arc-switch1005':0,
-                          'arc-switch1007':0,
-                          'arc-switch1035':0,
-                          'arc-switch1039':0,
-                          'mts-sonic-fanout':0} %}
+                        'mts-sonic-fanout':default_of_ports,
+                        'r-panther-03':r_panther_03_of_ports} %}
 
 {% set license_dict = {'arc-switchmtbc01':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-REA1-288A-4QWL-0PW5-U7',
                        'arc-switchmtbc02':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFMB-A88A-0VXP-TUXP-RJ',
@@ -77,7 +95,9 @@
                        'arc-switch1007':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YU2D-E88A-7KLT-FWFY-MB',
                        'arc-switch1035':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-M6ER-X88A-0TA4-M3RG-7B',
                        'arc-switch1039':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-KY0T-C88A-5CEP-8QUJ-PB',
-                       'mts-sonic-fanout':'LK2-RESTRICTED_CMDS_GEN2-43A7-C1ND-30WG-T88A-1H4M-NBU2-MY'} %}
+                       'mts-sonic-fanout':'LK2-RESTRICTED_CMDS_GEN2-43A7-C1ND-30WG-T88A-1H4M-NBU2-MY',
+                       'r-panther-03':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFM9-T88A-171M-EFFE-CA'} %}
+
 
 {% set port_speed_dict = {'arc-switchmtbc01':arc_switchmtbc01_port_speed,
                           'arc-switchmtbc02':arc_switchmtbc02_port_speed,
@@ -86,11 +106,13 @@
                           'arc-switch1007':arc_switch1007_port_speed,
                           'arc-switch1035':arc_switch1035_port_speed,
                           'arc-switch1039':arc_switch1039_port_speed,
-                          'mts-sonic-fanout':mts_sonic_fanout_port_speed} %}
+                          'mts-sonic-fanout':mts_sonic_fanout_port_speed,
+                          'r-panther-03':r_panther_03_fanout_port_speed} %}
 
+{% set qsfp_split_2 = qsfp_split_2_dict[inventory_hostname] %}
+{% set qsfp_split_4 = qsfp_split_4_dict[inventory_hostname] %}
 {% set eth_ports = eth_ports_dict[inventory_hostname] %}
 {% set of_ports = of_ports_dict[inventory_hostname] %}
-{% set qsfp_split_4 = qsfp_split_4_dict[inventory_hostname] %}
 {% set fanout_license = license_dict[inventory_hostname] %}
 {% set port_speed = port_speed_dict[inventory_hostname] %}
 
@@ -109,15 +131,14 @@ hostname {{ inventory_hostname }}
 username {{ fanout_root_user }} password {{ fanout_root_pass }}
 no fae trap-group TRAP_GROUP_LLDP policer bind
 no fae trap-group TRAP_GROUP_OF_CONTROLLER policer bind
-{% if qsfp_split_4 == 0 %}
-interface ethernet 1/31 module-type qsfp-split-2 force
-{% else %}
-{% for i in range(1, eth_ports|length, 4) %}
-{% set list = eth_ports[i].split('/') %}
-{% set ifindex = list[0] + '/' + list[1] %}
-interface ethernet {{ ifindex }} module-type qsfp-split-4 force
+
+{% for i in range(0, qsfp_split_2|length) %}
+interface ethernet {{ qsfp_split_2[i] }} module-type qsfp-split-2 force
 {% endfor %}
-{% endif %}
+
+{% for i in range(0, qsfp_split_4|length) %}
+interface ethernet {{ qsfp_split_4[i] }} module-type qsfp-split-4 force
+{% endfor %}
 
 {% for i in range(1, port_speed|length) %}
 interface ethernet {{ eth_ports[i] }} speed {{ port_speed[i] }} force

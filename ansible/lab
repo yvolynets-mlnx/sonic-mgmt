@@ -7,6 +7,7 @@ arc-mtbc-1001      ansible_host=10.12.206.180 sonic_version=v2 hwsku="ACS-MSN241
 arc-switch1025     ansible_host=10.210.25.45 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0601
 arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701
 mtbc-sonic-01-2410 ansible_host=10.12.71.4 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0801
+r-boxer-sw01       ansible_host=10.210.25.53 sonic_version=v2 hwsku="ACS-MSN2010" iface_speed=25000 mgmt_subnet_mask_length=22 vm_base=VM0901
 
 [sonic_sn2700_40]
 str-msn2700-01    ansible_host=10.251.0.188
@@ -70,3 +71,4 @@ arc-switch1039    ansible_host=10.210.25.47
 arc-switch1003    ansible_host=10.210.25.43
 arc-switchmtbc01  ansible_host=10.12.67.34
 arc-switchmtbc02  ansible_host=10.12.67.41
+r-panther-03      ansible_host=10.210.25.83
