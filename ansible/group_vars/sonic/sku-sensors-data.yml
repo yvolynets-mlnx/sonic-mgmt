@@ -1060,7 +1060,59 @@ sensors_checks:
       - ucd9200-i2c-5-41/pout1/power2_input
       temp: []
     psu_skips: {}
-    
+  ACS-MSN2010:
+    alarms:
+      fan: []
+      power:
+      - tps53679-i2c-5-70/vin/in1_alarm
+      - tps53679-i2c-5-70/vout1/in2_lcrit_alarm
+      - tps53679-i2c-5-70/vout1/in2_crit_alarm
+      - tps53679-i2c-5-70/vout2/in3_lcrit_alarm
+      - tps53679-i2c-5-70/vout2/in3_crit_alarm
+      - tps53679-i2c-5-70/iout1/curr1_max_alarm
+      - tps53679-i2c-5-70/iout1/curr1_crit_alarm
+      - tps53679-i2c-5-70/iout2/curr2_max_alarm
+      - tps53679-i2c-5-70/iout2/curr2_crit_alarm
+      - tps53679-i2c-5-71/vin/in1_alarm
+      - tps53679-i2c-5-71/vout1/in2_lcrit_alarm
+      - tps53679-i2c-5-71/vout1/in2_crit_alarm
+      - tps53679-i2c-5-71/vout2/in3_lcrit_alarm
+      - tps53679-i2c-5-71/vout2/in3_crit_alarm
+      - tps53679-i2c-5-71/iout1/curr1_max_alarm
+      - tps53679-i2c-5-71/iout1/curr1_crit_alarm
+      - tps53679-i2c-5-71/iout2/curr2_max_alarm
+      - tps53679-i2c-5-71/iout2/curr2_crit_alarm
+      temp:
+      - coretemp-isa-0000/Core 0/temp2_crit_alarm
+      - coretemp-isa-0000/Core 1/temp3_crit_alarm
+      - coretemp-isa-0000/Core 2/temp4_crit_alarm
+      - coretemp-isa-0000/Core 3/temp5_crit_alarm
+      - tps53679-i2c-5-70/TPS Temp1/temp1_max_alarm
+      - tps53679-i2c-5-70/TPS Temp1/temp1_crit_alarm
+      - tps53679-i2c-5-70/TPS Temp2/temp2_max_alarm
+      - tps53679-i2c-5-70/TPS Temp2/temp2_crit_alarm
+      - tps53679-i2c-5-71/TPS Temp1/temp1_max_alarm
+      - tps53679-i2c-5-71/TPS Temp1/temp1_crit_alarm
+      - tps53679-i2c-5-71/TPS Temp2/temp2_max_alarm
+      - tps53679-i2c-5-71/TPS Temp2/temp2_crit_alarm
+    compares:
+      fan: []
+      power: []
+      temp:
+      - - lm75-i2c-7-4a/Ambient Port Temp/temp1_input
+        - lm75-i2c-7-4a/Ambient Port Temp/temp1_max_hyst
+      - - lm75-i2c-7-4b/Ambient Port Temp/temp1_input
+        - lm75-i2c-7-4b/Ambient Port Temp/temp1_max_hyst
+      - - mlxsw-i2c-2-48/ASIC Temp/temp1_input
+        - mlxsw-i2c-2-48/ASIC Temp/temp1_highest
+    non_zero:
+      fan: []
+      power:
+      - tps53679-i2c-5-70/pout1/power1_input
+      - tps53679-i2c-5-70/pout2/power2_input
+      - tps53679-i2c-5-70/pout1/power1_input
+      temp: []
+    psu_skips: {}
   Arista-7050-QX32:
     alarms:
       fan: []
