@@ -65,7 +65,7 @@
       copy:
         src: "roles/sonicv2/files/ssw/ACS-MSN2010/port_config_boxer01.ini"
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/port_config.ini"
-      when: ansible_ssh_host == 'r-boxer-sw01'
+      when: sonic_hwsku == 'ACS-MSN2010'
 
     - name: Deploy port config file.
       copy:
