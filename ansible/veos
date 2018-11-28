@@ -25,6 +25,9 @@ DEV-R730-02 ansible_host=dev-r730-02
 [vm_host_9]
 R-SONIC-02 ansible_host=r-sonic-02
 
+[vm_host_10]
+DEV-R730-03 ansible_host=dev-r730-03
+
 [vm_host:children]
 vm_host_1
 vm_host_2
@@ -35,6 +38,7 @@ vm_host_6
 vm_host_7
 vm_host_8
 vm_host_9
+vm_host_10
 
 [vms_1]
 VM0101 ansible_host=10.213.84.17
@@ -309,7 +313,6 @@ VM0831	ansible_host=10.12.207.72
 VM0832	ansible_host=10.12.207.73
 
 [vms_9]
-
 VM0901	ansible_host=10.213.88.6
 VM0902	ansible_host=10.213.88.7
 VM0903	ansible_host=10.213.88.8
@@ -343,6 +346,39 @@ VM0930	ansible_host=10.213.88.35
 VM0931	ansible_host=10.213.88.36
 VM0932	ansible_host=10.213.88.37
 
+[vms_10]
+VM1001	ansible_host=10.12.207.6
+VM1002	ansible_host=10.12.207.7
+VM1003	ansible_host=10.12.207.8
+VM1004	ansible_host=10.12.207.9
+VM1005	ansible_host=10.12.207.10
+VM1006	ansible_host=10.12.207.11
+VM1007	ansible_host=10.12.207.12
+VM1008	ansible_host=10.12.207.13
+VM1009	ansible_host=10.12.207.14
+VM1010	ansible_host=10.12.207.15
+VM1011	ansible_host=10.12.207.16
+VM1012	ansible_host=10.12.207.17
+VM1013	ansible_host=10.12.207.18
+VM1014	ansible_host=10.12.207.19
+VM1015	ansible_host=10.12.207.20
+VM1016	ansible_host=10.12.207.21
+VM1017	ansible_host=10.12.207.22
+VM1018	ansible_host=10.12.207.23
+VM1019	ansible_host=10.12.207.24
+VM1020	ansible_host=10.12.207.25
+VM1021	ansible_host=10.12.207.26
+VM1022	ansible_host=10.12.207.27
+VM1023	ansible_host=10.12.207.28
+VM1024	ansible_host=10.12.207.29
+VM1025	ansible_host=10.12.207.30
+VM1026	ansible_host=10.12.207.31
+VM1027	ansible_host=10.12.207.32
+VM1028	ansible_host=10.12.207.33
+VM1029	ansible_host=10.12.207.34
+VM1030	ansible_host=10.12.207.35
+VM1031	ansible_host=10.12.207.36
+VM1032	ansible_host=10.12.207.37
 
 [eos:children]
 vms_1
@@ -354,6 +390,7 @@ vms_6
 vms_7
 vms_8
 vms_9
+vms_10
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -419,6 +456,13 @@ host_var_file=host_vars/R-SONIC-02.yml
 vm_host_9
 vms_9
 
+[server_10:children]
+vm_host_10
+vms_10
+
+[server_10:vars]
+host_var_file=host_vars/DEV-R730-03.yml
+
 [servers:children]
 server_1
 server_2
@@ -429,6 +473,7 @@ server_6
 server_7
 server_8
 server_9
+server_10
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't0', 't0-16', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']

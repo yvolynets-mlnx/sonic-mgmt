@@ -56,7 +56,8 @@
                             'arc-switch1035':['1/31'],
                             'arc-switch1039':['1/31'],
                             'mts-sonic-fanout':['1/31'],
-                            'r-panther-03':[]} %}
+                            'r-panther-03':[],
+                            'mtbc-sonic-02-2700':[1/31]} %}
 
 {% set qsfp_split_4_dict = {'arc-switchmtbc01':['1/9', '1/11', '1/13', '1/15', '1/17', '1/19', '1/21', '1/23'],
                             'arc-switchmtbc02':['1/1', '1/3', '1/5', '1/7', '1/9', '1/11', '1/13', '1/15'],
@@ -66,6 +67,7 @@
                             'arc-switch1035':[],
                             'arc-switch1039':[],
                             'mts-sonic-fanout':[],
+                            'mtbc-sonic-02-2700':[],
                             'r-panther-03':['1/29']} %}
 
 {% set eth_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_eth_ports,
@@ -76,7 +78,8 @@
                          'arc-switch1035':default_eth_ports,
                          'arc-switch1039':default_eth_ports,
                          'mts-sonic-fanout':default_eth_ports,
-                         'r-panther-03':r_panther_03_eth_ports} %}
+                         'r-panther-03':r_panther_03_eth_ports,
+                         'mtbc-sonic-02-2700':default_eth_ports} %}
 
 {% set of_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_of_ports,
                         'arc-switchmtbc02':arc_switchmtbc02_of_ports,
@@ -86,7 +89,8 @@
                         'arc-switch1035':default_of_ports,
                         'arc-switch1039':default_of_ports,
                         'mts-sonic-fanout':default_of_ports,
-                        'r-panther-03':r_panther_03_of_ports} %}
+                        'r-panther-03':r_panther_03_of_ports,
+                        'mtbc-sonic-02-2700':default_of_ports} %}
 
 {% set license_dict = {'arc-switchmtbc01':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-REA1-288A-4QWL-0PW5-U7',
                        'arc-switchmtbc02':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFMB-A88A-0VXP-TUXP-RJ',
@@ -96,6 +100,7 @@
                        'arc-switch1035':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-M6ER-X88A-0TA4-M3RG-7B',
                        'arc-switch1039':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-KY0T-C88A-5CEP-8QUJ-PB',
                        'mts-sonic-fanout':'LK2-RESTRICTED_CMDS_GEN2-43A7-C1ND-30WG-T88A-1H4M-NBU2-MY',
+                       'mtbc-sonic-02-2700':'LK2-RESTRICTED_CMDS_GEN2-43A3-VYT8-6UEG-888A-67UA-1WBB-FX',
                        'r-panther-03':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFM9-T88A-171M-EFFE-CA'} %}
 
 
@@ -107,7 +112,8 @@
                           'arc-switch1035':arc_switch1035_port_speed,
                           'arc-switch1039':arc_switch1039_port_speed,
                           'mts-sonic-fanout':mts_sonic_fanout_port_speed,
-                          'r-panther-03':r_panther_03_fanout_port_speed} %}
+                          'r-panther-03':r_panther_03_fanout_port_speed,
+                          'mtbc-sonic-02-2700':arc_switchmtbc01_port_speed} %}
 
 {% set qsfp_split_2 = qsfp_split_2_dict[inventory_hostname] %}
 {% set qsfp_split_4 = qsfp_split_4_dict[inventory_hostname] %}
