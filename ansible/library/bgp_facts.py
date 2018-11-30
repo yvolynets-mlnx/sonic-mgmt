@@ -154,13 +154,16 @@ class BgpModule(object):
                         if regex_cap_gr_peer_af_ip6.match(line): capabilities['peer af ipv6 unicast'] = regex_cap_gr_peer_af_ip6.match(line).group(1).lower()
 
                         if regex_stats.match(line):
-                            key, values = line.split(':')
-                            key = key.lstrip()
-                            sent, rcvd = values.split()
-                            value_dict = {}
-                            value_dict['sent'] = int(sent)
-                            value_dict['rcvd'] = int(rcvd)
-                            message_stats[key] = value_dict
+                            try:
+                                key, values = line.split(':')
+                                key = key.lstrip()
+                                sent, rcvd = values.split()
+                                value_dict = {}
+                                value_dict['sent'] = int(sent)
+                                value_dict['rcvd'] = int(rcvd)
+                                message_stats[key] = value_dict
+                            except Exception as e:
+                                print"NonFatal: line:'{}' should not have matched for sent/rcvd count".format(line)
 
                         if capabilities:
                             neighbor['capabilities'] = capabilities
