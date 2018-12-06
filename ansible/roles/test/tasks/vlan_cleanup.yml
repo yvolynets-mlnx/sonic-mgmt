@@ -4,12 +4,6 @@
     - "{{ minigraph_portchannel_interfaces }}"
   become: true
 
-- name: Bring up LAGs
-  shell: ifconfig {{ item.attachto }} up
-  with_items:
-    - "{{ minigraph_portchannel_interfaces }}"
-  become: true
-
 - name: Remove configuration for test
   file: 
     state: absent
