@@ -460,10 +460,10 @@ def parse_xml(filename, hostname):
             port_alias_map["Ethernet%d/1" % i] = "Ethernet%d" % ((i - 5) * 4)
         for i in range(29, 37):
             port_alias_map["Ethernet%d" % i] = "Ethernet%d" % ((i - 5) * 4)
-    elif hwsku == "Arista-7260CX3-C64":
+    elif hwsku == "Arista-7260CX3-C64" or hwsku == "Arista-7170-64C":
         for i in range(1, 65):
             port_alias_map["Ethernet%d/1" % i] = "Ethernet%d" % ((i - 1) * 4)
-    elif hwsku == "Arista-7060CX-32S-C32":
+    elif hwsku == "Arista-7060CX-32S-C32" or hwsku == "Arista-7060CX-32S-C32-T1":
         for i in range(1, 33):
             port_alias_map["Ethernet%d/1" % i] = "Ethernet%d" % ((i - 1) * 4)
     elif hwsku == "Mellanox-SN2700-D48C8":
@@ -518,6 +518,12 @@ def parse_xml(filename, hostname):
     elif hwsku == "Accton-AS7712-32X":
         for i in range(1, 33):
             port_alias_map["hundredGigE%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+    elif hwsku == "Celestica-DX010-C32":
+        for i in range(1, 33):
+            port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+    elif hwsku == "Seastone-DX010":
+        for i in range(1, 33):
+            port_alias_map["Eth%d" % i] = "Ethernet%d" % ((i - 1) * 4)
     else:
         if hwsku == "ACS-MSN2100":
             for i in range(0, 30, 1):
