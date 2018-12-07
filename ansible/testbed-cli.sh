@@ -66,14 +66,14 @@ function start_vms
 {
   echo "Starting VMs on server '$1'"
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_start_VMs.yml --vault-password-file="$2" -l "$1"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_start_VMs.yml --vault-password-file="$2" -l "$1" -vvvvv
 }
 
 function stop_vms
 {
   echo "Stopping VMs on server '$1'"
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_stop_VMs.yml --vault-password-file="$2" -l "$1"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_stop_VMs.yml --vault-password-file="$2" -l "$1" -vvvvv
 }
 
 function add_topo
@@ -82,9 +82,9 @@ function add_topo
 
   read_file $1
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_add_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_add_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" -vvvvv
 
-  #ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut"
+  #ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut" -vvvvv
 
   # Delete the obsoleted arp entry for the PTF IP
   ip neighbor flush $ptf_ip
@@ -99,7 +99,7 @@ function remove_topo
 
   read_file $1
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_remove_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_remove_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" -vvvvv
 
   rm /tmp/topo-$dut
   echo Done
@@ -111,7 +111,7 @@ function renumber_topo
 
   read_file $1
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_renumber_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_renumber_vm_topology.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" -vvvvv
 
   #ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut"
 
@@ -124,7 +124,7 @@ function connect_vms
 
   read_file $1
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_connect_vms.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e topo="$topo" -e vm_set_name="$testbed_name"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_connect_vms.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e topo="$topo" -e vm_set_name="$testbed_name" -vvvvv
 
   echo Done
 }
@@ -135,7 +135,7 @@ function disconnect_vms
 
   read_file $1
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_disconnect_vms.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e topo="$topo" -e vm_set_name="$testbed_name"
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i veos testbed_disconnect_vms.yml --vault-password-file="$2" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e topo="$topo" -e vm_set_name="$testbed_name" -vvvvv
 
   echo Done
 }
@@ -147,7 +147,7 @@ function generate_minigraph
 
   read_file $1
 
-  ansible-playbook -i "$2" config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -v
+  ansible-playbook -i "$2" config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -vvvvv
 
   echo Done
 }
@@ -158,7 +158,7 @@ function deploy_minigraph
 
   read_file $1
 
-  ansible-playbook -i "$2" config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -e deploy=true -e save=true
+  ansible-playbook -i "$2" config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -e deploy=true -e save=true -vvvvv
 
   echo Done
 }
@@ -169,7 +169,7 @@ function test_minigraph
 
   read_file $1
 
-  ansible-playbook -i "$2" --diff --connection=local --check config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1"
+  ansible-playbook -i "$2" --diff --connection=local --check config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -vvvvv
 
   echo Done
 }
@@ -201,7 +201,7 @@ function deploy
     # Set topology on server side
     reset_topo ${switch} ${switch}-${topo} veos  >/tmp/${switch}-${topo}.reset_topo.log  &
 
-    ANSIBLE_SCP_IF_SSH=y ansible-playbook  -i inventory --limit ${switch}-${topo} update_sonic.yml --tags update -b -vvvvv -e "image_url=${image_url}" -e "dut_minigraph=${switch}.${topo}.xml" -e topo="${topo}"
+    ANSIBLE_SCP_IF_SSH=y ansible-playbook  -i inventory --limit ${switch}-${topo} update_sonic.yml --tags update -b -e "image_url=${image_url}" -e "dut_minigraph=${switch}.${topo}.xml" -e topo="${topo}" -vvvvv
 
     echo "Deploy finished. Waiting for topology change."
     wait ${!}
@@ -215,7 +215,7 @@ function connect_topo
 
   read_file $1
 
-  ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut"
+  ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="$2" -e "dut=$dut" -vvvvv
 }
 
 if [ $# -lt 3 ]
