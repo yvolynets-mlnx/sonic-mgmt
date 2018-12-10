@@ -156,8 +156,9 @@
 
   always:
     - name: reset all changes
-      shell: "config load_minigraph -y"
-      become: yes
+      include: "roles/test/tasks/common_tasks/reload_sonic.yml"
+      vars:
+        config_source: "minigraph"
 
     - name: wait 60 seconds for ports to be up
       pause: seconds=60
