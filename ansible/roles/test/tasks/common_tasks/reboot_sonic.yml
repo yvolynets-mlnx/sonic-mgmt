@@ -3,7 +3,6 @@
     zebra_orig_config: "/usr/share/sonic/templates/zebra.conf.j2_orig"
     zebra_simx_config: "/usr/share/sonic/templates/zebra.conf.j2_simx"
     zebra_config: "/usr/share/sonic/templates/zebra.conf.j2"
-  when: "simx is defined and simx == 'yes'"
 
 - block:
   - name: "SimX workaround: Check for backuped original zebra template config"
