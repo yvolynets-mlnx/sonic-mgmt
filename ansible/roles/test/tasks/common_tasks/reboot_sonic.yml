@@ -1,3 +1,16 @@
+- name: set possible reboot types
+  set_fact:
+    reboot_types: ["reboot", "fast-reboot", "warm-reboot" ]
+
+- name: set default value for reboot type
+  set_fact:
+    reboot_type: "reboot"
+  when: reboot_type is not defined
+
+- fail:
+    msg: "Reboot type {{ reboot_type }} is invalid. Must be one of {{ reboot_types }}"
+  when: reboot_type not in reboot_types
+
 - name: "SimX workaround: Set zebra template config facts"
   set_fact:
     zebra_orig_config: "/usr/share/sonic/templates/zebra.conf.j2_orig"
@@ -18,10 +31,11 @@
 
   when: "simx is defined and simx == 'yes'"
 
-- name: "Rebooting {{ inventory_hostname }} : {{ ansible_host }} ..."
-  shell: sudo reboot
+- name: "rebooting {{ inventory_hostname }} : {{ ansible_host }} with {{ reboot_type }}..."
+  command: "{{ reboot_type }}"
   async: 1
   poll: 0
+  become: yes
   ignore_errors: true
 
 - name: "Pause for 1 minute before check"
