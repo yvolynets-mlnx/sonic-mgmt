@@ -79,6 +79,16 @@
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini"
       when: ansible_ssh_host == 'arc-switch1004'
 
+    - name: Deploy buffers patch.
+      copy:
+        src: "roles/sonic-common/files/buffers_config.sh"
+        dest: "/home/admin/buffers_config.sh"
+        mode: "0755"
+
+    - name: Update buffers template.
+      shell: "/home/admin/buffers_config.sh"
+      become: "yes"
+
     - name: Reload minigraph.
       shell: config load_minigraph -y
 
