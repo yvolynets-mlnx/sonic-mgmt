@@ -34,7 +34,7 @@
 - block:
     - name: Reboot device.
       command: reboot
-      async: 1
+      async: 300
       poll: 0
       ignore_errors: true
 
