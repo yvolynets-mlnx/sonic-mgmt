@@ -1,6 +1,6 @@
 # SONiC to SONiC image update on the running device.
-# Command example: 
-# ansible-playbook -i inventory --limit SWITCH update.yml --tags update -b -vvvvv -e CMD image_url=URL 
+# Command example:
+# ansible-playbook -i inventory --limit SWITCH update.yml --tags update -b -vvvvv -e CMD image_url=URL
 
 - fail: msg="image_url variable should be provided."
   when: image_url is not defined
@@ -62,7 +62,7 @@
 
     - name: Wait for switch initialization to finish
       pause:
-        seconds: 60
+        seconds: 180
 
     - name: Deploy minigraph file.
       copy:
