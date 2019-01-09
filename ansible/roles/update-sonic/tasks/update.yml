@@ -44,7 +44,7 @@
         port: 22
         state: started
         delay: 180
-        timeout: 300
+        timeout: 900
       connection: local
 
   when: "'Running SONiC has the same version' not in update_output.stdout"
