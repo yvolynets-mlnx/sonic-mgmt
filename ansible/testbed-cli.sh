@@ -281,9 +281,9 @@ case "${subcmd}" in
                ;;
   test-mg)     test_minigraph $@
                ;;
-  reset-topo) reset_topo $2 $3 $4
+  reset-topo) reset_topo $@
                ;;
-  deploy) deploy $2 $3 $4
+  deploy) deploy $@
                ;;
   *)           usage
                ;;
