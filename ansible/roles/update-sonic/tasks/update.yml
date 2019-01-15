@@ -29,7 +29,7 @@
 - fail: msg="{{ update_output.stdout }}"
   when:
     - update_output.rc != 0
-    - "'Running SONiC has the same version' not in update_output.stdout"
+    - "'running SONiC has the same version' not in update_output.stdout"
 
 - block:
     - name: Reboot device.
@@ -47,23 +47,72 @@
         timeout: 900
       connection: local
 
-  when: "'Running SONiC has the same version' not in update_output.stdout"
+  when: "'running SONiC has the same version' not in update_output.stdout"
+
+- name: Wait until possible FW updating is done
+  command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
+  register: output
+  until: output.rc == 0
+  retries: 12
+  delay: 10
+  ignore_errors: true
+
+# When running firmware version does not match current image, the output of mlxfwmanager --query
+# will have a line containing "FW (Running)".
+- name: Check current running firmware version
+  command: bash -c 'mlxfwmanager --query'
+  register: firmware_query_output
+
+- name: Firmware version info
+  debug: msg="{{ firmware_query_output.stdout_lines }}"
 
 - block:
 
-    # If upgrade from older version, firmware update is performed after reboot
-    - name: Wait for switch fw update to finish
-      command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
-      register: output
-      until: output.rc == 0
-      retries: 12
-      delay: 10
-      ignore_errors: true
+  - name: If unmached running FW ver, reboot to recover
+    command: reboot
+    async: 300
+    poll: 0
+    ignore_errors: true
 
-    - name: Wait for switch initialization to finish
-      shell: redis-cli -n 0 hgetall SWITCH_TABLE:switch | grep hash_seed
-      register: switch_init_done
-      until: switch_init_done.rc == 0
+  - name: Wait for device to come back.
+    wait_for:
+      host: "{{ ansible_ssh_host }}"
+      port: 22
+      state: started
+      delay: 180
+      timeout: 900
+    connection: local
+
+  - name: Wait until possible FW updating is done
+    command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
+    register: output
+    until: output.rc == 0
+    retries: 12
+    delay: 10
+    ignore_errors: true
+
+  - name: Check current running firmware version again
+    command: bash -c 'mlxfwmanager --query'
+    register: firmware_query_output_2
+    ignore_errors: true
+
+  - name: Firmware version info
+    debug: msg="{{ firmware_query_output_2.stdout_lines }}"
+
+  - name: If still unmatched running FW version, assert failure
+    fail: msg="Running firmware version does not match current image. Not recovered after reboot. Aborting..."
+    when: firmware_query_output_2.stdout.find("FW (Running)") != -1
+
+  when: firmware_query_output.stdout.find("FW (Running)") != -1
+
+- block:
+
+    # "config load_minigraph -y" needs to stop swss. If swss is not fully started, stopping swss may fail.
+    # This is the workaround to wait until swss service is started
+    - name: Wait for swss service to start
+      command: systemctl -p ActiveState -p SubState show swss
+      register: service_swss_state
+      until: (service_swss_state.stdout.find("ActiveState=active") >= 0) and (service_swss_state.stdout.find("SubState=running") >= 0)
       retries: 10
       delay: 30
 
