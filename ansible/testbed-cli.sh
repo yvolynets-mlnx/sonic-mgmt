@@ -215,7 +215,9 @@ function reset_topo
             exit 0
         fi
 
-        remove_topo $(cat /tmp/topo-${dut}) ${passwd}
+        if [ "$(cat /tmp/topo-${dut})" != "" ]; then
+            remove_topo $(cat /tmp/topo-${dut}) ${passwd}
+        fi
     else
         echo "No saved topology found for ${dut}"
     fi
