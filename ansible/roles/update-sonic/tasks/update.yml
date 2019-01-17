@@ -2,6 +2,10 @@
 # Command example:
 # ansible-playbook -i inventory --limit SWITCH update.yml --tags update -b -vvvvv -e CMD image_url=URL
 
+- name: Simx workaround
+  set_fact: simx=no
+  when: simx is not defined
+
 - fail: msg="image_url variable should be provided."
   when: image_url is not defined
 
@@ -62,9 +66,11 @@
 - name: Check current running firmware version
   command: bash -c 'mlxfwmanager --query'
   register: firmware_query_output
+  when: simx != 'yes'
 
 - name: Firmware version info
   debug: msg="{{ firmware_query_output.stdout_lines }}"
+  when: simx != 'yes'
 
 - block:
 
@@ -103,7 +109,7 @@
     fail: msg="Running firmware version does not match current image. Not recovered after reboot. Aborting..."
     when: firmware_query_output_2.stdout.find("FW (Running)") != -1
 
-  when: firmware_query_output.stdout.find("FW (Running)") != -1
+  when: simx != 'yes' and firmware_query_output.stdout.find("FW (Running)") != -1
 
 - block:
 
