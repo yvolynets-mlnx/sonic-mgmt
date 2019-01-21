@@ -21,6 +21,7 @@ iface_speed='40000'
 
 [sonic_s6000]
 lab-s6000-01      ansible_host=10.251.0.189
+vlab-01           ansible_host=10.250.0.101
 
 [sonic_s6000:vars]
 hwsku="Force10-S6000"
@@ -49,6 +50,7 @@ sonic_a7260
 [ptf]
 ptf_ptf1    ansible_host=10.255.0.188 ansible_ssh_user=root ansible_ssh_pass=root
 ptf_vms1-1  ansible_host=10.255.0.178 ansible_ssh_user=root ansible_ssh_pass=root
+ptf_vms6-1  ansible_host=10.250.0.102 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1029    ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1041    ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1038    ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root
