@@ -24,6 +24,7 @@ QUEUE_0 = 0
 QUEUE_1 = 1
 QUEUE_3 = 3
 QUEUE_4 = 4
+QUEUE_5 = 5
 
 # Constants
 STOP_PORT_MAX_RATE = 1
@@ -112,12 +113,14 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
             ## dscp 3 -> queue 3
             ## dscp 4 -> queue 4
             ## dscp 8 -> queue 1
-            ## So for the 64 pkts sent the mapping should be -> 61 queue 0, and 1 for queue1, queue3 and queue4
+            ## dscp 46 -> queue 5
+            ## So for the 64 pkts sent the mapping should be -> 60 queue 0, and 1 for queue1, queue3, queue4 and queue 5
             ## Check results
-            assert (queue_results[QUEUE_0] == 61)
+            assert (queue_results[QUEUE_0] == 60)
             assert (queue_results[QUEUE_1] == 1)
             assert (queue_results[QUEUE_3] == 1)
             assert (queue_results[QUEUE_4] == 1)
+            assert (queue_results[QUEUE_5] == 1)
 
         finally:
             print "END OF TEST"
