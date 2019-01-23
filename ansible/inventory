@@ -10,12 +10,12 @@ dev-r-vrt-232-005  ansible_host=dev-r-vrt-232-005  sonic_version=v2  sonic_hwsku
 dev-r-vrt-232-007  ansible_host=dev-r-vrt-232-007  sonic_version=v2  sonic_hwsku=ACS-MSN3700 serial_console="telnet 10.212.232.1 5007"
 
 # MTR testbed arc-switch1038 topologies
-arc-switch1038  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7001 10.224.2.81"
-arc-switch1038-t0  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7001 10.224.2.81" ptf_host=ptf-fib rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-arc-switch1038-t0-64-32  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7001 10.224.2.81" rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-arc-switch1038-t1  ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
-arc-switch1038-t1-lag  ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
-arc-switch1038-ptf32   ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
+arc-switch1038  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN3700 serial_console="ssh -l rcon:7001 10.224.2.81"
+arc-switch1038-t0  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN3700 serial_console="ssh -l rcon:7001 10.224.2.81" ptf_host=ptf-fib rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1038-t0-64-32  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN3700 serial_console="ssh -l rcon:7001 10.224.2.81" rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+arc-switch1038-t1  ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN3700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
+arc-switch1038-t1-lag  ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN3700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
+arc-switch1038-ptf32   ansible_host=arc-switch1038 sonic_version=v2 sonic_hwsku=ACS-MSN3700 ptf_host=ptf-fib ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1007 dut_mac="24:8a:07:05:31:c0" serial_console="ssh -l rcon:7001 10.224.2.81"
 
 # MTR testbed arc-switch1004 topologies
 arc-switch1004  ansible_host=arc-switch1004  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7011 10.224.2.80"
@@ -106,6 +106,7 @@ arc-switch1038-t0
 arc-switch1038-t0-64-32
 arc-switch1038-t1
 arc-switch1038-t1-lag
+arc-switch1038-ptf32
 
 # MTR arc-switch1025 topologies
 arc-switch1025
@@ -185,6 +186,7 @@ arc-switch1038-t0
 arc-switch1038-t0-64-32
 arc-switch1038-t1
 arc-switch1038-t1-lag
+arc-switch1038-ptf32
 
 # MTR arc-switch1025 topologies
 arc-switch1025

@@ -130,8 +130,8 @@ arc-switch1038,Ethernet104,arc-switch1007,Ethernet27,40000,1707,Access
 arc-switch1038,Ethernet108,arc-switch1007,Ethernet28,40000,1708,Access
 arc-switch1038,Ethernet112,arc-switch1007,Ethernet29,40000,1709,Access
 arc-switch1038,Ethernet116,arc-switch1007,Ethernet30,40000,1710,Access
-arc-switch1038,Ethernet120,arc-switch1007,Ethernet31,40000,1711,Access
-arc-switch1038,Ethernet124,arc-switch1007,Ethernet32,40000,1712,Access
+arc-switch1038,Ethernet120,arc-switch1007,Ethernet31,10000,1711,Access
+arc-switch1038,Ethernet124,arc-switch1007,Ethernet32,10000,1712,Access
 
 arc-switch1025,Ethernet0,arc-switch1035,Ethernet1,40000,1681,Access
 arc-switch1025,Ethernet4,arc-switch1035,Ethernet2,40000,1682,Access
