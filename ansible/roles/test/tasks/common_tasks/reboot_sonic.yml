@@ -33,15 +33,39 @@
 
 - name: "rebooting {{ inventory_hostname }} : {{ ansible_host }} with {{ reboot_type }}..."
   command: "{{ reboot_type }}"
-  async: 1
+  async: 300
   poll: 0
   become: yes
+  register: reboot_task
   ignore_errors: true
 
-- name: "Pause for 1 minute before check"
-  pause: minutes=1
+- block:
+  - name: "Wait for switch to shutdown"
+    become: false
+    local_action: wait_for
+    args:
+      host: "{{ ansible_host }}"
+      port: 22
+      state: absent
+      search_regex: "OpenSSH_[\\w\\.]+ Debian"
+      delay: 10
+      timeout: 180
+    changed_when: false
 
-- name: "Wait for switch to come back"
+  rescue:
+
+  - name: 'Poll reboot task status'
+    become: yes
+    async_status:
+      jid: "{{ reboot_task.ansible_job_id }}"
+    register: reboot_result
+    ignore_errors: true
+
+  - name: 'Fail if {{ reboot_type }} failed'
+    fail:
+       msg: "{{ reboot_result.stderr }}"
+
+- name: Wait for switch to come back
   become: false
   local_action: wait_for
   args:
@@ -53,8 +77,8 @@
     timeout: 180
   changed_when: false
 
-- name: "Wait for 2 minutes for prcesses and interfaces to be stable"
-  pause: minutes=2
+- name: wait for 2 minute for prcesses and interfaces to be stable
+  pause: seconds=120
 
 - block:
   - name: "SimX workaround: Check for backuped SimX zebra template config"
