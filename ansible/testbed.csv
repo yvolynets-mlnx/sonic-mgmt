@@ -31,6 +31,7 @@ arc-switch1029-fastreboot,ptf-1029,t0,vm-t1,10.213.84.98/16,server_4,VM0401,arc-
 arc-switch1041-fastreboot,ptf-1041,t0,vm-t1,10.213.86.93/16,server_3,VM0301,arc-switch1041,Mellanox testbed
 arc-switch1038-fastreboot,ptf-1038,t0,vm-t1,10.213.84.41/16,server_1,VM0101,arc-switch1038,Mellanox testbed
 arc-switch1025-fastreboot,ptf-1025,t0,vm-t1,10.213.84.213/16,server_6,VM0601,arc-switch1025,Mellanox testbed
+arc-switch1004-fastreboot,ptf-1004,t0,vm-t1,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox testbed
 
 arc-switch1004-t1,vm-t1,t1,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
 arc-switch1004-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
