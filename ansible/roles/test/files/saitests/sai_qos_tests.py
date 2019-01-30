@@ -20,11 +20,8 @@ PFC_PRIO_3 = 5
 PFC_PRIO_4 = 6
 TRANSMITTED_OCTETS = 10
 TRANSMITTED_PKTS = 11
-QUEUE_0 = 0
-QUEUE_1 = 1
-QUEUE_3 = 3
-QUEUE_4 = 4
-QUEUE_5 = 5
+NUM_QUEUE = 8
+DSCP_TO_TC_CONFIG_FILE="/root/dscp_to_tc_map.txt"
 
 # Constants
 STOP_PORT_MAX_RATE = 1
@@ -61,6 +58,7 @@ class ReleaseAllPorts(sai_base_test.ThriftInterfaceDataPlane):
 
 class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
     def runTest(self):
+        expect_results = [0] * NUM_QUEUE
         switch_init(self.client)
         
         router_mac = self.test_params['router_mac']        
@@ -75,6 +73,13 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
 
         ## Clear Switch Counters
         sai_thrift_clear_all_counters(self.client)
+
+        file = open(DSCP_TO_TC_CONFIG_FILE, 'r')
+        if not file:
+            self.fail("Not found DSCP to TC map config file")
+        dscp_to_tc_dic = eval(file.readline()).values()[0]
+        for dscp, queue in dscp_to_tc_dic.items():
+            expect_results[int(queue)] += 1
 
         ## DSCP Mapping test
         try:
@@ -109,18 +114,8 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
             ## Read Counters
             port_results, queue_results = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
 
-            ## According to SONiC configuration all dscp are classified to queue 0 except:
-            ## dscp 3 -> queue 3
-            ## dscp 4 -> queue 4
-            ## dscp 8 -> queue 1
-            ## dscp 46 -> queue 5
-            ## So for the 64 pkts sent the mapping should be -> 60 queue 0, and 1 for queue1, queue3, queue4 and queue 5
-            ## Check results
-            assert (queue_results[QUEUE_0] == 60)
-            assert (queue_results[QUEUE_1] == 1)
-            assert (queue_results[QUEUE_3] == 1)
-            assert (queue_results[QUEUE_4] == 1)
-            assert (queue_results[QUEUE_5] == 1)
+            for queue_index in range(NUM_QUEUE):
+                assert(queue_results[queue_index] == expect_results[queue_index])
 
         finally:
             print "END OF TEST"
