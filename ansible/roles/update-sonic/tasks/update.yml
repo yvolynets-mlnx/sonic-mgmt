@@ -42,12 +42,21 @@
       poll: 0
       ignore_errors: true
 
+    - name: Wait for device to go down.
+      wait_for:
+        host: "{{ ansible_ssh_host }}"
+        port: 22
+        state: stopped
+        delay: 10
+        timeout: 300
+      connection: local
+
     - name: Wait for device to come back.
       wait_for:
         host: "{{ ansible_ssh_host }}"
         port: 22
         state: started
-        delay: 180
+        delay: 10
         timeout: 900
       connection: local
 
@@ -66,7 +75,14 @@
 - name: Check current running firmware version
   command: bash -c 'mlxfwmanager --query'
   register: firmware_query_output
+  until: firmware_query_output.rc == 0
+  retries: 12
+  delay: 10
+  ignore_errors: true
   when: simx != 'yes'
+
+- fail: msg="Unable to get firmware information. Aborting..."
+  when: simx != 'yes' and firmware_query_output.rc != 0
 
 - name: Firmware version info
   debug: msg="{{ firmware_query_output.stdout_lines }}"
@@ -80,12 +96,21 @@
     poll: 0
     ignore_errors: true
 
+  - name: Wait for device to go down.
+    wait_for:
+      host: "{{ ansible_ssh_host }}"
+      port: 22
+      state: stopped
+      delay: 10
+      timeout: 300
+    connection: local
+
   - name: Wait for device to come back.
     wait_for:
       host: "{{ ansible_ssh_host }}"
       port: 22
       state: started
-      delay: 180
+      delay: 10
       timeout: 900
     connection: local
 
@@ -100,6 +125,9 @@
   - name: Check current running firmware version again
     command: bash -c 'mlxfwmanager --query'
     register: firmware_query_output_2
+    until: firmware_query_output_2.rc == 0
+    retries: 12
+    delay: 10
     ignore_errors: true
 
   - name: Firmware version info
