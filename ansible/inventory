@@ -77,7 +77,7 @@ mtbc-sonic-03-2700-ptf32   ansible_host=mtbc-sonic-03-2700  sonic_version=v2  so
 r-boxer-sw01 ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 r-boxer-sw01-t0  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 r-boxer-sw01-t1  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-r-boxer-sw01-lag  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+r-boxer-sw01-t1-lag  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 r-boxer-sw01-ptf32   ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTR SimX testbed dev-r-vrt-232-005 topologies
@@ -281,7 +281,7 @@ ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh
 ptf-mtbc01 ansible_host=10.12.206.220 ansible_ssh_user=root ansible_ssh_pass=root
 # MTBC mtbc-sonic-01-2410 PTF host
 ptf-mtbc02 ansible_host=10.12.207.41 ansible_ssh_user=root ansible_ssh_pass=root
-# MTBC mtbc-sonic-03-2700 PTF host 
+# MTBC mtbc-sonic-03-2700 PTF host
 ptf-mtbc03 ansible_host=10.12.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 # MTBC r-boxer-sw01 PTF host
 ptf-boxer-sw01 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
