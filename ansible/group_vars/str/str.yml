@@ -25,7 +25,7 @@ qos_params:
         ecn_1:
             dscp: 8
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_2:
             dscp: 8
@@ -35,7 +35,7 @@ qos_params:
         ecn_3:
             dscp: 0
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_4:
             dscp: 0
@@ -96,7 +96,7 @@ qos_params:
         ecn_1:
             dscp: 8
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_2:
             dscp: 8
@@ -106,7 +106,7 @@ qos_params:
         ecn_3:
             dscp: 0
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_4:
             dscp: 0
@@ -167,7 +167,7 @@ qos_params:
         ecn_1:
             dscp: 8
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_2:
             dscp: 8
@@ -177,7 +177,7 @@ qos_params:
         ecn_3:
             dscp: 0
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_4:
             dscp: 0
@@ -238,7 +238,7 @@ qos_params:
         ecn_1:
             dscp: 8
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_2:
             dscp: 8
@@ -248,7 +248,7 @@ qos_params:
         ecn_3:
             dscp: 0
             ecn: 0
-            num_of_pkts: 5000
+            num_of_pkts: 7000
             cell_size: 96
         ecn_4:
             dscp: 0

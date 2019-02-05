@@ -190,8 +190,8 @@
         test_params:
         - dscp='{{ qp.ecn_1.dscp }}'
         - ecn='{{  qp.ecn_1.ecn }}'
-        - limit='{{ red_max_threshold }}'
-        - min_limit='{{ green_max_threshold }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_1.num_of_pkts }}'
         - cell_size='{{ qp.ecn_1.cell_size }}'
         - dst_port_id='{{ dst_port_id }}'
@@ -206,8 +206,8 @@
         test_params:
         - dscp='{{ qp.ecn_2.dscp }}'
         - ecn='{{  qp.ecn_2.ecn }}'
-        - limit='{{ red_max_threshold }}'
-        - min_limit='{{ green_max_threshold }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_2.num_of_pkts }}'
         - cell_size='{{ qp.ecn_2.cell_size }}'
         - dst_port_id='{{ dst_port_id }}'
@@ -222,8 +222,8 @@
         test_params:
         - dscp='{{ qp.ecn_3.dscp }}'
         - ecn='{{  qp.ecn_3.ecn }}'
-        - limit='{{ red_max_threshold }}'
-        - min_limit='{{ green_max_threshold }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_3.num_of_pkts }}'
         - cell_size='{{ qp.ecn_3.cell_size }}'
         - dst_port_id='{{ dst_port_id }}'
@@ -238,8 +238,8 @@
         test_params:
         - dscp='{{ qp.ecn_4.dscp }}'
         - ecn='{{  qp.ecn_4.ecn }}'
-        - limit='{{ red_max_threshold }}'
-        - min_limit='{{ green_max_threshold }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_4.num_of_pkts }}'
         - cell_size='{{ qp.ecn_4.cell_size }}'
         - dst_port_id='{{ dst_port_id }}'

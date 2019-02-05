@@ -316,30 +316,45 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             print "END OF TEST"
 
 class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
+    def predictTx(self, min, max, num_pkts):
+        tx = 0
+        for i in range(min, num_pkts):
+            drop = float(tx) / (max - min) # drop probability 0..1
+            rnd = float(int(os.urandom(8).encode('hex'), 16)) / ((1 << 64) - 1) # random number between 0 and 1
+            if rnd > drop:
+                tx += 1
+        return min + tx
+
     def runTest(self):
         time.sleep(5)
         switch_init(self.client)
+        ecn_tolerance_prc = 10
         
         # Parse input parameters
         dscp = int(self.test_params['dscp'])
         ecn = int(self.test_params['ecn'])
         router_mac = self.test_params['router_mac']
-        default_packet_length = 64
+        cell_size = int(self.test_params['cell_size'])
         dst_port_id = int(self.test_params['dst_port_id'])
         dst_port_ip = self.test_params['dst_port_ip']
         dst_port_mac = self.dataplane.get_mac(0, dst_port_id)
         src_port_id = int(self.test_params['src_port_id'])
         src_port_ip = self.test_params['src_port_ip']
         src_port_mac = self.dataplane.get_mac(0, src_port_id)
+        num_of_pkts = int(self.test_params['num_of_pkts'])
+        packet_length = cell_size - 20 # to be within one cell
         if ecn == 1:
             # scapy(ptf?) cannot capture more than 1023 packets.
-            num_of_pkts = 1023
-        else:
-            num_of_pkts = int(self.test_params['num_of_pkts'])
-        limit = int(self.test_params['limit'])
-        min_limit = int(self.test_params['min_limit'])
-        cell_size = int(self.test_params['cell_size'])
-        packet_length = max(default_packet_length, int(math.ceil(float(min_limit) / num_of_pkts)))
+            packet_length = min(packet_length * (num_of_pkts / 500), 1500)
+            num_of_pkts = 500
+
+        green_min_limit = int(self.test_params['green_min_limit'])
+        green_max_limit = int(self.test_params['green_max_limit'])
+        green_min_limit_cells = int(math.ceil(float(green_min_limit) / 64 / cell_size) * 64)
+        green_max_limit_cells = int(math.ceil(float(green_max_limit) / 64 / cell_size) * 64)
+
+        logging.info("WRED min/max (cells): %d, %d" % (green_min_limit_cells, green_max_limit_cells))
+
         cells_per_packet = int(math.ceil(float(packet_length) / cell_size))
 
         logging.info('num_of_pkts: %d' % num_of_pkts)
@@ -367,9 +382,6 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
             send_packet(self, src_port_id, pkt, num_of_pkts)
             time.sleep(1)
 
-            # Clear Counters
-            sai_thrift_clear_all_counters(self.client)
-
             # Set receiving socket buffers to some big value
             for p in self.dataplane.ports.values():
                 p.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 41943040)
@@ -391,7 +403,7 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
                         if ( (int(pkt_str[ECN_INDEX_IN_HEADER]) & 0x03)  == 1 ):
                             not_marked_cnt += 1
                         elif ( (int(pkt_str[ECN_INDEX_IN_HEADER]) & 0x03) == 3 ):
-                            assert (not_marked_cnt == 0)
+                            #assert (not_marked_cnt == 0)
                             marked_cnt += 1
                     else:  # Received less packets then expected
                         logging.info("Warning: sent %d but captured %d" % (num_of_pkts, cnt))
@@ -403,26 +415,37 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
 
             time.sleep(5)
             # Read Counters
-            logging.info("DST port counters:")
             port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
+            logging.info("DST port counters (port %d):" %  dst_port_id)
             logging.info(port_counters)
             logging.info(queue_counters)
+
+            expected_tx_cells = self.predictTx(green_min_limit_cells, green_max_limit_cells, num_of_pkts*cells_per_packet)
+            tolerance = float(expected_tx_cells) * ecn_tolerance_prc / 100
+            limit_max = expected_tx_cells + tolerance
+            limit_min = expected_tx_cells - tolerance
+
             if (ecn == 0):
-                transmitted_data = port_counters[TRANSMITTED_PKTS] * cells_per_packet * cell_size
-                logging.info('transmitted_data: %d' % transmitted_data)
+                actual_tx_cells = port_counters[TRANSMITTED_PKTS] * cells_per_packet
+                logging.info('Tolerance +/- (cells): %d (%d%%)' % (tolerance, ecn_tolerance_prc))
+                logging.info('port_counters[TRANSMITTED_PKTS]: %d' % port_counters[TRANSMITTED_PKTS])
                 logging.info('port_counters[TRANSMITTED_OCTETS]: %d' % port_counters[TRANSMITTED_OCTETS])
-                assert (port_counters[TRANSMITTED_OCTETS] <= limit * 1.05)
-                assert (transmitted_data >= min_limit)
-                assert (marked_cnt == 0)
+                logging.info("Actually transmitted  (cells): %d" % actual_tx_cells)
+                logging.info("Expected to be transmitted  (cells): %d" % expected_tx_cells)
+                logging.info("Expected in range (cells): %d <= %d <= %d" % (limit_min, actual_tx_cells, limit_max))
+                assert (actual_tx_cells >= limit_min)
+                assert (actual_tx_cells <= limit_max)
             elif (ecn == 1):
-                non_marked_data = not_marked_cnt * cells_per_packet * cell_size
-                logging.info('non_marked_data: %d' % non_marked_data)
-                logging.info('port_counters[EGRESS_DROP]: %d' % port_counters[EGRESS_DROP])
-                logging.info('port_counters[INGRESS_DROP]: %d' % port_counters[INGRESS_DROP])
-                assert (non_marked_data <= min_limit*1.05)
-                assert (non_marked_data >= min_limit*0.95)
-                assert (port_counters[EGRESS_DROP]  == 0)
+                actual_not_marked_cells = not_marked_cnt * cells_per_packet
+                logging.info('Tolerance +/- (cells): %d (%d%%)' % (tolerance, ecn_tolerance_prc))
+                logging.info("Actually not marked  (cells): %d" % actual_not_marked_cells)
+                logging.info("Expected not marked  (cells): %d" % expected_tx_cells)
+                logging.info("Expected in range    (cells): %d <= %d <= %d" % (limit_min, actual_not_marked_cells, limit_max))
+                logging.info("Drops ingress:%d, egress %d" % (port_counters[INGRESS_DROP], port_counters[EGRESS_DROP]))
+                assert (actual_not_marked_cells >= limit_min)
+                assert (actual_not_marked_cells <= limit_max)
                 assert (port_counters[INGRESS_DROP] == 0)
+                assert (port_counters[EGRESS_DROP] == 0)
 
         finally:
             # RELEASE PORT
