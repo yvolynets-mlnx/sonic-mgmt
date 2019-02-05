@@ -127,7 +127,7 @@
   vars:
     target_table: 'BUFFER_PG'
     target_port_name: "***{{ dut_switch_ports[src_port_id|int] }}***"
-    target_pg: '0-1'
+    target_pg: '0-2'
     
 - name: Set lossy MAX buffer size
   set_fact:

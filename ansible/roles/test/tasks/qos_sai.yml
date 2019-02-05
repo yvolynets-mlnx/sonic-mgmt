@@ -165,22 +165,22 @@
       shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
 
     #DSCP MAPPING
-    - command: sonic-cfggen -d --var-json DSCP_TO_TC_MAP
-      register: config_output
-
-    - copy: content={{ config_output.stdout | from_json }}
-            dest=/root/dscp_to_tc_map.txt
-      delegate_to: "{{ ptf_host }}"
-
-    - include: qos_sai_ptf.yml
-      vars:
-        test_name: dscp mapping ptf test
-        test_path: sai_qos_tests.DscpMappingPB
-        test_params:
-        - dst_port_id='{{ dst_port_id }}'
-        - dst_port_ip='{{ dst_port_ip }}'
-        - src_port_id='{{ src_port_id }}'
-        - src_port_ip='{{ src_port_ip }}'
+#    - command: sonic-cfggen -d --var-json DSCP_TO_TC_MAP
+#      register: config_output
+#
+#    - copy: content={{ config_output.stdout | from_json }}
+#            dest=/root/dscp_to_tc_map.txt
+#      delegate_to: "{{ ptf_host }}"
+#
+#    - include: qos_sai_ptf.yml
+#      vars:
+#        test_name: dscp mapping ptf test
+#        test_path: sai_qos_tests.DscpMappingPB
+#        test_params:
+#        - dst_port_id='{{ dst_port_id }}'
+#        - dst_port_ip='{{ dst_port_ip }}'
+#        - src_port_id='{{ src_port_id }}'
+#        - src_port_ip='{{ src_port_ip }}'
 
     #ECN limit
     - include: qos_sai_ptf.yml
