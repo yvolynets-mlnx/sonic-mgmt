@@ -336,7 +336,7 @@
       <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/7" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet24"/>
       <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/8" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet28"/>
       <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/9" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet32"/>
-      <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/10" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet26"/>
+      <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/10" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet36"/>
       <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/11" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet40"/>
       <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/12" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet44"/>
       <DeviceInterfaceLink BandWidth="10000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/13" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet48"/>
