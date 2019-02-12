@@ -3,6 +3,7 @@
 
 # Dev setup switches
 arc-switch1004  ansible_host=arc-switch1004  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7011 10.224.2.80"
+r-anaconda-10  ansible_host=r-anaconda-10  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:7002 10.208.0.85"
 arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81"
 arc-switch1027  ansible_host=arc-switch1027  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7030 10.224.2.81"
 arc-switch1028  ansible_host=arc-switch1028  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7021 10.224.2.81" ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
@@ -24,6 +25,14 @@ arc-switch1004-t0-64-32  ansible_host=arc-switch1004  sonic_version=v2  sonic_hw
 arc-switch1004-t1  ansible_host=arc-switch1004 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-1004 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1005 dut_mac="e4:1d:2d:fd:89:c0" serial_console="ssh -l rcon:7011 10.224.2.80"
 arc-switch1004-t1-lag  ansible_host=arc-switch1004 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-1004 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1005 dut_mac="e4:1d:2d:fd:89:c0" serial_console="ssh -l rcon:7011 10.224.2.81"
 arc-switch1004-ptf32   ansible_host=arc-switch1004 sonic_version=v2 sonic_hwsku=ACS-MSN2700 ptf_host=ptf-1004 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1005 dut_mac="e4:1d:2d:fd:89:c0" serial_console="ssh -l rcon:7011 10.224.2.81"
+
+# MTR testbed r-anaconda-10 topologies
+r-anaconda-10  ansible_host=r-anaconda-10  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:7002 10.208.0.85"
+r-anaconda-10-t0  ansible_host=r-anaconda-10  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:7002 10.208.0.85" ptf_host=ptf-r-anaconda-10 rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+r-anaconda-10-t0-64-32  ansible_host=r-anaconda-10  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:7002 10.208.0.85" rtmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+r-anaconda-10-t1  ansible_host=r-anaconda-10 sonic_version=v2 sonic_hwsku=ACS-MSN3700C ptf_host=ptf-r-anaconda-10 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1016 dut_mac="98:03:9b:98:cf:46" serial_console="ssh -l rcon:7002 10.208.0.85"
+r-anaconda-10-t1-lag  ansible_host=r-anaconda-10 sonic_version=v2 sonic_hwsku=ACS-MSN3700C ptf_host=ptf-r-anaconda-10 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1016 dut_mac="98:03:9b:98:cf:46" serial_console="ssh -l rcon:7002 10.208.0.85"
+r-anaconda-10-ptf32   ansible_host=r-anaconda-10 sonic_version=v2 sonic_hwsku=ACS-MSN3700C ptf_host=ptf-r-anaconda-10 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=arc-switch1016 dut_mac="98:03:9b:98:cf:46" serial_console="ssh -l rcon:7002 10.208.0.85"
 
 # MTR testbed arc-switch1025 topologies
 arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81"
@@ -123,6 +132,14 @@ arc-switch1004-t1
 arc-switch1004-t1-lag
 arc-switch1004-ptf32
 
+# MTR r-anaconda-10 topologies
+r-anaconda-10
+r-anaconda-10-t0
+r-anaconda-10-t0-64-32
+r-anaconda-10-t1
+r-anaconda-10-t1-lag
+r-anaconda-10-ptf32
+
 # MTR arc-switch1041 topologies
 arc-switch1041
 arc-switch1041-t1
@@ -203,6 +220,14 @@ arc-switch1004-t1
 arc-switch1004-t1-lag
 arc-switch1004-ptf32
 
+# MTR r-anaconda-10 topologies
+r-anaconda-10
+r-anaconda-10-t0
+r-anaconda-10-t0-64-32
+r-anaconda-10-t1
+r-anaconda-10-t1-lag
+r-anaconda-10-ptf32
+
 # MTR arc-switch1029 topologies
 arc-switch1029
 arc-switch1029-t1
@@ -269,6 +294,8 @@ ptf-fib ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1025 ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1004 PTF host
 ptf-1004 ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR r-anaconda-10 PTF host
+ptf-r-anaconda-10 ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
 # MTS mts-sonic-dut-t1 PTF host
 mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1041 PTF host

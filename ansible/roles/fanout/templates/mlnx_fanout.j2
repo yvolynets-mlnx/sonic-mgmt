@@ -39,6 +39,7 @@
 {% set arc_switch1003_port_speed = [-1, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 50000, 50000, 50000, 50000] %}
 {% set arc_switch1005_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000, 10000, 10000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
 {% set arc_switch1007_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000] %}
+{% set arc_switch1016_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000] %}
 {% set arc_switch1035_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
 {% set arc_switch1039_port_speed = [] %}
 {% set mts_sonic_fanout_port_speed = [] %}
@@ -53,6 +54,7 @@
                             'arc-switch1003':['1/31'],
                             'arc-switch1005':['1/31'],
                             'arc-switch1007':['1/31'],
+                            'arc-switch1016':['1/31'],
                             'arc-switch1035':['1/31'],
                             'arc-switch1039':['1/31'],
                             'mts-sonic-fanout':['1/31'],
@@ -64,6 +66,7 @@
                             'arc-switch1003':[],
                             'arc-switch1005':[],
                             'arc-switch1007':[],
+                            'arc-switch1016':[],
                             'arc-switch1035':[],
                             'arc-switch1039':[],
                             'mts-sonic-fanout':[],
@@ -75,6 +78,7 @@
                          'arc-switch1003':default_eth_ports,
                          'arc-switch1005':default_eth_ports,
                          'arc-switch1007':default_eth_ports,
+                         'arc-switch1016':default_eth_ports,
                          'arc-switch1035':default_eth_ports,
                          'arc-switch1039':default_eth_ports,
                          'mts-sonic-fanout':default_eth_ports,
@@ -86,6 +90,7 @@
                         'arc-switch1003':default_of_ports,
                         'arc-switch1005':default_of_ports,
                         'arc-switch1007':default_of_ports,
+                        'arc-switch1016':default_of_ports,
                         'arc-switch1035':default_of_ports,
                         'arc-switch1039':default_of_ports,
                         'mts-sonic-fanout':default_of_ports,
@@ -109,6 +114,7 @@
                           'arc-switch1003':arc_switch1003_port_speed,
                           'arc-switch1005':arc_switch1005_port_speed,
                           'arc-switch1007':arc_switch1007_port_speed,
+                          'arc-switch1016':arc_switch1016_port_speed,
                           'arc-switch1035':arc_switch1035_port_speed,
                           'arc-switch1039':arc_switch1039_port_speed,
                           'mts-sonic-fanout':mts_sonic_fanout_port_speed,

@@ -6,6 +6,7 @@ arc-switch1029     ansible_host=10.210.25.44 sonic_version=v2 hwsku="ACS-MSN2100
 arc-mtbc-1001      ansible_host=10.12.206.180 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0501
 arc-switch1025     ansible_host=10.210.25.45 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0601
 arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701
+r-anaconda-10      ansible_host=10.210.25.3 sonic_version=v2 hwsku="ACS-MSN3700C" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM1101
 mtbc-sonic-01-2410 ansible_host=10.12.71.4 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0801
 mtbc-sonic-03-2700 ansible_host=10.12.71.251 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=100000 mgmt_subnet_mask_length=24 vm_base=VM1001
 r-boxer-sw01       ansible_host=10.210.25.53 sonic_version=v2 hwsku="ACS-MSN2010" iface_speed=25000 mgmt_subnet_mask_length=22 vm_base=VM0901
@@ -57,6 +58,7 @@ ptf-1041    ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=roo
 ptf-1038    ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1025    ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1004    ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-r-anaconda-10    ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc03  ansible_host=10.12.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-005 ansible_host=10.212.232.6 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=root
@@ -75,6 +77,7 @@ str-7260-11       ansible_host=10.251.0.234
 str-msn2700-02    ansible_host=10.251.0.235 os=sonic
 arc-switch1007    ansible_host=10.210.25.42
 arc-switch1005    ansible_host=10.210.24.23
+arc-switch1016    ansible_host=10.210.25.116
 arc-switch1035    ansible_host=10.210.25.46
 mts-sonic-fanout  ansible_host=10.12.74.64
 arc-switch1039    ansible_host=10.210.25.47

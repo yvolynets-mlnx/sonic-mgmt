@@ -28,6 +28,9 @@ R-SONIC-02 ansible_host=r-sonic-02
 [vm_host_10]
 DEV-R730-03 ansible_host=dev-r730-03
 
+[vm_host_11]
+R-SONIC-03 ansible_host=r-sonic-03
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -45,6 +48,7 @@ vm_host_7
 vm_host_8
 vm_host_9
 vm_host_10
+vm_host_11
 vm_host_50
 vm_host_51
 
@@ -388,6 +392,40 @@ VM1030	ansible_host=10.12.207.35
 VM1031	ansible_host=10.12.207.36
 VM1032	ansible_host=10.12.207.37
 
+[vms_11]
+VM1101	ansible_host=10.213.103.6
+VM1102	ansible_host=10.213.103.7
+VM1103	ansible_host=10.213.103.8
+VM1104	ansible_host=10.213.103.9
+VM1105	ansible_host=10.213.103.11
+VM1106	ansible_host=10.213.103.11
+VM1107	ansible_host=10.213.103.12
+VM1108	ansible_host=10.213.103.13
+VM1109	ansible_host=10.213.103.14
+VM1110	ansible_host=10.213.103.15
+VM1111	ansible_host=10.213.103.16
+VM1112	ansible_host=10.213.103.17
+VM1113	ansible_host=10.213.103.18
+VM1114	ansible_host=10.213.103.19
+VM1115	ansible_host=10.213.103.20
+VM1116	ansible_host=10.213.103.21
+VM1117	ansible_host=10.213.103.22
+VM1118	ansible_host=10.213.103.23
+VM1119	ansible_host=10.213.103.24
+VM1120	ansible_host=10.213.103.25
+VM1121	ansible_host=10.213.103.26
+VM1122	ansible_host=10.213.103.27
+VM1123	ansible_host=10.213.103.28
+VM1124	ansible_host=10.213.103.29
+VM1125	ansible_host=10.213.103.30
+VM1126	ansible_host=10.213.103.31
+VM1127	ansible_host=10.213.103.32
+VM1128	ansible_host=10.213.103.33
+VM1129	ansible_host=10.213.103.34
+VM1130	ansible_host=10.213.103.35
+VM1131	ansible_host=10.213.103.36
+VM1132	ansible_host=10.213.103.37
+
 [vms_50]
 VM5001 ansible_host=0.0.0.0
 VM5002 ansible_host=0.0.0.0
@@ -467,6 +505,7 @@ vms_7
 vms_8
 vms_9
 vms_10
+vms_11
 vms_50
 vms_51
 
@@ -541,6 +580,13 @@ vms_10
 [server_10:vars]
 host_var_file=host_vars/DEV-R730-03.yml
 
+[server_11:children]
+vm_host_11
+vms_11
+
+[server_11:vars]
+host_var_file=host_vars/R-SONIC-03.yml
+
 [server_50:children]
 vm_host_50
 vms_50
@@ -566,6 +612,7 @@ server_7
 server_8
 server_9
 server_10
+server_11
 server_50
 server_51
 
