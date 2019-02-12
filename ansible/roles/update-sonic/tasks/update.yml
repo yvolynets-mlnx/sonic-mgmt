@@ -62,13 +62,16 @@
 
   when: "'running SONiC has the same version' not in update_output.stdout"
 
-- name: Wait until possible FW updating is done
-  command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
-  register: output
-  until: output.rc == 0
-  retries: 12
-  delay: 10
-  ignore_errors: true
+- name: "Wait until SONiC init is done"
+  command: bash -c 'docker ps | grep [s]yncd'
+  register: result
+  until: result.rc == 0
+  retries: 60
+  delay: 5
+  ignore_errors: yes
+
+- fail: msg="SONiC init is failed. Aborting..."
+  when: result.rc != 0
 
 # When running firmware version does not match current image, the output of mlxfwmanager --query
 # will have a line containing "FW (Running)".
