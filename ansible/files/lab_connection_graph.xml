@@ -13,7 +13,7 @@
       <Device Hostname="r-boxer-sw01" HwSku="Mellanox-2010" Type="DevSonic"/>
       <Device Hostname="dev-r-vrt-232-005" HwSku="Mellanox-2700" Type="DevSonic"/>
       <Device Hostname="dev-r-vrt-232-007" HwSku="Mellanox-3700" Type="DevSonic"/>
-      <Device Hostname="r-anaconda-10" HwSku="Mellanox-3700C" Type="DevSonic"/>
+      <Device Hostname="r-anaconda-10" HwSku="Mellanox-3700" Type="DevSonic"/>
       <Device Hostname="arc-switch1005" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1016" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1007" HwSku="MLNX-OS" Type="FanoutLeaf"/>
