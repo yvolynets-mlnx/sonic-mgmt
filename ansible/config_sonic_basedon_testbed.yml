@@ -54,7 +54,7 @@
         src: "roles/sonicv2/files/ssw/ACS-MSN2700/port_config1004.ini"
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini"
       become: true
-      when: ansible_ssh_host == 'arc-switch1004'
+      when: inventory_hostname == 'arc-switch1004'
 
     - name: set default testbed file
       set_fact:
