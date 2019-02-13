@@ -229,8 +229,8 @@ r-anaconda-10,Ethernet104,arc-switch1016,Ethernet27,40000,1707,Access
 r-anaconda-10,Ethernet108,arc-switch1016,Ethernet28,40000,1708,Access
 r-anaconda-10,Ethernet112,arc-switch1016,Ethernet29,40000,1709,Access
 r-anaconda-10,Ethernet116,arc-switch1016,Ethernet30,40000,1710,Access
-r-anaconda-10,Ethernet120,arc-switch1016,Ethernet31,40000,1711,Access
-r-anaconda-10,Ethernet124,arc-switch1016,Ethernet32,40000,1712,Access
+r-anaconda-10,Ethernet120,arc-switch1016,Ethernet31,10000,1711,Access
+r-anaconda-10,Ethernet124,arc-switch1016,Ethernet32,10000,1712,Access
 
 mts-sonic-dut,Ethernet0,mts-sonic-fanout,Ethernet1,100000,1681,Access
 mts-sonic-dut,Ethernet4,mts-sonic-fanout,Ethernet2,100000,1682,Access
