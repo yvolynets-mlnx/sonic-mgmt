@@ -34,7 +34,7 @@
     {%- else %}
         {%- if (inventory_hostname == "arc-switch1041" or inventory_hostname == "arc-switch1025" or inventory_hostname == "arc-switch1004" or inventory_hostname == "mts-sonic-dut" or inventory_hostname == "mtbc-sonic-03-2700") and index >= 30 %}
           <Speed>50000</Speed>
-        {%- elif inventory_hostname == "arc-switch1038" and index >= 30 %}
+        {%- elif ( inventory_hostname == "arc-switch1038" or inventory_hostname == "r-anaconda-10") and index >= 30 %}
           <Speed>10000</Speed>
         {%- else %}
           <Speed>{{ iface_speed }}</Speed>
