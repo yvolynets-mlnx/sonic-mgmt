@@ -168,8 +168,8 @@
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1016" EndPort="ethernet 1/28" StartDevice="r-anaconda-10" StartPort="Ethernet108"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1016" EndPort="ethernet 1/29" StartDevice="r-anaconda-10" StartPort="Ethernet112"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1016" EndPort="ethernet 1/30" StartDevice="r-anaconda-10" StartPort="Ethernet116"/>
-      <DeviceInterfaceLink BandWidth="10000"  EndDevice="arc-switch1016" EndPort="ethernet 1/31/1" StartDevice="r-anaconda-10" StartPort="Ethernet120"/>
-      <DeviceInterfaceLink BandWidth="10000"  EndDevice="arc-switch1016" EndPort="ethernet 1/31/2" StartDevice="r-anaconda-10" StartPort="Ethernet124"/>
+      <DeviceInterfaceLink BandWidth="1000"  EndDevice="arc-switch1016" EndPort="ethernet 1/31/1" StartDevice="r-anaconda-10" StartPort="Ethernet120"/>
+      <DeviceInterfaceLink BandWidth="1000"  EndDevice="arc-switch1016" EndPort="ethernet 1/31/2" StartDevice="r-anaconda-10" StartPort="Ethernet124"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sonic-fanout" EndPort="ethernet 1/1" StartDevice="mts-sonic-dut" StartPort="Ethernet0"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sonic-fanout" EndPort="ethernet 1/2" StartDevice="mts-sonic-dut" StartPort="Ethernet4"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mts-sonic-fanout" EndPort="ethernet 1/3" StartDevice="mts-sonic-dut" StartPort="Ethernet8"/>
