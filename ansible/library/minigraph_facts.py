@@ -483,9 +483,21 @@ def parse_xml(filename, hostname):
         for i in s100G_ports:
             alias = "etp%d" % (i / 4 + 1)
             port_alias_map[alias] = "Ethernet%d" % i
-    elif (hwsku == "Mellanox-SN2700" or hwsku == "ACS-MSN2700") or (hwsku == "ACS-MSN3700") or (hwsku == "ACS-MSN3700C"):
-        for i in range(1, 33):
-            port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+    elif (hwsku == "Mellanox-SN2700" or hwsku == "ACS-MSN2700") or (hwsku == "ACS-MSN3700"):
+        if hostname == "arc-switch1004":
+            for i in range(1, 17):
+                port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+
+            port_alias_map["etp17"] = "Ethernet64"
+            port_alias_map["etp18"] = "Ethernet65"
+            port_alias_map["etp19"] = "Ethernet66"
+            port_alias_map["etp20"] = "Ethernet67"
+
+            for i in range(21, 33):
+                port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+        else:
+            for i in range(1, 33):
+                port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
     elif hwsku == "Arista-7060CX-32S-D48C8":
         # All possible breakout 50G port numbers:
         all_ports = [ x for x in range(1, 33)]

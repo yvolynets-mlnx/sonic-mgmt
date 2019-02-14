@@ -174,13 +174,13 @@
       copy:
         src: "roles/sonicv2/files/ssw/ACS-MSN2700/port_config1004.ini"
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini"
-      when: inventory_hostname == 'arc-switch1004'
+      when: ansible_ssh_host == 'arc-switch1004'
 
     - name: Deploy SAI xml file.
       copy:
         src: "roles/sonicv2/files/ssw/ACS-MSN2700/sai_2700_1004.xml"
         dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/sai_2700.xml"
-      when: inventory_hostname == 'arc-switch1004'
+      when: ansible_ssh_host == 'arc-switch1004'
 
     - name: Deploy buffers patch.
       copy:
