@@ -483,7 +483,7 @@ def parse_xml(filename, hostname):
         for i in s100G_ports:
             alias = "etp%d" % (i / 4 + 1)
             port_alias_map[alias] = "Ethernet%d" % i
-    elif (hwsku == "Mellanox-SN2700" or hwsku == "ACS-MSN2700") or (hwsku == "ACS-MSN3700"):
+    elif (hwsku == "Mellanox-SN2700" or hwsku == "ACS-MSN2700") or (hwsku == "ACS-MSN3700") or (hwsku == "ACS-MSN3700C"):
         if hostname == "arc-switch1004":
             for i in range(1, 17):
                 port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
