@@ -107,6 +107,11 @@
       v6_nei: "{{ v6_intf_nei }}"
     when: v6_nei is not defined
 
+  #### Temporary added to capture more log for debug #### 
+  - name: turn on the debug log for orchagent, nbrmgrd and neighsyncd
+    shell: swssloglevel -l DEBUG -c orchagent;  swssloglevel -l DEBUG -c neighsyncd; swssloglevel -l DEBUG -c nbrmgrd;
+    become: yes
+
   - name: add an ipv6 entry for Ethernet0 if not find v6 neighbor
     command: "/sbin/ifconfig Ethernet0 inet6 add {{ v6_intf_ip }}"
     when: v6_nei is not defined
@@ -155,6 +160,11 @@
   become: yes
 
   always:
+    #### turn off the debug log ####
+    - name: turn off the debug log for orchagent, nbrmgrd and neighsyncd
+      shell: swssloglevel -l NOTICE -c orchagent;  swssloglevel -l NOTICE -c  neighsyncd; swssloglevel -l NOTICE -c nbrmgrd;
+      become: yes
+
     - name: reset all changes
       include: "roles/test/tasks/common_tasks/reload_sonic.yml"
       vars:
