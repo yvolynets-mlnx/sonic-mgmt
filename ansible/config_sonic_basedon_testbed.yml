@@ -35,26 +35,12 @@
   tasks:
 
   - block:
-    - name: Deploy port config file.
-      copy:
-        src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
-        dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
-      become: true
-      when: hwsku == 'ACS-MSN2100'
 
-    - name: Deploy port config file.
-      copy:
-        src: "roles/sonicv2/files/ssw/ACS-MSN2010/port_config_boxer01.ini"
-        dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/port_config.ini"
-      become: true
-      when: hwsku == 'ACS-MSN2010'
-
-    - name: Deploy port config file.
-      copy:
-        src: "roles/sonicv2/files/ssw/ACS-MSN2700/port_config1004.ini"
-        dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini"
-      become: true
-      when: inventory_hostname == 'arc-switch1004'
+    - name: Deploy specific device configuration files
+      include: deploy_device_configs.yml
+      vars:
+        dut_hwsku: "{{ hwsku }}"
+        dut_hostname: "{{ inventory_hostname }}"
 
     - name: set default testbed file
       set_fact:

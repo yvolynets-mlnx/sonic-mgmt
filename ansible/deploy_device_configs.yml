@@ -1,0 +1,42 @@
+- name: Set specific HWSKU device configs
+  set_fact:
+    device_configs:
+      ACS-MSN2100:
+        port_config:
+          src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
+          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
+      ACS-MSN2010:
+        port_config:
+          src: "roles/sonicv2/files/ssw/ACS-MSN2010/port_config_boxer01.ini"
+          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/port_config.ini"
+      arc-switch1004:
+        port_config:
+          src: "roles/sonicv2/files/ssw/ACS-MSN2700/port_config1004.ini"
+          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini"
+        sai_xml:
+          src: "roles/sonicv2/files/ssw/ACS-MSN2700/sai_2700_1004.xml"
+          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/sai_2700.xml"
+      arc-switch1038:
+        port_config:
+           src: "roles/sonicv2/files/ssw/ACS-MSN3700/port_config1038.ini"
+           dest: "/usr/share/sonic/device/x86_64-mlnx_msn3700-r0/ACS-MSN3700/port_config.ini"
+        sai_xml:
+           src: "roles/sonicv2/files/ssw/ACS-MSN3700/sai_3700_1038.xml"
+           dest: "/usr/share/sonic/device/x86_64-mlnx_msn3700-r0/ACS-MSN3700/sai_3700.xml"
+
+- name: Find specific configs if defined for this dut
+  set_fact:
+    dut_configs: "{{ item.value }}"
+  with_dict: device_configs
+  when: item.key == "{{ dut_hwsku }}" or item.key == "{{ dut_hostname }}"
+
+- debug:
+    msg: "Deploying next specific configs for {{ dut_hostname }} {{ dut_configs }}"
+  when: dut_configs is defined
+
+- name: Deploy specific device configs
+  copy:
+    src: "{{ item.value.src }}"
+    dest: "{{ item.value.dest }}"
+  become: true
+  with_dict: "{{ dut_configs|default({}) }}"
