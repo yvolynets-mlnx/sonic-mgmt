@@ -25,6 +25,11 @@
 - name: Remove SONiC image from local server.
   local_action: file path={{ filename }} state=absent
 
+- name: List current images
+  command: sonic_installer list
+  register: current_images_output
+  ignore_errors: yes
+
 - name: Update SONiC image.
   command: sonic_installer install {{ filename }} -y
   register: update_output
