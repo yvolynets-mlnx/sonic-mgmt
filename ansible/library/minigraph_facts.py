@@ -484,7 +484,20 @@ def parse_xml(filename, hostname):
             alias = "etp%d" % (i / 4 + 1)
             port_alias_map[alias] = "Ethernet%d" % i
     elif (hwsku == "Mellanox-SN2700" or hwsku == "ACS-MSN2700") or (hwsku == "ACS-MSN3700") or (hwsku == "ACS-MSN3700C"):
-        if hostname == "arc-switch1004":
+        if hostname == "arc-switch1038":
+            for i in range(1, 17):
+                port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+
+            port_alias_map["etp17a"] = "Ethernet64"
+            port_alias_map["etp17b"] = "Ethernet65"
+            port_alias_map["etp17c"] = "Ethernet66"
+            port_alias_map["etp17d"] = "Ethernet67"
+            port_alias_map["etp21a"] = "Ethernet80"
+            port_alias_map["etp21b"] = "Ethernet82"
+
+            for i in range(23, 33):
+                port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+        elif hostname == "arc-switch1004":
             for i in range(1, 17):
                 port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
 
