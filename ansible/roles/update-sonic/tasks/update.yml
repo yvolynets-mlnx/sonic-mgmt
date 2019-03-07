@@ -150,13 +150,20 @@
 - block:
 
     # "config load_minigraph -y" needs to stop swss. If swss is not fully started, stopping swss may fail.
-    # This is the workaround to wait until swss service is started
-    - name: Wait for swss service to start
-      command: systemctl -p ActiveState -p SubState show swss
-      register: service_swss_state
-      until: (service_swss_state.stdout.find("ActiveState=active") >= 0) and (service_swss_state.stdout.find("SubState=running") >= 0)
+    # This is the workaround to wait until swss service is started.
+    # If check status using systemctl, status of swss service could be acitve(running) before swss starting is
+    # fully completed. The syncd service is started after swss, here we replace checking swss status with syncd.
+    # To ensure that all service are fully started, we wait 1 minute after the syncd service is running.
+    - name: Wait for syncd service to start
+      command: systemctl -p ActiveState -p SubState show syncd
+      register: service_syncd_state
+      until: (service_syncd_state.stdout.find("ActiveState=active") >= 0) and (service_syncd_state.stdout.find("SubState=running") >= 0)
       retries: 10
       delay: 30
+
+    # To ensure that all service are fully started, we wait 1 minute after the syncd service is running.
+    - name: Wait 1 minute to ensure that all services are fully started
+      pause: seconds=60
 
     - name: Deploy minigraph file.
       copy:
