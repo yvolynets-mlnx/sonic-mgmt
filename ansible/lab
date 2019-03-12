@@ -12,6 +12,7 @@ mtbc-sonic-03-2700 ansible_host=10.12.71.251 sonic_version=v2 hwsku="ACS-MSN2700
 r-boxer-sw01       ansible_host=10.210.25.53 sonic_version=v2 hwsku="ACS-MSN2010" iface_speed=25000 mgmt_subnet_mask_length=22 vm_base=VM0901
 dev-r-vrt-232-005  ansible_host=10.212.232.5 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
 dev-r-vrt-232-007  ansible_host=10.212.232.7 sonic_version=v2 hwsku="ACS-MSN3700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5101
+r-tigris-04  ansible_host=10.210.25.93 sonic_version=v2 hwsku="ACS-MSN3800" iface_speed=50000 mgmt_subnet_mask_length=16 vm_base=VM1201
 
 [sonic_sn2700_40]
 str-msn2700-01    ansible_host=10.251.0.188
@@ -59,6 +60,7 @@ ptf-1038    ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=roo
 ptf-1025    ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1004    ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-anaconda-10    ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-r-tigris-04    ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc03  ansible_host=10.12.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-005 ansible_host=10.212.232.6 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=root
@@ -85,6 +87,7 @@ arc-switch1003    ansible_host=10.210.25.43
 arc-switchmtbc01  ansible_host=10.12.67.34
 arc-switchmtbc02  ansible_host=10.12.67.41
 r-panther-03      ansible_host=10.210.25.83
+r-panther-04      ansible_host=10.210.25.94
 mtbc-sonic-02-2700  ansible_host=10.12.67.45
 arc-switch232-005 ansible_host=0.0.0.0
 arc-switch232-007 ansible_host=0.0.0.0

@@ -38,12 +38,13 @@
 {% set arc_switchmtbc02_port_speed = [] %}
 {% set arc_switch1003_port_speed = [-1, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 50000, 50000, 50000, 50000] %}
 {% set arc_switch1005_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000, 10000, 10000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
-{% set arc_switch1007_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000, 10000, 10000, 10000, 10000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000] %}
+{% set arc_switch1007_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000] %}
 {% set arc_switch1016_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 10000, 10000] %}
 {% set arc_switch1035_port_speed = [-1, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 40000, 50000, 50000] %}
 {% set arc_switch1039_port_speed = [] %}
 {% set mts_sonic_fanout_port_speed = [] %}
 {% set r_panther_03_fanout_port_speed = [-1, 25000, 25000, 25000, 25000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000] %}
+{% set r_panther_04_fanout_port_speed = [-1, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 500000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000] %}
 {# -----------------------------End of speed configuration-------------------------------- #}
 
 
@@ -59,6 +60,7 @@
                             'arc-switch1039':['1/31'],
                             'mts-sonic-fanout':['1/31'],
                             'r-panther-03':[],
+                            'r-panther-04':['1/31'],
                             'mtbc-sonic-02-2700':[1/31]} %}
 
 {% set qsfp_split_4_dict = {'arc-switchmtbc01':['1/9', '1/11', '1/13', '1/15', '1/17', '1/19', '1/21', '1/23'],
@@ -71,6 +73,7 @@
                             'arc-switch1039':[],
                             'mts-sonic-fanout':[],
                             'mtbc-sonic-02-2700':[],
+                            'r-panther-04':[],
                             'r-panther-03':['1/29']} %}
 
 {% set eth_ports_dict = {'arc-switchmtbc01':arc_switchmtbc01_eth_ports,
@@ -79,6 +82,7 @@
                          'arc-switch1005':default_eth_ports,
                          'arc-switch1007':default_eth_ports,
                          'arc-switch1016':default_eth_ports,
+                         'r-panther-04':default_eth_ports,
                          'arc-switch1035':default_eth_ports,
                          'arc-switch1039':default_eth_ports,
                          'mts-sonic-fanout':default_eth_ports,
@@ -91,6 +95,7 @@
                         'arc-switch1005':default_of_ports,
                         'arc-switch1007':default_of_ports,
                         'arc-switch1016':default_of_ports,
+                        'r-panther-04':default_of_ports,
                         'arc-switch1035':default_of_ports,
                         'arc-switch1039':default_of_ports,
                         'mts-sonic-fanout':default_of_ports,
@@ -107,6 +112,7 @@
                        'arc-switch1039':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-KY0T-C88A-5CEP-8QUJ-PB',
                        'mts-sonic-fanout':'LK2-RESTRICTED_CMDS_GEN2-43A7-C1ND-30WG-T88A-1H4M-NBU2-MY',
                        'mtbc-sonic-02-2700':'LK2-RESTRICTED_CMDS_GEN2-43A3-VYT8-6UEG-888A-67UA-1WBB-FX',
+                       'r-panther-04':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YU2E-E88A-55NQ-59H3-17',
                        'r-panther-03':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFM9-T88A-171M-EFFE-CA'} %}
 
 
@@ -120,6 +126,7 @@
                           'arc-switch1039':arc_switch1039_port_speed,
                           'mts-sonic-fanout':mts_sonic_fanout_port_speed,
                           'r-panther-03':r_panther_03_fanout_port_speed,
+                          'r-panther-04':r_panther_04_fanout_port_speed,
                           'mtbc-sonic-02-2700':arc_switchmtbc01_port_speed} %}
 
 {% set qsfp_split_2 = qsfp_split_2_dict[inventory_hostname] %}

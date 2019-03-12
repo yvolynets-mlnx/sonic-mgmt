@@ -31,6 +31,9 @@ DEV-R730-03 ansible_host=dev-r730-03
 [vm_host_11]
 R-SONIC-03 ansible_host=r-sonic-03
 
+[vm_host_12]
+R-SONIC-04 ansible_host=r-sonic-04
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -49,6 +52,7 @@ vm_host_8
 vm_host_9
 vm_host_10
 vm_host_11
+vm_host_12
 vm_host_50
 vm_host_51
 
@@ -426,6 +430,40 @@ VM1130	ansible_host=10.213.103.35
 VM1131	ansible_host=10.213.103.36
 VM1132	ansible_host=10.213.103.37
 
+[vms_12]
+VM1201  ansible_host=10.213.104.6
+VM1202  ansible_host=10.213.104.7
+VM1203  ansible_host=10.213.104.8
+VM1204  ansible_host=10.213.104.9
+VM1205  ansible_host=10.213.104.10
+VM1206  ansible_host=10.213.104.11
+VM1207  ansible_host=10.213.104.12
+VM1208  ansible_host=10.213.104.13
+VM1209  ansible_host=10.213.104.14
+VM1210  ansible_host=10.213.104.15
+VM1211  ansible_host=10.213.104.16
+VM1212  ansible_host=10.213.104.17
+VM1213  ansible_host=10.213.104.18
+VM1214  ansible_host=10.213.104.19
+VM1215  ansible_host=10.213.104.20
+VM1216  ansible_host=10.213.104.21
+VM1217  ansible_host=10.213.104.22
+VM1218  ansible_host=10.213.104.23
+VM1219  ansible_host=10.213.104.24
+VM1220  ansible_host=10.213.104.25
+VM1221  ansible_host=10.213.104.26
+VM1222  ansible_host=10.213.104.27
+VM1223  ansible_host=10.213.104.28
+VM1224  ansible_host=10.213.104.29
+VM1225  ansible_host=10.213.104.30
+VM1226  ansible_host=10.213.104.31
+VM1227  ansible_host=10.213.104.32
+VM1228  ansible_host=10.213.104.33
+VM1229  ansible_host=10.213.104.34
+VM1230  ansible_host=10.213.104.35
+VM1231  ansible_host=10.213.104.36
+VM1232  ansible_host=10.213.104.37
+
 [vms_50]
 VM5001 ansible_host=0.0.0.0
 VM5002 ansible_host=0.0.0.0
@@ -506,6 +544,7 @@ vms_8
 vms_9
 vms_10
 vms_11
+vms_12
 vms_50
 vms_51
 
@@ -587,6 +626,13 @@ vms_11
 [server_11:vars]
 host_var_file=host_vars/R-SONIC-03.yml
 
+[server_12:children]
+vm_host_12
+vms_12
+
+[server_12:vars]
+host_var_file=host_vars/R-SONIC-04.yml
+
 [server_50:children]
 vm_host_50
 vms_50
@@ -613,6 +659,7 @@ server_8
 server_9
 server_10
 server_11
+server_12
 server_50
 server_51
 

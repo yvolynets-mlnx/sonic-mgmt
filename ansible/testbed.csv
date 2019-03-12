@@ -33,6 +33,7 @@ arc-switch1038-fastreboot,ptf-1038,t0,vm-t1,10.213.84.41/16,server_1,VM0101,arc-
 arc-switch1025-fastreboot,ptf-1025,t0,vm-t1,10.213.84.213/16,server_6,VM0601,arc-switch1025,Mellanox testbed
 arc-switch1004-fastreboot,ptf-1004,t0,vm-t1,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox testbed
 r-anaconda-10-fastreboot,ptf-r-anaconda-10,t0,vm-t1,10.213.103.5/16,server_11,VM1101,r-anaconda-10,Mellanox testbed
+r-tigris-04-fastreboot,ptf-r-tigris-04,t0,vm-t1,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox testbed
 
 arc-switch1004-t1,vm-t1,t1,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
 arc-switch1004-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
@@ -43,6 +44,11 @@ r-anaconda-10-t1,vm-t1,t1,docker-ptf-mlnx,10.213.103.5/16,server_11,VM1101,r-ana
 r-anaconda-10-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.103.5/16,server_11,VM1101,r-anaconda-10,Mellanox MTR testbed
 r-anaconda-10-t0,vm-t1,t0,docker-ptf-mlnx,10.213.103.5/16,server_11,VM1101,r-anaconda-10,Mellanox MTR testbed
 r-anaconda-10-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.103.5/16,server_11,VM1101,r-anaconda-10,Mellanox MTR testbed
+
+r-tigris-04-t1,vm-t1,t1,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t0,vm-t1,t0,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 
 mtbc-sonic-01-2410-t0,vm-t1,t0,docker-ptf-mlnx,10.12.207.41/24,server_8,VM0801,mtbc-sonic-01-2410,Mellanox MTBC testbed
 mtbc-sonic-01-2410-t1,vm-t1,t1,docker-ptf-mlnx,10.12.207.41/24,server_8,VM0801,mtbc-sonic-01-2410,Mellanox MTBC testbed
