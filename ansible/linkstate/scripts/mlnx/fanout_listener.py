@@ -1,5 +1,4 @@
 import sys
-import errno
 import os
 import time
 import socket
@@ -7,8 +6,6 @@ import pickle
 import argparse
 import datetime
 import signal
-from pprint import pprint
-from threading import Thread
 
 sys.path.append('/usr/lib/python2.7/dist-packages/python_sdk_api/')
 sys.path.append('/usr/lib/python2.7/site-packages/python_sdk_api/')
