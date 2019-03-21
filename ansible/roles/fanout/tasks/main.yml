@@ -77,38 +77,6 @@
   when: peer_hwsku == "MLNX-OS"
   tags: check_pfcwd_config
 
- ###################################################################
- # vlan_trunk task to apply special config for the vlan trunk test #
- ###################################################################
-
-- block:
-  - debug: msg={{ inventory_hostname }}
-  - name: build special vlan trunk test config for fanout mlnx-os-switch
-    action: apswitch template=mlnx_fanout.j2
-    connection: switch
-    args:
-      login: "{{ switch_login['MLNX-OS'] }}"
-    vars:
-      action_variable: "vlan_trunk"
-    when: peer_hwsku == "MLNX-OS"
-    tags: vlan_trunk
-
- #############################################################
- # del_vlan_trunk task to del vlan trunk test special config #
- #############################################################
-
-- block:
-  - debug: msg={{ inventory_hostname }}
-  - name: remove special vlan trunk test config for fanout mlnx-os-switch
-    action: apswitch template=mlnx_fanout.j2
-    connection: switch
-    args:
-      login: "{{ switch_login['MLNX-OS'] }}"
-    vars:
-      action_variable: "del_vlan_trunk"
-    when: peer_hwsku == "MLNX-OS"
-    tags: del_vlan_trunk
-
 #- set_fact: os='eos'
 #  when: os is not defined
 
