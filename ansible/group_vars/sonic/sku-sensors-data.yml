@@ -433,10 +433,6 @@ sensors_checks:
       - - pmbus-i2c-5-27/vout2/in3_min
         - pmbus-i2c-5-27/vout2/in3_input
       temp:
-      - - acpitz-virtual-0/temp1/temp1_input
-        - acpitz-virtual-0/temp1/temp1_crit
-      - - acpitz-virtual-0/temp2/temp2_input
-        - acpitz-virtual-0/temp2/temp2_crit
       - - lm75-i2c-7-4a/temp1/temp1_input
         - lm75-i2c-7-4a/temp1/temp1_max_hyst
       - - lm75-i2c-17-49/temp1/temp1_input
@@ -681,10 +677,6 @@ sensors_checks:
       - - pmbus-i2c-5-27/vout2/in3_min
         - pmbus-i2c-5-27/vout2/in3_input
       temp:
-      - - acpitz-virtual-0/temp1/temp1_input
-        - acpitz-virtual-0/temp1/temp1_crit
-      - - acpitz-virtual-0/temp2/temp2_input
-        - acpitz-virtual-0/temp2/temp2_crit
       - - lm75-i2c-7-4a/temp1/temp1_input
         - lm75-i2c-7-4a/temp1/temp1_max_hyst
       - - lm75-i2c-17-49/temp1/temp1_input
