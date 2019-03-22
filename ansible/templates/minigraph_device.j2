@@ -1,4 +1,3 @@
-
   <DeviceInfos>
     <DeviceInfo>
       <AutoNegotiation>true</AutoNegotiation>
@@ -36,18 +35,18 @@
           <Speed>50000</Speed>
         {%- elif inventory_hostname == "arc-switch1004" and (index >= 16 and index <= 19) %}
           <Speed>10000</Speed>
-        {% elif inventory_hostname == "arc-switch1038" -%}
-            {% if index >= 16 and index <= 19 %}
+        {%- elif inventory_hostname == "arc-switch1038" %}
+            {%- if index >= 16 and index <= 19 %}
           <Speed>10000</Speed>
-            {% elif index >= 20 and index <= 21 %}
+            {%- elif index >= 20 and index <= 21 %}
           <Speed>10000</Speed>
-            {% elif index >= 30 %}
+            {%- elif index >= 30 %}
           <Speed>10000</Speed>
-            {% else %}
+            {%- else %}
           <Speed>{{ iface_speed }}</Speed>
-            {% endif %}
+            {%- endif %}
         {%- elif inventory_hostname == "r-anaconda-10" and index >= 30 %}
-          <Speed>1000</Speed>
+          <Speed>10000</Speed>
         {%- elif inventory_hostname == "r-tigris-04" %}
           <Speed>50000</Speed>
         {%- else %}
