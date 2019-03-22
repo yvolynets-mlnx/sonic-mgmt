@@ -501,10 +501,10 @@ def parse_xml(filename, hostname):
             for i in range(1, 17):
                 port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
 
-            port_alias_map["etp17"] = "Ethernet64"
-            port_alias_map["etp18"] = "Ethernet65"
-            port_alias_map["etp19"] = "Ethernet66"
-            port_alias_map["etp20"] = "Ethernet67"
+            port_alias_map["etp17a"] = "Ethernet64"
+            port_alias_map["etp17b"] = "Ethernet65"
+            port_alias_map["etp17c"] = "Ethernet66"
+            port_alias_map["etp17d"] = "Ethernet67"
 
             for i in range(21, 33):
                 port_alias_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
