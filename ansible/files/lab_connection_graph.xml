@@ -62,11 +62,11 @@
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/15" StartDevice="arc-switch1038" StartPort="Ethernet56"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/16" StartDevice="arc-switch1038" StartPort="Ethernet60"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/17" StartDevice="arc-switch1038" StartPort="Ethernet64"/>
-      <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/18" StartDevice="arc-switch1038" StartPort="Ethernet68"/>
-      <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/19" StartDevice="arc-switch1038" StartPort="Ethernet72"/>
-      <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/20" StartDevice="arc-switch1038" StartPort="Ethernet76"/>
-      <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/21" StartDevice="arc-switch1038" StartPort="Ethernet80"/>
-      <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/22" StartDevice="arc-switch1038" StartPort="Ethernet84"/>
+      <DeviceInterfaceLink BandWidth="10000" EndDevice="arc-switch1007" EndPort="ethernet 1/18" StartDevice="arc-switch1038" StartPort="Ethernet65"/>
+      <DeviceInterfaceLink BandWidth="10000" EndDevice="arc-switch1007" EndPort="ethernet 1/19" StartDevice="arc-switch1038" StartPort="Ethernet66"/>
+      <DeviceInterfaceLink BandWidth="10000" EndDevice="arc-switch1007" EndPort="ethernet 1/20" StartDevice="arc-switch1038" StartPort="Ethernet67"/>
+      <DeviceInterfaceLink BandWidth="10000" EndDevice="arc-switch1007" EndPort="ethernet 1/21" StartDevice="arc-switch1038" StartPort="Ethernet80"/>
+      <DeviceInterfaceLink BandWidth="10000" EndDevice="arc-switch1007" EndPort="ethernet 1/22" StartDevice="arc-switch1038" StartPort="Ethernet82"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/23" StartDevice="arc-switch1038" StartPort="Ethernet88"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/24" StartDevice="arc-switch1038" StartPort="Ethernet92"/>
       <DeviceInterfaceLink BandWidth="40000" EndDevice="arc-switch1007" EndPort="ethernet 1/25" StartDevice="arc-switch1038" StartPort="Ethernet96"/>
