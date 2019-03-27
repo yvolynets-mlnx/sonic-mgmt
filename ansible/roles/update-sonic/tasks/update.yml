@@ -149,20 +149,28 @@
 
 - block:
 
-    # "config load_minigraph -y" needs to stop swss. If swss is not fully started, stopping swss may fail.
-    # This is the workaround to wait until swss service is started.
-    # If check status using systemctl, status of swss service could be acitve(running) before swss starting is
-    # fully completed. The syncd service is started after swss, here we replace checking swss status with syncd.
-    # To ensure that all service are fully started, we wait 1 minute after the syncd service is running.
-    - name: Wait for syncd service to start
-      command: systemctl -p ActiveState -p SubState show syncd
-      register: service_syncd_state
-      until: (service_syncd_state.stdout.find("ActiveState=active") >= 0) and (service_syncd_state.stdout.find("SubState=running") >= 0)
+    # "config load_minigraph -y" needs to stop swss and some other services. If the service to be stopped is not fully
+    # started yet, stopping them may fail with error like 'service swss.service is canceled'. This is the workaround
+    # to wait until all critical services are fully started.
+    # According to current design of the services, a process 'docker wait <service_name>' would be started in the final
+    # stage of service starting. The trick is to check if there is such a process for all the critical services.
+    - name: Wait until all critical services are started
+      shell: 'ps -ef | grep "docker wait {{ item }}" | grep -v grep'
+      register: critical_service_started
+      until: critical_service_started.rc == 0
       retries: 10
       delay: 30
+      with_items:
+        - swss
+        - bgp
+        - teamd
+        - pmon
+        - lldp
+        - snmp
+        - dhcp_relay
 
-    # To ensure that all service are fully started, we wait 1 minute after the syncd service is running.
-    - name: Wait 1 minute to ensure that all services are fully started
+    # Wait another minute to ensure that everything is working
+    - name: Wait another minute to ensure that everything is working
       pause: seconds=60
 
     - name: Deploy minigraph file.
