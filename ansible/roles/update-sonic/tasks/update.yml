@@ -155,19 +155,23 @@
     # According to current design of the services, a process 'docker wait <service_name>' would be started in the final
     # stage of service starting. The trick is to check if there is such a process for all the critical services.
     - name: Wait until all critical services are started
-      shell: 'ps -ef | grep "docker wait {{ item }}" | grep -v grep'
-      register: critical_service_started
-      until: critical_service_started.rc == 0
+      shell: 'ps -ef | grep "docker wait" | grep -v grep'
+      register: out
+      until: out.stdout.find('swss')>=0 and out.stdout.find('syncd')>=0 and out.stdout.find('bgp')>=0 and
+             out.stdout.find('teamd')>=0 and out.stdout.find('pmon')>=0 and out.stdout.find('lldp')>=0 and
+             out.stdout.find('snmp')>=0 and out.stdout.find('dhcp_relay')>=0
       retries: 10
       delay: 30
-      with_items:
-        - swss
-        - bgp
-        - teamd
-        - pmon
-        - lldp
-        - snmp
-        - dhcp_relay
+      when: simx|bool == False
+
+    # simx is not updated to use new service design yet, keep using the old checking method
+    - name: Wait for syncd service to start
+      command: systemctl -p ActiveState -p SubState show syncd
+      register: service_syncd_state
+      until: (service_syncd_state.stdout.find("ActiveState=active") >= 0) and (service_syncd_state.stdout.find("SubState=running") >= 0)
+      retries: 10
+      delay: 30
+      when: simx|bool == True
 
     # Wait another minute to ensure that everything is working
     - name: Wait another minute to ensure that everything is working
