@@ -1,0 +1,7 @@
+[gerrit]
+host=10.7.77.140
+project=switchx/sonic/sonic-mgmt
+track=true
+usepushurl=true
+defaultbranch=develop
+
