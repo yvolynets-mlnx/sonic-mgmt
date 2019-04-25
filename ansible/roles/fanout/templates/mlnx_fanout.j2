@@ -12,6 +12,7 @@
 {% set eth_typ_slow = '0x8809' %}
 {% set eth_typ_arp = '0x0806' %}
 {% set eth_typ_vlan = '0x8100' %}
+{% set eth_typ_test = '0x1234' %}
 {% set MTU = '9216' %}
 {% set trunk_port = '1/32' %}
 
@@ -231,6 +232,13 @@ openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={
 {% for i in range(1, eth_ports|length-1) %}
 {% set vlanid = (vlanid_offset + i)|string %}
 openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_arp }},in_port={{ of_ports[i] }},actions=output:{{ of_ports[uplink_port_id] }}
+{% endfor %}
+
+{% set of_counter = of_counter + eth_ports|length-2 -%}
+
+{% for i in range(1, eth_ports|length-1) %}
+{% set vlanid = (vlanid_offset + i)|string %}
+openflow add-flows {{ of_counter + i }} table={{ open_flow_tableid }},priority={{ dut_to_server_flow_priority }},dl_type={{ eth_typ_test }},in_port={{ of_ports[i] }},actions=output:{{ of_ports[uplink_port_id] }}
 {% endfor %}
 
 openflow add-flows {{ last_flowid }} table={{ open_flow_tableid }},priority={{ low_priority }},actions=normal
