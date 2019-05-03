@@ -73,7 +73,7 @@
         - UDLDTest
         - DHCPTest
         - LLDPTest
-#        - BGPTest   Disabling temporarily
+        - BGPTest
         - LACPTest
         - SNMPTest
         - SSHTest
