@@ -4,12 +4,12 @@
 # Dev setup switches
 arc-switch1004  ansible_host=arc-switch1004  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7011 10.224.2.80"
 r-anaconda-10  ansible_host=r-anaconda-10  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:7002 10.208.0.85"
+r-tigris-04  ansible_host=r-tigris-04  sonic_version=v2  sonic_hwsku=ACS-MSN3800 serial_console="ssh -l rcon:7021 10.208.0.70"
 arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81"
 arc-switch1027  ansible_host=arc-switch1027  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7030 10.224.2.81"
 arc-switch1028  ansible_host=arc-switch1028  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7021 10.224.2.81" ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 dev-r-vrt-232-005  ansible_host=dev-r-vrt-232-005  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.212.232.1 5005"
 dev-r-vrt-232-007  ansible_host=dev-r-vrt-232-007  sonic_version=v2  sonic_hwsku=ACS-MSN3700 serial_console="telnet 10.212.232.1 5007"
-r-tigris-04  ansible_host=r-tigris-04  sonic_version=v2  sonic_hwsku=ACS-MSN3800 serial_console="ssh -l rcon:7021 10.208.0.70"
 
 # MTR testbed arc-switch1038 topologies
 arc-switch1038  ansible_host=arc-switch1038  sonic_version=v2  sonic_hwsku=ACS-MSN3700 serial_console="ssh -l rcon:7001 10.224.2.81"
