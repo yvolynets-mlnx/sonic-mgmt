@@ -98,3 +98,13 @@
     when: "stat_result.stdout == 'yes'"
 
   when: "simx is defined and simx == 'yes'"
+
+- name: Wait for warmboot-finalizer service to finish
+  become: true
+  ignore_errors: true
+  shell: systemctl is-active warmboot-finalizer.service
+  register: status
+  until: status.stdout.find('inactive') != -1
+  delay: 10
+  retries: 30
+  when: reboot_type == 'warm-reboot'
