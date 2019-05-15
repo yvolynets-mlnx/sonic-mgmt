@@ -10,11 +10,18 @@
   set_fact:
     lldp_daemon: "/opt/lldp.py"
 
+- name: "Set ARP/NDP update facts"
+  set_fact:
+    arp_ndp_update: "/tmp/arp_ndp_update.sh"
+
 - block:
-  - name: "Gathering minigraph facts about the device"
+  - name: "Gather minigraph facts about the device"
     minigraph_facts: host={{ inventory_hostname }}
 
-  - name: "Remove existing IPs from the PTF host"
+  - name: "Gather interface facts about the device"
+    interface_facts:
+
+  - name: "Remove existing IPs from the PTF interfaces"
     script: "roles/test/files/helpers/remove_ip.sh"
     delegate_to: "{{ ptf_host }}"
 
@@ -22,7 +29,7 @@
     script: "roles/test/files/helpers/change_mac.sh"
     delegate_to: "{{ ptf_host }}"
 
-  - name: "Delete macvlan devices on the PTF host"
+  - name: "Remove macvlan devices on the PTF host"
     shell: "ip link del et{{ item }}"
     delegate_to: "{{ ptf_host }}"
     with_items: "{{ range(32) | list }}"
@@ -79,6 +86,17 @@
     delegate_to: "{{ ptf_host }}"
     with_items: "{{ range(32)| list }}"
 
+  - name: "Copy ARP/NDP update script to the PTF container"
+    template:
+      src: "roles/test/templates/simx/arp_ndp_update.sh.j2"
+      dest: "{{ arp_ndp_update }}"
+      mode: "0755"
+    delegate_to: "{{ ptf_host }}"
+
+  - name: "Update ARP/NDP cache on the PTF host"
+    shell: "bash -c '{{ arp_ndp_update }} &> /dev/null'"
+    delegate_to: "{{ ptf_host }}"
+
   when: "topo_action is defined and topo_action == 'add'"
 
 - block:
@@ -99,10 +117,14 @@
     vars:
       supervisor_host: "{{ ptf_host }}"
 
-  - name: "Delete macvlan devices on the PTF host"
+  - name: "Remove macvlan devices on the PTF host"
     shell: "ip link del et{{ item }}"
     delegate_to: "{{ ptf_host }}"
     with_items: "{{ range(32) | list }}"
     ignore_errors: "yes"
+
+  - name: "Remove ARP/NDP update script from the PTF container"
+    shell: "rm -f {{ arp_ndp_update }}"
+    delegate_to: "{{ ptf_host }}"
 
   when: "topo_action is defined and topo_action == 'remove'"
