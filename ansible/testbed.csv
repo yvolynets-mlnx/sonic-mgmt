@@ -63,6 +63,9 @@ mtbc-sonic-03-2700-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.12.207.38/24,server_10,V
 dev-r-vrt-232-005-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.232.6/16,server_50,VM5001,dev-r-vrt-232-005,Mellanox MTR SimX testbed
 dev-r-vrt-232-007-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.232.8/16,server_51,VM5101,dev-r-vrt-232-007,Mellanox MTR SimX testbed
 
+dev-r-vrt-233-005-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.233.6/16,server_52,VM5201,dev-r-vrt-233-005,Mellanox MTR SimX testbed
+dev-r-vrt-233-007-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.233.8/16,server_53,VM5301,dev-r-vrt-233-007,Mellanox MTR SimX testbed
+
 ptf1-m,ptf1,ptf32,docker-ptf-sai-mlnx,10.255.0.188/24,server_1,,str-msn2700-01,Test ptf Mellanox
 ptf2-b,ptf2,ptf64,docker-ptf-sai-brcm,10.255.0.189/24,server_1,,lab-s6100-01,Test ptf Broadcom
 r-boxer-sw01-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.88.5/16,server_9,VM0901,r-boxer-sw01,Mellanox MTBC testbed

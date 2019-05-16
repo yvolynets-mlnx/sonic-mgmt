@@ -12,5 +12,7 @@ arc-switch1035,10.210.25.46/24,Mellanox-2700,DevSonic
 mts-sonic-fanout,10.12.74.64/24,Mellanox-2700,FanoutLeaf
 arc-switch232-005,0.0.0.0/0,Mellanox-3700,FanoutLeaf
 arc-switch232-007,0.0.0.0/0,Mellanox-3700,FanoutLeaf
+arc-switch233-005,0.0.0.0/0,Mellanox-2700,FanoutLeaf
+arc-switch233-007,0.0.0.0/0,Mellanox-3700,FanoutLeaf
 r-panther-03,10.210.25.83/22,Mellanox-2700,FanoutLeaf
 r-panther-04,10.210.25.94/22,Mellanox-2700,FanoutLeaf
