@@ -6,14 +6,11 @@
 - fail: msg="topo_action is provided with invalid value"
   when: "topo_action not in [ 'add', 'remove' ]"
 
-- name: "Set zebra template config facts"
-  set_fact:
-    zebra_orig_config: "/usr/share/sonic/templates/zebra.conf.j2_orig"
-    zebra_simx_config: "/usr/share/sonic/templates/zebra.conf.j2_simx"
-    zebra_config: "/usr/share/sonic/templates/zebra.conf.j2"
+- name: "Set BGP template config facts"
+  include: "roles/test/tasks/common_tasks/simx/routing_stack_helper.yml"
 
 - block:
-  - name: "Gathering minigraph facts about the device"
+  - name: "Gather minigraph facts about the device"
     minigraph_facts: host={{ inventory_hostname }}
 
   - name: "Set T1 topology"
@@ -39,56 +36,56 @@
       fib: "/tmp/fib_info.txt"
     connection: "local"
 
-  - name: "Generate zebra config"
+  - name: "Generate BGP config"
     template:
-      src: "roles/test/templates/simx/zebra_route_populate.conf.j2"
-      dest: "/tmp/zebra_route_populate.conf"
+      src: "roles/test/templates/simx/bgp_route_populate.conf.j2"
+      dest: "/tmp/bgp_route_populate.conf"
 
-  - name: "Check for backuped original zebra template config"
-    shell: "docker exec bgp bash -c '[ -f {{ zebra_orig_config }} ] && echo 'yes' || echo 'no''"
+  - name: "Check for backuped original BGP template config"
+    shell: "docker exec bgp bash -c '[ -f {{ bgp_orig_config }} ] && echo 'yes' || echo 'no''"
     register: "stat_result"
 
-  - name: "Restore original zebra template config if backup exists"
-    shell: "docker exec bgp bash -c 'cp -f {{ zebra_orig_config }} {{ zebra_config }}'"
+  - name: "Restore original BGP template config if backup exists"
+    shell: "docker exec bgp bash -c 'cp -f {{ bgp_orig_config }} {{ bgp_config }}'"
     when: "stat_result.stdout == 'yes'"
 
-  - name: "Create original zebra template config backup if it doesn't exist"
-    shell: "docker exec bgp bash -c 'cp -f {{ zebra_config }} {{ zebra_orig_config }}'"
+  - name: "Create original BGP template config backup if it doesn't exist"
+    shell: "docker exec bgp bash -c 'cp -f {{ bgp_config }} {{ bgp_orig_config }}'"
     when: "stat_result.stdout == 'no'"
 
-  - name: "Copy zebra config to BGP container"
-    shell: "docker cp /tmp/zebra_route_populate.conf bgp:/zebra_route_populate.conf"
+  - name: "Copy config to BGP container"
+    shell: "docker cp /tmp/bgp_route_populate.conf bgp:/bgp_route_populate.conf"
 
-  - name: "Append to existing zebra template config"
-    shell: "docker exec bgp bash -c 'cat /zebra_route_populate.conf >> {{ zebra_config }}'"
+  - name: "Append to existing BGP template config"
+    shell: "docker exec bgp bash -c 'cat /bgp_route_populate.conf >> {{ bgp_config }}'"
 
-  - name: "Clean up intermediate zebra config"
-    shell: "docker exec bgp bash -c 'rm -f /zebra_route_populate.conf'"
+  - name: "Clean up intermediate BGP config"
+    shell: "docker exec bgp bash -c 'rm -f /bgp_route_populate.conf'"
 
-  - name: "Check for backuped SimX zebra template config"
-    shell: "docker exec bgp bash -c '[ -f {{ zebra_simx_config }} ] && echo 'yes' || echo 'no''"
+  - name: "Check for backuped SimX BGP template config"
+    shell: "docker exec bgp bash -c '[ -f {{ bgp_simx_config }} ] && echo 'yes' || echo 'no''"
     register: "stat_result"
 
-  - name: "Create SimX zebra template config backup if it doesn't exist"
-    shell: "docker exec bgp bash -c 'cp -f {{ zebra_config }} {{ zebra_simx_config }}'"
+  - name: "Create SimX BGP template config backup if it doesn't exist"
+    shell: "docker exec bgp bash -c 'cp -f {{ bgp_config }} {{ bgp_simx_config }}'"
     when: "stat_result.stdout == 'no'"
 
   when: "topo_action is defined and topo_action == 'add'"
 
 - block:
-  - name: "Check for backuped original zebra template config"
-    shell: "docker exec bgp bash -c '[ -f {{ zebra_orig_config }} ] && echo 'yes' || echo 'no''"
+  - name: "Check for backuped original BGP template config"
+    shell: "docker exec bgp bash -c '[ -f {{ bgp_orig_config }} ] && echo 'yes' || echo 'no''"
     register: "stat_result"
 
-  - name: "Restore original zebra template config if backup exists"
-    shell: "docker exec bgp bash -c 'cp -f {{ zebra_orig_config }} {{ zebra_config }}'"
+  - name: "Restore original BGP template config if backup exists"
+    shell: "docker exec bgp bash -c 'cp -f {{ bgp_orig_config }} {{ bgp_config }}'"
     when: "stat_result.stdout == 'yes'"
 
-  - name: "Clean up backuped zebra template config"
+  - name: "Clean up backuped BGP template config"
     shell: "{{ item }}"
     with_items:
-      - "docker exec bgp bash -c 'rm -f {{ zebra_orig_config }}'"
-      - "docker exec bgp bash -c 'rm -f {{ zebra_simx_config }}'"
+      - "docker exec bgp bash -c 'rm -f {{ bgp_orig_config }}'"
+      - "docker exec bgp bash -c 'rm -f {{ bgp_simx_config }}'"
 
   when: "topo_action is defined and topo_action == 'remove'"
 

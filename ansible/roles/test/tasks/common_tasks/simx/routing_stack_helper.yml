@@ -1,0 +1,18 @@
+
+- name: "Get system routing stack"
+  shell: "docker ps | grep bgp | awk '{print$2}' | cut -d'-' -f3 | cut -d':' -f1"
+  register: result
+
+- name: "Set BGP template config facts: Quagga stack"
+  set_fact:
+    bgp_orig_config: "/usr/share/sonic/templates/zebra.conf.j2_orig"
+    bgp_simx_config: "/usr/share/sonic/templates/zebra.conf.j2_simx"
+    bgp_config: "/usr/share/sonic/templates/zebra.conf.j2"
+  when: "result.stdout == 'quagga'"
+
+- name: "Set BGP template config facts: FRR stack"
+  set_fact:
+    bgp_orig_config: "/usr/share/sonic/templates/frr.conf.j2_orig"
+    bgp_simx_config: "/usr/share/sonic/templates/frr.conf.j2_simx"
+    bgp_config: "/usr/share/sonic/templates/frr.conf.j2"
+  when: "result.stdout == 'frr'"

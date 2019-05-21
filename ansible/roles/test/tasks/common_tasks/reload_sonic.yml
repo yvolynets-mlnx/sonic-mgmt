@@ -4,24 +4,10 @@
 - fail: msg="config_source is provided with invalid value"
   when: "config_source not in [ 'minigraph', 'config_db' ]"
 
-- name: "SimX workaround: Set zebra template config facts"
-  set_fact:
-    zebra_orig_config: "/usr/share/sonic/templates/zebra.conf.j2_orig"
-    zebra_simx_config: "/usr/share/sonic/templates/zebra.conf.j2_simx"
-    zebra_config: "/usr/share/sonic/templates/zebra.conf.j2"
-
-- block:
-  - name: "SimX workaround: Check for backuped original zebra template config"
-    shell: "docker exec bgp bash -c '[ -f {{ zebra_orig_config }} ] && echo 'yes' || echo 'no''"
-    register: "stat_result"
-
-  - name: "SimX workaround: Restore default BGP config to speed up system boot"
-    shell: "{{ item }}"
-    become: "yes"
-    with_items:
-      - "docker exec bgp bash -c 'cp -f {{ zebra_orig_config }} {{ zebra_config }}'"
-    when: "stat_result.stdout == 'yes'"
-
+- name: "SimX workaround: Restore original BGP template config"
+  include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
+  vars:
+    routes_action: "remove"
   when: "simx is defined and simx == 'yes'"
 
 - name: "Reload SONiC configuration using minigraph"
@@ -40,21 +26,8 @@
 - name: "Wait for 2 minutes for prcesses and interfaces to be stable"
   pause: minutes=2
 
-- block:
-  - name: "SimX workaround: Check for backuped SimX zebra template config"
-    shell: "docker exec bgp bash -c '[ -f {{ zebra_simx_config }} ] && echo 'yes' || echo 'no''"
-    register: "stat_result"
-
-  - name: "SimX workaround: Apply BGP static routes"
-    shell: "{{ item }}"
-    become: "yes"
-    with_items:
-      - "docker exec bgp bash -c 'cp -f {{ zebra_simx_config }} {{ zebra_config }}'"
-      - "service bgp restart"
-    when: "stat_result.stdout == 'yes'"
-
-  - name: "SimX workaround: Wait for 1 minute for BGP to be stable"
-    pause: minutes=1
-    when: "stat_result.stdout == 'yes'"
-
+- name: "SimX workaround: Apply SimX BGP template config"
+  include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
+  vars:
+    routes_action: "add"
   when: "simx is defined and simx == 'yes'"
