@@ -69,6 +69,6 @@
     port: 22
     state: started
     delay: 10
-    timeout: 600
+    timeout: 1200
   connection: local
   when: hostname in configuration
