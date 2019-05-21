@@ -368,7 +368,7 @@ ptf-boxer-sw01 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=r
 # MTR SimX dev-r-vrt-232-005 PTF host
 ptf-232-005 ansible_host=10.212.232.6 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR SimX dev-r-vrt-232-007 PTF host
-ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=rooti
+ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR SimX dev-r-vrt-233-005 PTF host
 ptf-233-005 ansible_host=10.212.233.6 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR SimX dev-r-vrt-233-007 PTF host
