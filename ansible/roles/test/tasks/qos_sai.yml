@@ -29,14 +29,7 @@
 
     - name: Disable bgpd
       become: yes
-      lineinfile: dest=/etc/quagga/daemons
-                  regexp=^bgpd=.*$
-                  line='bgpd=no'
-      notify:
-        - Restart Quagga Daemon
-      vars:
-        ansible_shell_type: docker
-        ansible_python_interpreter: docker exec -i bgp python
+      shell: docker exec -i bgp supervisorctl stop bgpd
 
     - meta: flush_handlers
 
@@ -339,14 +332,7 @@
 
     - name: Enable bgpd
       become: yes
-      lineinfile: dest=/etc/quagga/daemons
-                  regexp=^bgpd=.*$
-                  line='bgpd=yes'
-      notify:
-        - Restart Quagga Daemon
-      vars:
-        ansible_shell_type: docker
-        ansible_python_interpreter: docker exec -i bgp python
+      shell: docker exec -i bgp supervisorctl start bgpd
 
     - name: Restore origin buffer profile after PFC tests
       shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
