@@ -95,8 +95,9 @@
       when: config_db_backup_file.stat.exists
 
     - name: Reload config to cleanup
-      command: config reload -y
-      become: yes
+      include: "roles/test/tasks/common_tasks/reload_config.yml"
+      vars:
+        config_source: "config_db"
 
     - name: wait 60 seconds for ports to be up
       pause: seconds=60

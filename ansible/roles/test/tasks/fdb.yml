@@ -120,8 +120,9 @@
     poll: 0
 
   - name: Reload config
-    command: config reload -y
-    become: yes
+    include: "roles/test/tasks/common_tasks/reload_config.yml"
+    vars:
+      config_source: "config_db"
 
   - name: Get PID of the PTF script
     command: "pgrep -f '/usr/bin/python /usr/bin/ptf'"

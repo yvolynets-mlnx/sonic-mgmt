@@ -66,6 +66,10 @@
 - name: wait for 2 minute for prcesses and interfaces to be stable
   pause: seconds=120
 
+- name: "SimX workaround: Run links sanity check"
+  include: "roles/test/tasks/common_tasks/simx/links_sanity.yml"
+  when: "simx is defined and simx == 'yes'"
+
 - name: "SimX workaround: Apply SimX BGP template config"
   include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
   vars:
