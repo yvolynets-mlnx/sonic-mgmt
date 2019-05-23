@@ -166,12 +166,9 @@
       become: yes
 
     - name: reset all changes
-      include: "roles/test/tasks/common_tasks/reload_sonic.yml"
+      include: "roles/test/tasks/common_tasks/reload_config.yml"
       vars:
         config_source: "minigraph"
-
-    - name: wait 60 seconds for ports to be up
-      pause: seconds=60
 
     - name: check port status
       interface_facts: up_ports={{ minigraph_ports }}
