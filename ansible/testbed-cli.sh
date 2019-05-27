@@ -120,7 +120,6 @@ function add_topo
   # Delete the obsoleted arp entry for the PTF IP
   ip neighbor flush $ptf_ip
 
-  echo $1 > /tmp/topo-$dut
   echo Done
 }
 
