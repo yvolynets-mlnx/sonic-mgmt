@@ -176,7 +176,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             while port_pg_counter == 0 and pkts_count < pkts_max:
                 testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
                 pkts_count += pkts_bunch_size
-                time.sleep(8)
+                time.sleep(1)
 
                 drop_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
                 assert (drop_counters[EGRESS_DROP] == 0)
@@ -193,8 +193,8 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             # Increase the number of packets on 25% for a oversight of translating packet size to cells
             pkts_max = ((max_buffer_size + max_queue_size) / default_packet_length) * 1.3
             port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
-            ingress_counter = port_counters[INGRESS_DROP]            
-            while ingress_counter == 0 and pkts_count < pkts_max:               
+            ingress_drop = port_counters[INGRESS_DROP]
+            while ingress_drop == 0 and pkts_count < pkts_max:
                 pkt = simple_tcp_packet(pktlen=default_packet_length,
                                         eth_dst=router_mac,
                                         eth_src=src_port_mac,
@@ -204,13 +204,15 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
                                         ip_ttl=ttl)
                 testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
                 pkts_count += pkts_bunch_size
-                time.sleep(8)
+                time.sleep(2)
                 
                 port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[src_port_id])
-                ingress_counter = port_counters[INGRESS_DROP]    
-                    
-            assert(port_counters[EGRESS_DROP] == 0)
-            assert(port_counters[INGRESS_DROP] != 0)
+
+                ingress_drop = port_counters[INGRESS_DROP]
+                egress_drop = port_counters[EGRESS_DROP]
+
+            assert(egress_drop == 0)
+            assert(ingress_drop != 0)
             assert(port_counters[pg] != 0)
 
         finally:
@@ -704,6 +706,7 @@ class BufferUtilizationTest(sai_base_test.ThriftInterfaceDataPlane):
         buffer_headroom = int(self.test_params['buffer_headroom'])
         buffer_alpha = float(self.test_params['buffer_alpha'])
         buffer_pool_size = int(self.test_params['buffer_pool_size'])
+        buffer_utilization_tolerance = int(self.test_params['buffer_utilization_tolerance'])
         cell_size = int(self.test_params['cell_size'])
         default_port_mtu = int(self.test_params['default_port_mtu'])
         packet_send_rate = int(self.test_params['packet_send_rate'])
@@ -728,7 +731,7 @@ class BufferUtilizationTest(sai_base_test.ThriftInterfaceDataPlane):
         # one packet can fit into one cell
         default_packet_length = 72
 
-        assert default_packet_length < cell_size, "Packet length should be less than the cell cise"
+        assert default_packet_length < cell_size, "Packet length should be less than the cell size"
 
         # calculate the exact max packets number that buffer can hold
         cell_size = float(cell_size)
@@ -781,8 +784,9 @@ class BufferUtilizationTest(sai_base_test.ThriftInterfaceDataPlane):
             buffer_utilization = pkts_count - ingress_drop_counter
             logging.info("Result: Buffer utilization %d, calculated %d" % (buffer_utilization, buffer_max_pkts_capacity))
 
-            assert not buffer_utilization < buffer_max_pkts_capacity, "Buffer is under utilized"
-            assert not buffer_utilization > buffer_max_pkts_capacity, "Buffer is over utilized"
+            # Utilization should be within 3-4 MTU (generic for SCP and SPC2)
+            assert not (buffer_utilization + buffer_utilization_tolerance*mtu_cells) < buffer_max_pkts_capacity, "Buffer is under utilized"
+            assert not (buffer_utilization - buffer_utilization_tolerance*mtu_cells) > buffer_max_pkts_capacity, "Buffer is over utilized"
 
         finally:
             # RELEASE PORT
