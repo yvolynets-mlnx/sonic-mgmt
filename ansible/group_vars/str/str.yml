@@ -5,6 +5,150 @@
 # since xon_th and xoff_th are configured to the same value.
 # The current parameters are according to current fw behavior
 qos_params:
+    ACS-MSN3700:
+        xoff_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+        xoff_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+        xon_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+        xon_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+        ecn_1:
+            dscp: 8
+            ecn: 0
+            num_of_pkts: 7000
+            cell_size: 144
+        ecn_2:
+            dscp: 8
+            ecn: 1
+            num_of_pkts: 1023
+            cell_size: 144
+        ecn_3:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 7000
+            cell_size: 144
+        ecn_4:
+            dscp: 0
+            ecn: 1
+            num_of_pkts: 1023
+            cell_size: 144
+        lossy_queue:
+            dscp: 8
+            ecn: 1
+        wrr:
+           ecn: 1
+           q0_num_of_pkts: 600
+           q1_num_of_pkts: 400
+           q3_num_of_pkts: 500
+           q4_num_of_pkts: 500
+           limit: 80
+        buff_util_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+            cell_size: 144
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+        buff_util_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+            cell_size: 144
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+
+    ACS-MSN3700C:
+        xoff_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+        xoff_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+        xon_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+        xon_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+        ecn_1:
+            dscp: 8
+            ecn: 0
+            num_of_pkts: 7000
+            cell_size: 144
+        ecn_2:
+            dscp: 8
+            ecn: 1
+            num_of_pkts: 1023
+            cell_size: 144
+        ecn_3:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 7000
+            cell_size: 144
+        ecn_4:
+            dscp: 0
+            ecn: 1
+            num_of_pkts: 1023
+            cell_size: 144
+        lossy_queue:
+            dscp: 8
+            ecn: 1
+        wrr:
+           ecn: 1
+           q0_num_of_pkts: 600
+           q1_num_of_pkts: 400
+           q3_num_of_pkts: 500
+           q4_num_of_pkts: 500
+           limit: 80
+        buff_util_1:
+            dscp: 3
+            ecn: 1
+            pg: 3
+            cell_size: 144
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+        buff_util_2:
+            dscp: 4
+            ecn: 1
+            pg: 4
+            cell_size: 144
+            packet_send_rates:
+                - 100
+                - 300
+                - 500
+                - 700
+                - 1000
+                - 1200
+
     ACS-MSN2700:
         xoff_1:
             dscp: 3

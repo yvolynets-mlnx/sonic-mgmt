@@ -352,7 +352,7 @@
       vars:
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i syncd python
-      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740')
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740' or sonic_hwsku == 'ACS-MSN3700' or sonic_hwsku == 'ACS-MSN3700C')
 
     - name: Remove populate ARP entries on DUT
       shell: /bin/bash /tmp/arp_populate_delete.sh
