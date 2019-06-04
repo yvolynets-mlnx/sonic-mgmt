@@ -3,15 +3,18 @@
 # flapped.
 
 - block:
-    - name: Set interface name and default link timeout
+    - name: Set interface name
       set_fact:
         interface: "{{ item }}"
-        link_timeout: 20
 
-    - name: Set Mellanox SPC-2 custom link timeout
+    - name: Set default link timeout
       set_fact:
-        link_timeout: 30
-      when: sonic_hwsku is defined and sonic_hwsku in mellanox_spc2_hwskus
+        link_timeout: 20
+        link_delay: 5
+
+    - name: Set Mellanox custom link timeout
+      include: "roles/test/tasks/link_flap/mlnx/link_flap_timeout.yml"
+      when: sonic_asic_type == "mellanox"
 
     - set_fact:
         peer_device: "{{neighbors[interface]['peerdevice']}}"
@@ -47,8 +50,13 @@
       delegate_to: "{{peer_host}}"
       when: peer_type == "FanoutLeafSonic"
 
-    - pause:
-        seconds: "{{ link_timeout }}"
+    - name: Wait until interface {{ interface }} on {{ inventory_hostname }} is down
+      interface_facts: up_ports="[ '{{ interface }}' ]"
+      register: out
+      until: out.ansible_facts.ansible_interface_link_down_ports | length > 0
+      retries: "{{ (link_timeout / link_delay) | round(0, 'ceil') | int }}"
+      delay: "{{ link_delay }}"
+      when: "interface in minigraph_ports.keys()"
 
     - interface_facts: up_ports={{minigraph_ports | difference(intfs_to_exclude)}}
 
@@ -76,8 +84,13 @@
       delegate_to: "{{peer_host}}"
       when: peer_type == "FanoutLeafSonic"
 
-    - pause:
-        seconds: "{{ link_timeout }}"
+    - name: Wait until interface {{ interface }} on {{ inventory_hostname }} is up
+      interface_facts: up_ports="[ '{{ interface }}' ]"
+      register: out
+      until: out.ansible_facts.ansible_interface_link_down_ports | length == 0
+      retries: "{{ (link_timeout / link_delay) | round(0, 'ceil') | int }}"
+      delay: "{{ link_delay }}"
+      when: "interface in minigraph_ports.keys()"
 
     - interface_facts: up_ports={{minigraph_ports}}
 
