@@ -22,23 +22,28 @@
     src: "{{ filename }}"
     dest: "{{ filename }}"
 
+- name: Extract version of the SONiC image file
+  command: "sonic_installer binary_version {{ filename }}"
+  register: image_file_version
+
 - name: Remove SONiC image from local server.
   local_action: file path={{ filename }} state=absent
 
-- name: List current images
-  command: sonic_installer list
-  register: current_images_output
-  ignore_errors: yes
+- name: "Get image facts"
+  image_facts:
+
+- name: Compare running version with image file version
+  set_fact:
+    update_required: "{{ ansible_image_facts['current'] != image_file_version.stdout }}"
 
 - name: Update SONiC image.
   command: sonic_installer install {{ filename }} -y
   register: update_output
   ignore_errors: yes
+  when: update_required
 
-- fail: msg="{{ update_output.stdout }}"
-  when:
-    - update_output.rc != 0
-    - "'running SONiC has the same version' not in update_output.stdout"
+- name: Ensure that target image is always default after reboot
+  command: "sonic_installer set_default {{ image_file_version.stdout }}"
 
 - block:
     - name: Reboot device.
@@ -65,7 +70,7 @@
         timeout: 900
       connection: local
 
-  when: "'running SONiC has the same version' not in update_output.stdout"
+  when: update_required
 
 - name: "Wait until SONiC init is done"
   command: bash -c 'docker ps | grep [s]yncd'
