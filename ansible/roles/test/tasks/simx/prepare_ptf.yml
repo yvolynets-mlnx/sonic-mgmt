@@ -93,8 +93,18 @@
       mode: "0755"
     delegate_to: "{{ ptf_host }}"
 
+  - name: "Check interface IPv4 address on SONiC"
+    command: "show ip interface"
+    register: sonic_intf_ipv4
+  - debug: msg="{{ sonic_intf_ipv4.stdout_lines }}"
+
+  - name: "Check interface IPv6 address on SONiC"
+    command: "show ipv6 interface"
+    register: sonic_intf_ipv6
+  - debug: msg="{{ sonic_intf_ipv6.stdout_lines }}"
+
   - name: "Update ARP/NDP cache on the PTF host"
-    shell: "bash -c '{{ arp_ndp_update }} &> /dev/null'"
+    shell: "bash -c '{{ arp_ndp_update }}'"
     delegate_to: "{{ ptf_host }}"
 
   when: "topo_action is defined and topo_action == 'add'"
