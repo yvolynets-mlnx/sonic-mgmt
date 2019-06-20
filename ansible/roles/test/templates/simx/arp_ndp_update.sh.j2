@@ -6,7 +6,7 @@ set -e
 
 {% for intf in dut_intfs -%}
 # DUT interface: {{ intf }}
-ping -c 1 {{ ansible_interface_facts[intf]['ipv4']['address'] }}
-ping6 -c 1 {{ ansible_interface_facts[intf]['ipv6'] | selectattr("scope", "match", "^global$") | map(attribute='address') | list | first }}
+ping -c 3 {{ ansible_interface_facts[intf]['ipv4']['address'] }}
+ping6 -c 3 {{ ansible_interface_facts[intf]['ipv6'] | selectattr("scope", "match", "^global$") | map(attribute='address') | list | first }}
 
 {% endfor %}
