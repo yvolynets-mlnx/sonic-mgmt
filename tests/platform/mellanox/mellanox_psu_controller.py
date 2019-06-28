@@ -1,9 +1,18 @@
 """
 Mellanox specific PSU controller
 
-This script contains illustrative functions and class for creating PSU controller based on Mellanox lab configuration.
+This script contains function for creating PSU controller based on lab configuration.
 
-Some actual configurations were or replaced with dummy configurations.
+The methods used in Mellanox internal tool /.autodirect/mswg/utils/bin/rreboot is used while implementing the
+SentrySwitchedCDU PSU controller.
+
+Mellanox uses PDU to controll the power supply to PSUs of SONiC switches. The relationship between DUT device and PDU
+is stored in configuration file rhreboot.conf which could be found from one of the following locations in Mellanox
+lab network:
+        locations = ("/", "/auto/", "/.autodirect/", "/net/site-labfs01/vol/", "/RDMZ",
+                     "/net/rdmzlabfs01.rdmz.labs.mlnx/vol/RDMZ", "/net/10.224.1.11/vol/RDMZ")
+        for location in locations:
+            file_location = location + "LIT/SCRIPTS/rhreboot.conf"
 """
 import logging
 import subprocess
@@ -39,7 +48,7 @@ def connect_mellanox_server():
     try:
         mellanox_server = paramiko.client.SSHClient()
         mellanox_server.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
-        mellanox_server.connect("a_mellanox_server", username="username", password="password")
+        mellanox_server.connect("arc-build-server", username="root", password="3tango")
     except Exception as e:
         logging.debug("Failed to connect to mellanox server, exception: " + repr(e))
     return mellanox_server
@@ -47,17 +56,17 @@ def connect_mellanox_server():
 
 def find_psu_controller_conf_file(server):
     """
-    @summary: Find the exact location of the configuration file which contains mapping between PSU controllers and DUT
-              switches.
+    @summary: Find the exact location of the rhreboot.conf file on server
     @param server: The paramiko.client.SSHClient object connected to a Mellanox server
-    @return: Returns the exact path of the configuration file
+    @return: Returns the exact path of the rhreboot.conf file
     """
     result = None
     try:
-        locations = ("/path1", "/path2")
-        config_file_name = "psu_controller_configuration_file.txt"
+        locations = ("/", "/auto/", "/.autodirect/", "/net/site-labfs01/vol/", "/RDMZ",
+                     "/net/rdmzlabfs01.rdmz.labs.mlnx/vol/RDMZ", "/net/10.224.1.11/vol/RDMZ")
         for location in locations:
-            _, stdout, stderr = server.exec_command("find %s -name %s" % (location, config_file_name))
+            file_location = location + "LIT/SCRIPTS/rhreboot.conf"
+            _, stdout, stderr = server.exec_command("find " + file_location)
 
             lines = stdout.readlines()
             if len(lines) > 0:
@@ -70,10 +79,10 @@ def find_psu_controller_conf_file(server):
 
 def get_psu_controller_host(hostname, server, conf_file_location):
     """
-    @summary: Check the configuration file to find out IP address of the PDU controlling power to PSUs of DUT.
+    @summary: Check the rhreboot.conf file to find out address of PDU controlling power to PSUs of DUT
     @param hostname: Hostname of the SONiC DUT
     @param server: The paramiko.client.SSHClient object connected to a Mellanox server
-    @param conf_file_location: Exact path of the configuration file on the Mellanox server
+    @param conf_file_location: Exact path of the rhreboot.conf file on the Mellanox server
     @return: Returns IP address of the PDU controlling power to PSUs of DUT
     """
     result = None
@@ -152,8 +161,9 @@ class SentrySwitchedCDU(PsuControllerBase):
         """
         @summary: Use SNMP to turn on power to PSU of DUT specified by psu_id
 
-        There is a limitation in the Mellanox configuration. Currently we can just find out which PDU ports are
-        connected to PSUs of which DUT. But we cannot find out the exact mapping between PDU ports and PSUs of DUT.
+        There is a limitation in the Mellanox rhreboot.conf and PDU configuration. Currently we can just find out
+        which PDU ports are connected to PSUs of which DUT. But we cannot find out the exact mapping between PDU ports
+        and PSUs of DUT.
 
         To overcome this limitation, the trick is to convert the specified psu_id to integer, then calculate the mode
         upon the number of PSUs on DUT. The calculated mode is used as an index to get PDU ports ID stored in
@@ -177,8 +187,9 @@ class SentrySwitchedCDU(PsuControllerBase):
         """
         @summary: Use SNMP to turn off power to PSU of DUT specified by psu_id
 
-        There is a limitation in the Mellanox configuration. Currently we can just find out which PDU ports are
-        connected to PSUs of which DUT. But we cannot find out the exact mapping between PDU ports and PSUs of DUT.
+        There is a limitation in the Mellanox rhreboot.conf and PDU configuration. Currently we can just find out
+        which PDU ports are connected to PSUs of which DUT. But we cannot find out the exact mapping between PDU ports
+        and PSUs of DUT.
 
         To overcome this limitation, the trick is to convert the specified psu_id to integer, then calculate the mode
         upon the number of PSUs on DUT. The calculated mode is used as an index to get PDU ports ID stored in
@@ -202,8 +213,9 @@ class SentrySwitchedCDU(PsuControllerBase):
         """
         @summary: Use SNMP to get status of PDU ports supplying power to PSUs of DUT
 
-        There is a limitation in the Mellanox configuration. Currently we can just find out which PDU ports are
-        connected to PSUs of which DUT. But we cannot find out the exact mapping between PDU ports and PSUs of DUT.
+        There is a limitation in the Mellanox rhreboot.conf and PDU configuration. Currently we can just find out
+        which PDU ports are connected to PSUs of which DUT. But we cannot find out the exact mapping between PDU ports
+        and PSUs of DUT.
 
         To overcome this limitation, the trick is to convert the specified psu_id to integer, then calculate the mode
         upon the number of PSUs on DUT. The calculated mode is used as an index to get PDU ports ID stored in
