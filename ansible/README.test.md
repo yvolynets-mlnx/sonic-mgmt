@@ -27,7 +27,7 @@ Where:
 ---
 ### **Run test by test case tag `(DEPRECATING)`**
 
-When Ansible running playbooks by tag, it first include all tasks(all test cases) within test role shich not relate to specific tag. It's very slow along with adding more test cases and it occupied too much resource other than just run one test case using specific tag. It does not scale. 
+When Ansible running playbooks by tag, it first include all tasks(all test cases) within test role which not relate to specific tag. It's very slow along with adding more test cases and it occupied too much resource other than just run one test case using specific tag. It does not scale. 
 
 We newly added a run test case by test name option(see above setion). Running test by tag option won’t be actively maintained going forward, but will backward compatible for all already working test cases, and eventually will be phaseout. There still going to be more improvement after the initial check in. 
 
@@ -171,3 +171,11 @@ ansible-playbook test_sonic.yml -i inventory --limit {DUT_NAME} -e "testbed_name
 ### CRM test
 ```
 ansible-playbook test_sonic.yml -i inventory --limit {DUT_NAME} --become --tags crm
+```
+
+##### MAC read test
+```
+ansible-playbook test_sonic.yml -i inventory --limit {DUT_NAME} -e testbed_name={TESTBED_NAME} -e testbed_type={TESTBED_TYPE} -e testcase_name=read_mac -e iterations={ITERATIONS} -e image1={IMAGE1} -e image2={IMAGE2}
+```
+- Replace {ITERATIONS} with the integer number of image flipping iterations.
+- Replace {IMAGE1} and {IMAGE2} with URLs to the specific SONiC binary images.
