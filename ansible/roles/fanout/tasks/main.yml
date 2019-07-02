@@ -108,3 +108,39 @@
 - include: mlnx/check_pfcwd_fanout.yml
   when: peer_hwsku == "MLNX-OS"
   tags: check_pfcwd_config
+
+##############################################################################################
+### playbook to deploy the fanout switch 
+### Use this playbook to deploy the VLAN configurations of fanout switch in SONiC testbed
+### This playbook will run based on hardware platform. Each fanout switch hardware type has its
+### own unique feature and configuration command or format. Unless you use the hardware switch
+### specified in this playbook, you would need to come up with your own fanout switch deployment 
+### playbook
+################################################################################################
+# Deploy fanout switch
+- name: Gathering lab graph facts about the device
+  conn_graph_facts: host={{ inventory_hostname }}
+  connection: local
+
+- set_fact: sw_type="{{ device_info['Type'] }}"
+
+- set_fact: os='eos'
+  when: os is not defined
+
+- include: fanout_eos.yml
+  when: os == 'eos'
+
+- include: fanout_sonic.yml
+  when: os == 'sonic'
+
+- include: fanout_mlnx.yml
+  when: os == 'mellanox'
+
+- block:
+  - set_fact:
+      leaf_name: "{{ inventory_hostname }}"
+      leaf: "{{ ansible_host }}"
+
+  - include: rootfanout_connect.yml
+      deploy_leaf=true
+  when: sw_type == 'FanoutLeaf'
