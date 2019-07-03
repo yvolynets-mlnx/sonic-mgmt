@@ -28,8 +28,8 @@
         <Speed>10000</Speed>
     {% endif %}
 {% else %}
-    {%- if  port_speed[index] != ""  %}
-          <Speed>{{ port_speed[index] }}</Speed>
+    {%- if port_alias[index] in port_speed and port_speed[port_alias[index]] != ""  %}
+          <Speed>{{ port_speed[port_alias[index]] }}</Speed>
     {%- else %}
         {%- if (inventory_hostname == "arc-switch1041" or inventory_hostname == "arc-switch1025" or inventory_hostname == "arc-switch1004" or inventory_hostname == "mts-sonic-dut" or inventory_hostname == "mtbc-sonic-03-2700") and index >= 30 %}
           <Speed>50000</Speed>

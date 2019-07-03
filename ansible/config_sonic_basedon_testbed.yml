@@ -79,9 +79,6 @@
   - name: find interface name mapping and individual interface speed if defined
     port_alias: hwsku="{{ hwsku }}"
 
-  - name: find interface speed mapping
-    port_speed: hwsku="{{ hwsku }}"
-
   - name: find all enabled host_interfaces
     set_fact:
       host_if_indexes: "{{ vm_topo_config['host_interfaces'] | difference(vm_topo_config['disabled_host_interfaces']) }}"
