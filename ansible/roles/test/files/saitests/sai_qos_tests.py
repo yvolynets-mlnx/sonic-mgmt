@@ -330,7 +330,6 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
     def runTest(self):
         time.sleep(5)
         switch_init(self.client)
-        ecn_tolerance_prc = 10
         
         # Parse input parameters
         dscp = int(self.test_params['dscp'])
@@ -350,6 +349,10 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
             packet_length = min(packet_length * (num_of_pkts / 500), 1500)
             num_of_pkts = 500
 
+        if self.test_params.has_key("tolerance"):
+            ecn_tolerance_prc = int(self.test_params['tolerance'])
+        else:
+            ecn_tolerance_prc = 10 # +/-10% declared by FW team
         green_min_limit = int(self.test_params['green_min_limit'])
         green_max_limit = int(self.test_params['green_max_limit'])
         green_min_limit_cells = int(math.ceil(float(green_min_limit) / 64 / cell_size) * 64)

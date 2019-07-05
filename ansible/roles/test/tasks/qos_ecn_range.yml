@@ -1,0 +1,18 @@
+
+
+- set_fact:
+    cmd: "ecnconfig -p AZURE_LOSSY -gmin {{ item.min | int * cell_size | int}} -gmax {{ item.max | int * cell_size | int}}"
+
+- set_fact:
+    test_params: '{{test_params_part + [ "green_min_limit={{ item.min | int * cell_size | int}}", "green_max_limit={{ item.max | int * cell_size | int}}", "tolerance={{ item.tolerance }}"]}}'
+
+- debug: var=test_params
+
+- name: Set ECN config on switch
+  include: roles/test/tasks/run_command_with_log_analyzer.yml
+  vars:
+    command_to_run: "{{ cmd }}"
+    errors_expected: false
+    testname: 'ECN_Range_Check'
+
+- include: qos_sai_ptf.yml

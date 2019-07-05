@@ -45,6 +45,31 @@ qos_params:
             ecn: 1
             num_of_pkts: 1023
             cell_size: 144
+        ecn_5:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 10000
+            cell_size: 144
+            # numbers for 3700 TBD
+            threshold: [
+                         {min: 1088, max: 3264, tolerance: 10},
+                         {min: 1088, max: 3776, tolerance: 10},
+                         {min: 1088, max: 4032, tolerance: 10},
+                         {min: 1088, max: 4352, tolerance: 10},
+                         {min: 1088, max: 4608, tolerance: 10},
+                         {min: 1088, max: 4928, tolerance: 10},
+                         {min: 1088, max: 4992, tolerance: 10},
+                         {min: 1088, max: 5056, tolerance: 10},
+                         {min: 1088, max: 5120, tolerance: 10},
+                         {min: 1088, max: 5184, tolerance: 10},
+                         {min: 1088, max: 5248, tolerance: 11},
+                         {min: 1088, max: 5312, tolerance: 11},
+                         {min: 1088, max: 5376, tolerance: 12},
+                         {min: 1088, max: 5440, tolerance: 12},
+                         {min: 1088, max: 5632, tolerance: 14},
+                         {min: 1088, max: 6016, tolerance: 16},
+                         {min: 1088, max: 6400, tolerance: 18}
+                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
@@ -119,6 +144,30 @@ qos_params:
             ecn: 1
             num_of_pkts: 1023
             cell_size: 144
+        ecn_5:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 10000
+            cell_size: 96
+            threshold: [
+                         {min: 1088, max: 3264, tolerance: 10},
+                         {min: 1088, max: 3776, tolerance: 10},
+                         {min: 1088, max: 4032, tolerance: 10},
+                         {min: 1088, max: 4352, tolerance: 10},
+                         {min: 1088, max: 4608, tolerance: 10},
+                         {min: 1088, max: 4928, tolerance: 10},
+                         {min: 1088, max: 4992, tolerance: 10},
+                         {min: 1088, max: 5056, tolerance: 10},
+                         {min: 1088, max: 5120, tolerance: 10},
+                         {min: 1088, max: 5184, tolerance: 10},
+                         {min: 1088, max: 5248, tolerance: 11},
+                         {min: 1088, max: 5312, tolerance: 11},
+                         {min: 1088, max: 5376, tolerance: 12},
+                         {min: 1088, max: 5440, tolerance: 12},
+                         {min: 1088, max: 5632, tolerance: 14},
+                         {min: 1088, max: 6016, tolerance: 16},
+                         {min: 1088, max: 6400, tolerance: 18}
+                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
@@ -193,6 +242,30 @@ qos_params:
             ecn: 1
             num_of_pkts: 1023
             cell_size: 96
+        ecn_5:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 10000
+            cell_size: 96
+            threshold: [
+                         {min: 1088, max: 3264, tolerance: 10},
+                         {min: 1088, max: 3776, tolerance: 10},
+                         {min: 1088, max: 4032, tolerance: 10},
+                         {min: 1088, max: 4352, tolerance: 10},
+                         {min: 1088, max: 4608, tolerance: 10},
+                         {min: 1088, max: 4928, tolerance: 10},
+                         {min: 1088, max: 4992, tolerance: 10},
+                         {min: 1088, max: 5056, tolerance: 10},
+                         {min: 1088, max: 5120, tolerance: 10},
+                         {min: 1088, max: 5184, tolerance: 10},
+                         {min: 1088, max: 5248, tolerance: 11},
+                         {min: 1088, max: 5312, tolerance: 11},
+                         {min: 1088, max: 5376, tolerance: 12},
+                         {min: 1088, max: 5440, tolerance: 12},
+                         {min: 1088, max: 5632, tolerance: 14},
+                         {min: 1088, max: 6016, tolerance: 16},
+                         {min: 1088, max: 6400, tolerance: 18}
+                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
@@ -266,6 +339,30 @@ qos_params:
             ecn: 1
             num_of_pkts: 1023
             cell_size: 96
+        ecn_5:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 10000
+            cell_size: 96
+            threshold: [
+                         {min: 1088, max: 3264, tolerance: 10},
+                         {min: 1088, max: 3776, tolerance: 10},
+                         {min: 1088, max: 4032, tolerance: 10},
+                         {min: 1088, max: 4352, tolerance: 10},
+                         {min: 1088, max: 4608, tolerance: 10},
+                         {min: 1088, max: 4928, tolerance: 10},
+                         {min: 1088, max: 4992, tolerance: 10},
+                         {min: 1088, max: 5056, tolerance: 10},
+                         {min: 1088, max: 5120, tolerance: 10},
+                         {min: 1088, max: 5184, tolerance: 10},
+                         {min: 1088, max: 5248, tolerance: 11},
+                         {min: 1088, max: 5312, tolerance: 11},
+                         {min: 1088, max: 5376, tolerance: 12},
+                         {min: 1088, max: 5440, tolerance: 12},
+                         {min: 1088, max: 5632, tolerance: 14},
+                         {min: 1088, max: 6016, tolerance: 16},
+                         {min: 1088, max: 6400, tolerance: 18}
+                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
@@ -339,6 +436,30 @@ qos_params:
             ecn: 1
             num_of_pkts: 1023
             cell_size: 96
+        ecn_5:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 10000
+            cell_size: 96
+            threshold: [
+                         {min: 1088, max: 3264, tolerance: 10},
+                         {min: 1088, max: 3776, tolerance: 10},
+                         {min: 1088, max: 4032, tolerance: 10},
+                         {min: 1088, max: 4352, tolerance: 10},
+                         {min: 1088, max: 4608, tolerance: 10},
+                         {min: 1088, max: 4928, tolerance: 10},
+                         {min: 1088, max: 4992, tolerance: 10},
+                         {min: 1088, max: 5056, tolerance: 10},
+                         {min: 1088, max: 5120, tolerance: 10},
+                         {min: 1088, max: 5184, tolerance: 10},
+                         {min: 1088, max: 5248, tolerance: 11},
+                         {min: 1088, max: 5312, tolerance: 11},
+                         {min: 1088, max: 5376, tolerance: 12},
+                         {min: 1088, max: 5440, tolerance: 12},
+                         {min: 1088, max: 5632, tolerance: 14},
+                         {min: 1088, max: 6016, tolerance: 16},
+                         {min: 1088, max: 6400, tolerance: 18}
+                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
@@ -412,6 +533,30 @@ qos_params:
             ecn: 1
             num_of_pkts: 1023
             cell_size: 96
+        ecn_5:
+            dscp: 0
+            ecn: 0
+            num_of_pkts: 10000
+            cell_size: 96
+            threshold: [
+                         {min: 1088, max: 3264, tolerance: 10},
+                         {min: 1088, max: 3776, tolerance: 10},
+                         {min: 1088, max: 4032, tolerance: 10},
+                         {min: 1088, max: 4352, tolerance: 10},
+                         {min: 1088, max: 4608, tolerance: 10},
+                         {min: 1088, max: 4928, tolerance: 10},
+                         {min: 1088, max: 4992, tolerance: 10},
+                         {min: 1088, max: 5056, tolerance: 10},
+                         {min: 1088, max: 5120, tolerance: 10},
+                         {min: 1088, max: 5184, tolerance: 10},
+                         {min: 1088, max: 5248, tolerance: 11},
+                         {min: 1088, max: 5312, tolerance: 11},
+                         {min: 1088, max: 5376, tolerance: 12},
+                         {min: 1088, max: 5440, tolerance: 12},
+                         {min: 1088, max: 5632, tolerance: 14},
+                         {min: 1088, max: 6016, tolerance: 16},
+                         {min: 1088, max: 6400, tolerance: 18}
+                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
