@@ -2,10 +2,12 @@
 - name: "Get system routing stack"
   shell: "docker ps | grep bgp | awk '{print$2}' | cut -d'-' -f3 | cut -d':' -f1"
   register: bgp_type
+  failed_when: "bgp_type.stdout not in [ 'quagga', 'frr' ]"
 
 - name: "Get BGP config mode from config_db"
   command: "sonic-cfggen -d -v 'DEVICE_METADATA[\"localhost\"][\"docker_routing_config_mode\"]'"
   register: config_mode
+  failed_when: "config_mode.stdout not in [ 'unified', 'separated' ]"
 
 # For Quagga
 - name: "Set BGP template config facts"
