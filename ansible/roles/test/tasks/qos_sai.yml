@@ -6,6 +6,15 @@
 
 - include_vars: group_vars/str/str.yml
 
+- set_fact:
+    run_dir: /home/admin/qos_tests
+    out_dir: /home/admin/qos_tests/results
+
+- name: Create run_dir for LogAnalyzer
+  file:
+    path: "{{ run_dir }}"
+    state: directory
+
 - block:
     - name: Getting minigraph facts
       minigraph_facts: host={{ inventory_hostname }}
@@ -239,6 +248,23 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
+
+    - name: Test ECN with different thresholds
+      include: qos_ecn_range.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_5.dscp }}, ecn = {{ qp.ecn_5.ecn }}
+        test_path: sai_qos_tests.DscpEcnSend
+        cell_size: '{{ qp.ecn_5.cell_size }}'
+        test_params_part:
+        - dscp='{{ qp.ecn_5.dscp }}'
+        - ecn='{{  qp.ecn_5.ecn }}'
+        - num_of_pkts='{{ qp.ecn_5.num_of_pkts }}'
+        - cell_size='{{ qp.ecn_5.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+      with_items: "{{qp.ecn_5.threshold}}"
 
     - name: Set testing buffer profile for lossy test
       shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
