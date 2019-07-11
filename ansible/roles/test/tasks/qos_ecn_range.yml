@@ -4,7 +4,7 @@
     cmd: "ecnconfig -p AZURE_LOSSY -gmin {{ item.min | int * cell_size | int}} -gmax {{ item.max | int * cell_size | int}}"
 
 - set_fact:
-    test_params: '{{test_params_part + [ "green_min_limit={{ item.min | int * cell_size | int}}", "green_max_limit={{ item.max | int * cell_size | int}}", "tolerance={{ item.tolerance }}"]}}'
+    test_params: '{{test_params_part + [ "green_min_limit={{ item.min | int * cell_size | int}}", "green_max_limit={{ item.max | int * cell_size | int}}", "ecn_tolerance={{ item.tolerance }}"]}}'
 
 - debug: var=test_params
 

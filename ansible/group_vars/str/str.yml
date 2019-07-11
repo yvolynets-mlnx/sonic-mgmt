@@ -7,8 +7,55 @@
 # Notes:
 #  buffer_utilization_tolerance parameter is multiply of MTU
 #
+ASIC_params:
+    SPC1:
+        cell_size: 96
+        buffer_utilization_tolerance: 0
+        default_ecn_tolerance: 10
+        ecn_range_treshold: [
+            {min: 1088, max: 3264, tolerance: 10},
+            {min: 1088, max: 3776, tolerance: 10},
+            {min: 1088, max: 4032, tolerance: 10},
+            {min: 1088, max: 4352, tolerance: 10},
+            {min: 1088, max: 4608, tolerance: 10},
+            {min: 1088, max: 4928, tolerance: 10},
+            {min: 1088, max: 4992, tolerance: 10},
+            {min: 1088, max: 5056, tolerance: 10},
+            {min: 1088, max: 5120, tolerance: 10},
+            {min: 1088, max: 5184, tolerance: 10},
+            {min: 1088, max: 5248, tolerance: 11},
+            {min: 1088, max: 5312, tolerance: 12},
+            {min: 1088, max: 5376, tolerance: 12},
+            {min: 1088, max: 5440, tolerance: 13},
+            {min: 1088, max: 5632, tolerance: 14},
+            {min: 1088, max: 6016, tolerance: 16},
+            {min: 1088, max: 6400, tolerance: 18}
+        ]
+    SPC2:
+        cell_size: 144
+        buffer_utilization_tolerance: 4
+        default_ecn_tolerance: 30
+        ecn_range_treshold: [
+            {min: 1088, max: 3264, tolerance: 35},
+            {min: 1088, max: 3776, tolerance: 35},
+            {min: 1088, max: 4032, tolerance: 35},
+            {min: 1088, max: 4352, tolerance: 30},
+            {min: 1088, max: 4608, tolerance: 30},
+            {min: 1088, max: 4928, tolerance: 30},
+            {min: 1088, max: 4992, tolerance: 30},
+            {min: 1088, max: 5056, tolerance: 30},
+            {min: 1088, max: 5120, tolerance: 30},
+            {min: 1088, max: 5184, tolerance: 30},
+            {min: 1088, max: 5248, tolerance: 30},
+            {min: 1088, max: 5312, tolerance: 30},
+            {min: 1088, max: 5376, tolerance: 30},
+            {min: 1088, max: 5440, tolerance: 30},
+            {min: 1088, max: 5632, tolerance: 25},
+            {min: 1088, max: 6016, tolerance: 25},
+            {min: 1088, max: 6400, tolerance: 25}
+        ]
+
 qos_params:
-    ACS-MSN3700:
         xoff_1:
             dscp: 3
             ecn: 1
@@ -29,47 +76,22 @@ qos_params:
             dscp: 8
             ecn: 0
             num_of_pkts: 7000
-            cell_size: 144
         ecn_2:
             dscp: 8
             ecn: 1
             num_of_pkts: 1023
-            cell_size: 144
         ecn_3:
             dscp: 0
             ecn: 0
             num_of_pkts: 7000
-            cell_size: 144
         ecn_4:
             dscp: 0
             ecn: 1
             num_of_pkts: 1023
-            cell_size: 144
-        ecn_5:
+        ecn_range:
             dscp: 0
             ecn: 0
             num_of_pkts: 10000
-            cell_size: 144
-            # numbers for 3700 TBD
-            threshold: [
-                         {min: 1088, max: 3264, tolerance: 10},
-                         {min: 1088, max: 3776, tolerance: 10},
-                         {min: 1088, max: 4032, tolerance: 10},
-                         {min: 1088, max: 4352, tolerance: 10},
-                         {min: 1088, max: 4608, tolerance: 10},
-                         {min: 1088, max: 4928, tolerance: 10},
-                         {min: 1088, max: 4992, tolerance: 10},
-                         {min: 1088, max: 5056, tolerance: 10},
-                         {min: 1088, max: 5120, tolerance: 10},
-                         {min: 1088, max: 5184, tolerance: 10},
-                         {min: 1088, max: 5248, tolerance: 11},
-                         {min: 1088, max: 5312, tolerance: 11},
-                         {min: 1088, max: 5376, tolerance: 12},
-                         {min: 1088, max: 5440, tolerance: 12},
-                         {min: 1088, max: 5632, tolerance: 14},
-                         {min: 1088, max: 6016, tolerance: 16},
-                         {min: 1088, max: 6400, tolerance: 18}
-                        ]
         lossy_queue:
             dscp: 8
             ecn: 1
@@ -84,8 +106,6 @@ qos_params:
             dscp: 3
             ecn: 1
             pg: 3
-            cell_size: 144
-            buffer_utilization_tolerance: 4
             packet_send_rates:
                 - 100
                 - 300
@@ -97,495 +117,6 @@ qos_params:
             dscp: 4
             ecn: 1
             pg: 4
-            cell_size: 144
-            buffer_utilization_tolerance: 4
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-
-    ACS-MSN3700C:
-        xoff_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xoff_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        xon_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xon_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        ecn_1:
-            dscp: 8
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 144
-        ecn_2:
-            dscp: 8
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 144
-        ecn_3:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 144
-        ecn_4:
-            dscp: 0
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 144
-        ecn_5:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 10000
-            cell_size: 96
-            threshold: [
-                         {min: 1088, max: 3264, tolerance: 10},
-                         {min: 1088, max: 3776, tolerance: 10},
-                         {min: 1088, max: 4032, tolerance: 10},
-                         {min: 1088, max: 4352, tolerance: 10},
-                         {min: 1088, max: 4608, tolerance: 10},
-                         {min: 1088, max: 4928, tolerance: 10},
-                         {min: 1088, max: 4992, tolerance: 10},
-                         {min: 1088, max: 5056, tolerance: 10},
-                         {min: 1088, max: 5120, tolerance: 10},
-                         {min: 1088, max: 5184, tolerance: 10},
-                         {min: 1088, max: 5248, tolerance: 11},
-                         {min: 1088, max: 5312, tolerance: 11},
-                         {min: 1088, max: 5376, tolerance: 12},
-                         {min: 1088, max: 5440, tolerance: 12},
-                         {min: 1088, max: 5632, tolerance: 14},
-                         {min: 1088, max: 6016, tolerance: 16},
-                         {min: 1088, max: 6400, tolerance: 18}
-                        ]
-        lossy_queue:
-            dscp: 8
-            ecn: 1
-        wrr:
-           ecn: 1
-           q0_num_of_pkts: 600
-           q1_num_of_pkts: 400
-           q3_num_of_pkts: 500
-           q4_num_of_pkts: 500
-           limit: 80
-        buff_util_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-            cell_size: 144
-            buffer_utilization_tolerance: 4
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-        buff_util_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-            cell_size: 144
-            buffer_utilization_tolerance: 4
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-
-    ACS-MSN2700:
-        xoff_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xoff_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        xon_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xon_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        ecn_1:
-            dscp: 8
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_2:
-            dscp: 8
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_3:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_4:
-            dscp: 0
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_5:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 10000
-            cell_size: 96
-            threshold: [
-                         {min: 1088, max: 3264, tolerance: 10},
-                         {min: 1088, max: 3776, tolerance: 10},
-                         {min: 1088, max: 4032, tolerance: 10},
-                         {min: 1088, max: 4352, tolerance: 10},
-                         {min: 1088, max: 4608, tolerance: 10},
-                         {min: 1088, max: 4928, tolerance: 10},
-                         {min: 1088, max: 4992, tolerance: 10},
-                         {min: 1088, max: 5056, tolerance: 10},
-                         {min: 1088, max: 5120, tolerance: 10},
-                         {min: 1088, max: 5184, tolerance: 10},
-                         {min: 1088, max: 5248, tolerance: 11},
-                         {min: 1088, max: 5312, tolerance: 11},
-                         {min: 1088, max: 5376, tolerance: 12},
-                         {min: 1088, max: 5440, tolerance: 12},
-                         {min: 1088, max: 5632, tolerance: 14},
-                         {min: 1088, max: 6016, tolerance: 16},
-                         {min: 1088, max: 6400, tolerance: 18}
-                        ]
-        lossy_queue:
-            dscp: 8
-            ecn: 1
-        wrr:
-           ecn: 1
-           q0_num_of_pkts: 600
-           q1_num_of_pkts: 400
-           q3_num_of_pkts: 500
-           q4_num_of_pkts: 500
-           limit: 80
-        buff_util_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-        buff_util_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-    ACS-MSN2740:
-        xoff_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xoff_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        xon_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xon_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        ecn_1:
-            dscp: 8
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_2:
-            dscp: 8
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_3:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_4:
-            dscp: 0
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_5:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 10000
-            cell_size: 96
-            threshold: [
-                         {min: 1088, max: 3264, tolerance: 10},
-                         {min: 1088, max: 3776, tolerance: 10},
-                         {min: 1088, max: 4032, tolerance: 10},
-                         {min: 1088, max: 4352, tolerance: 10},
-                         {min: 1088, max: 4608, tolerance: 10},
-                         {min: 1088, max: 4928, tolerance: 10},
-                         {min: 1088, max: 4992, tolerance: 10},
-                         {min: 1088, max: 5056, tolerance: 10},
-                         {min: 1088, max: 5120, tolerance: 10},
-                         {min: 1088, max: 5184, tolerance: 10},
-                         {min: 1088, max: 5248, tolerance: 11},
-                         {min: 1088, max: 5312, tolerance: 11},
-                         {min: 1088, max: 5376, tolerance: 12},
-                         {min: 1088, max: 5440, tolerance: 12},
-                         {min: 1088, max: 5632, tolerance: 14},
-                         {min: 1088, max: 6016, tolerance: 16},
-                         {min: 1088, max: 6400, tolerance: 18}
-                        ]
-        lossy_queue:
-            dscp: 8
-            ecn: 1
-        wrr:
-           ecn: 1
-           q0_num_of_pkts: 600
-           q1_num_of_pkts: 400
-           q3_num_of_pkts: 500
-           q4_num_of_pkts: 500
-           limit: 80
-        buff_util_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-        buff_util_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-    ACS-MSN2410:
-        xoff_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xoff_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        xon_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xon_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        ecn_1:
-            dscp: 8
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_2:
-            dscp: 8
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_3:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_4:
-            dscp: 0
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_5:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 10000
-            cell_size: 96
-            threshold: [
-                         {min: 1088, max: 3264, tolerance: 10},
-                         {min: 1088, max: 3776, tolerance: 10},
-                         {min: 1088, max: 4032, tolerance: 10},
-                         {min: 1088, max: 4352, tolerance: 10},
-                         {min: 1088, max: 4608, tolerance: 10},
-                         {min: 1088, max: 4928, tolerance: 10},
-                         {min: 1088, max: 4992, tolerance: 10},
-                         {min: 1088, max: 5056, tolerance: 10},
-                         {min: 1088, max: 5120, tolerance: 10},
-                         {min: 1088, max: 5184, tolerance: 10},
-                         {min: 1088, max: 5248, tolerance: 11},
-                         {min: 1088, max: 5312, tolerance: 11},
-                         {min: 1088, max: 5376, tolerance: 12},
-                         {min: 1088, max: 5440, tolerance: 12},
-                         {min: 1088, max: 5632, tolerance: 14},
-                         {min: 1088, max: 6016, tolerance: 16},
-                         {min: 1088, max: 6400, tolerance: 18}
-                        ]
-        lossy_queue:
-            dscp: 8
-            ecn: 1
-        wrr:
-           ecn: 1
-           q0_num_of_pkts: 600
-           q1_num_of_pkts: 400
-           q3_num_of_pkts: 500
-           q4_num_of_pkts: 500
-           limit: 80
-        buff_util_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-        buff_util_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-    ACS-MSN2100:
-        xoff_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xoff_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        xon_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-        xon_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-        ecn_1:
-            dscp: 8
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_2:
-            dscp: 8
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_3:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 7000
-            cell_size: 96
-        ecn_4:
-            dscp: 0
-            ecn: 1
-            num_of_pkts: 1023
-            cell_size: 96
-        ecn_5:
-            dscp: 0
-            ecn: 0
-            num_of_pkts: 10000
-            cell_size: 96
-            threshold: [
-                         {min: 1088, max: 3264, tolerance: 10},
-                         {min: 1088, max: 3776, tolerance: 10},
-                         {min: 1088, max: 4032, tolerance: 10},
-                         {min: 1088, max: 4352, tolerance: 10},
-                         {min: 1088, max: 4608, tolerance: 10},
-                         {min: 1088, max: 4928, tolerance: 10},
-                         {min: 1088, max: 4992, tolerance: 10},
-                         {min: 1088, max: 5056, tolerance: 10},
-                         {min: 1088, max: 5120, tolerance: 10},
-                         {min: 1088, max: 5184, tolerance: 10},
-                         {min: 1088, max: 5248, tolerance: 11},
-                         {min: 1088, max: 5312, tolerance: 11},
-                         {min: 1088, max: 5376, tolerance: 12},
-                         {min: 1088, max: 5440, tolerance: 12},
-                         {min: 1088, max: 5632, tolerance: 14},
-                         {min: 1088, max: 6016, tolerance: 16},
-                         {min: 1088, max: 6400, tolerance: 18}
-                        ]
-        lossy_queue:
-            dscp: 8
-            ecn: 1
-        wrr:
-           ecn: 1
-           q0_num_of_pkts: 600
-           q1_num_of_pkts: 400
-           q3_num_of_pkts: 500
-           q4_num_of_pkts: 500
-           limit: 80
-        buff_util_1:
-            dscp: 3
-            ecn: 1
-            pg: 3
-            cell_size: 96
-            buffer_utilization_tolerance: 0
-            packet_send_rates:
-                - 100
-                - 300
-                - 500
-                - 700
-                - 1000
-                - 1200
-        buff_util_2:
-            dscp: 4
-            ecn: 1
-            pg: 4
-            cell_size: 96
-            buffer_utilization_tolerance: 0
             packet_send_rates:
                 - 100
                 - 300

@@ -336,6 +336,7 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
         ecn = int(self.test_params['ecn'])
         router_mac = self.test_params['router_mac']
         cell_size = int(self.test_params['cell_size'])
+        ecn_tolerance_prc = int(self.test_params['ecn_tolerance'])
         dst_port_id = int(self.test_params['dst_port_id'])
         dst_port_ip = self.test_params['dst_port_ip']
         dst_port_mac = self.dataplane.get_mac(0, dst_port_id)
@@ -349,10 +350,6 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
             packet_length = min(packet_length * (num_of_pkts / 500), 1500)
             num_of_pkts = 500
 
-        if self.test_params.has_key("tolerance"):
-            ecn_tolerance_prc = int(self.test_params['tolerance'])
-        else:
-            ecn_tolerance_prc = 10 # +/-10% declared by FW team
         green_min_limit = int(self.test_params['green_min_limit'])
         green_max_limit = int(self.test_params['green_max_limit'])
         green_min_limit_cells = int(math.ceil(float(green_min_limit) / 64 / cell_size) * 64)

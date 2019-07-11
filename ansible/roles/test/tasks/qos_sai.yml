@@ -20,12 +20,24 @@
       minigraph_facts: host={{ inventory_hostname }}
       become: no
 
-    - name: check if the device has configured qos parameters
-      fail: msg="device doesn't have configured qos parameters"
-      when: sonic_hwsku is not defined or qos_params[sonic_hwsku] is not defined
-
     - name: set qos parameters for the device
-      set_fact: qp={{ qos_params[sonic_hwsku] }}
+      set_fact: qp={{ qos_params }}
+
+    - name: set ASIC parameters for SPC1
+      set_fact:
+        ap={{ ASIC_params['SPC1'] }}
+      when: sonic_hwsku in mellanox_spc1_hwskus
+
+    - name: set ASIC parameters for SPC2
+      set_fact:
+        ap={{ ASIC_params['SPC2'] }}
+      when: sonic_hwsku in mellanox_spc2_hwskus
+
+    - name: Update ASIC dependant values
+      set_fact:
+        qp: "{{ qp | combine(ap) }}"
+
+    - debug: var=qp
 
     - name: Ensure LLDP Daemon stopped
       become: yes
@@ -195,7 +207,8 @@
         - green_min_limit='{{ green_min_threshold }}'
         - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_1.num_of_pkts }}'
-        - cell_size='{{ qp.ecn_1.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
         - dst_port_id='{{ dst_port_id }}'
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
@@ -211,7 +224,8 @@
         - green_min_limit='{{ green_min_threshold }}'
         - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_2.num_of_pkts }}'
-        - cell_size='{{ qp.ecn_2.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
         - dst_port_id='{{ dst_port_id }}'
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
@@ -227,7 +241,8 @@
         - green_min_limit='{{ green_min_threshold }}'
         - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_3.num_of_pkts }}'
-        - cell_size='{{ qp.ecn_3.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
         - dst_port_id='{{ dst_port_id }}'
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
@@ -243,7 +258,8 @@
         - green_min_limit='{{ green_min_threshold }}'
         - green_max_limit='{{ green_max_threshold }}'
         - num_of_pkts='{{ qp.ecn_4.num_of_pkts }}'
-        - cell_size='{{ qp.ecn_4.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
         - dst_port_id='{{ dst_port_id }}'
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
@@ -252,19 +268,19 @@
     - name: Test ECN with different thresholds
       include: qos_ecn_range.yml
       vars:
-        test_name: ECN threshold. dscp = {{ qp.ecn_5.dscp }}, ecn = {{ qp.ecn_5.ecn }}
+        test_name: ECN threshold. dscp = {{ qp.ecn_range.dscp }}, ecn = {{ qp.ecn_range.ecn }}
         test_path: sai_qos_tests.DscpEcnSend
-        cell_size: '{{ qp.ecn_5.cell_size }}'
+        cell_size: '{{ qp.cell_size }}'
         test_params_part:
-        - dscp='{{ qp.ecn_5.dscp }}'
-        - ecn='{{  qp.ecn_5.ecn }}'
-        - num_of_pkts='{{ qp.ecn_5.num_of_pkts }}'
-        - cell_size='{{ qp.ecn_5.cell_size }}'
+        - dscp='{{ qp.ecn_range.dscp }}'
+        - ecn='{{  qp.ecn_range.ecn }}'
+        - num_of_pkts='{{ qp.ecn_range.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
         - dst_port_id='{{ dst_port_id }}'
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-      with_items: "{{qp.ecn_5.threshold}}"
+      with_items: "{{qp.ecn_range_threshold}}"
 
     - name: Set testing buffer profile for lossy test
       shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
@@ -318,8 +334,8 @@
         - buffer_headroom='{{ lossless_buffer_max_size }}'
         - buffer_alpha='{{ lossless_buffer_alpha }}'
         - buffer_pool_size='{{ lossless_buffer_pool_size }}'
-        - buffer_utilization_tolerance='{{ qp.buff_util_1.buffer_utilization_tolerance }}'
-        - cell_size='{{ qp.buff_util_1.cell_size }}'
+        - buffer_utilization_tolerance='{{ qp.buffer_utilization_tolerance }}'
+        - cell_size='{{ qp.cell_size }}'
         - default_port_mtu=9100
         - packet_send_rate='{{ item }}'
         - dst_port_id='{{ dst_port_id }}'
@@ -338,8 +354,8 @@
         - buffer_headroom='{{ lossless_buffer_max_size }}'
         - buffer_alpha='{{ lossless_buffer_alpha }}'
         - buffer_pool_size='{{ lossless_buffer_pool_size }}'
-        - buffer_utilization_tolerance='{{ qp.buff_util_2.buffer_utilization_tolerance }}'
-        - cell_size='{{ qp.buff_util_2.cell_size }}'
+        - buffer_utilization_tolerance='{{ qp.buffer_utilization_tolerance }}'
+        - cell_size='{{ qp.cell_size }}'
         - default_port_mtu=9100
         - packet_send_rate='{{ item }}'
         - dst_port_id='{{ dst_port_id }}'
@@ -374,7 +390,7 @@
       shell: redis-cli -n 4 del 'BUFFER_PG|{{dut_switch_ports[src_port_id|int]}}|0-1'
       ignore_errors: yes
 
-    - name: Disable Mellanox packet aging
+    - name: Enable Mellanox packet aging
       shell: python /root/packets_aging.py enable
       ignore_errors: yes
       vars:
@@ -387,5 +403,10 @@
       become: true
       ignore_errors: yes
 
-    - meta: flush_handlers
+    - name: Restore ECN settings
+      shell: ecnconfig -p AZURE_LOSSY -gmin {{ green_min_threshold }} -gmax {{ green_max_threshold }}
+      become: true
+      ignore_errors: yes
+      when: green_min_threshold is defined and green_max_threshold is defined
 
+    - meta: flush_handlers
