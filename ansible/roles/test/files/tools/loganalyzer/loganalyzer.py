@@ -105,25 +105,41 @@ class LogAnalyzer:
         return self.end_marker_prefix + "-" + self.run_id
     #---------------------------------------------------------------------
 
-    def place_marker(self, log_file_list, marker):
+    def place_marker_to_file(self, log_file, marker):
         '''
         @summary: Place marker into each log file specified.
         @param log_file_list : List of file paths, to be applied with marker.
         @param marker:         Marker to be placed into log files.
         '''
+        if not len(log_file) or self.is_filename_stdin(log_file):
+            self.print_diagnostic_message('Log file {} not found. Skip adding marker.'.format(log_file))
+        self.print_diagnostic_message('log file:{}, place marker {}'.format(log_file, marker))
+        with open(log_file, 'a') as file:
+            file.write(marker)
+            file.write('\n')
+            file.flush()
 
-        for log_file in log_file_list:
-            if not len(log_file) or self.is_filename_stdin(log_file):
-                continue
-            self.print_diagnostic_message('log file:%s, place marker %s'%(log_file, marker))
-            with open(log_file, 'a') as file:
-                file.write(marker)
-                file.write('\n')
-                file.flush()
+    def place_marker_to_syslog(self, marker):
+        '''
+        @summary: Place marker into '/dev/log'.
+        @param marker: Marker to be placed into syslog.
+        '''
 
         syslogger = self.init_sys_logger()
         syslogger.info(marker)
         syslogger.info('\n')
+
+    def place_marker(self, log_file_list, marker):
+        '''
+        @summary: Place marker into '/dev/log' and each log file specified.
+        @param log_file_list : List of file paths, to be applied with marker.
+        @param marker:         Marker to be placed into log files.
+        '''
+
+        for log_file in log_file_list:
+            self.place_marker_to_file(log_file, marker)
+
+        self.place_marker_to_syslog(marker)
 
         return
     #---------------------------------------------------------------------
@@ -183,6 +199,7 @@ class LogAnalyzer:
                                        skipinitialspace=True)
 
                 for index, row in enumerate(csvreader):
+                    row = [item for item in row if item != ""]
                     self.print_diagnostic_message('[diagnostic]:processing row:%d' % index)
                     self.print_diagnostic_message('row:%s'% row)
                     try:
@@ -202,13 +219,10 @@ class LogAnalyzer:
                                             'must be \'s\'(string) or \'r\'(regex)'
                                             %(filename,index))
 
-                        #-- One error message per line
-                        error_string = row[1]
-
                         if (is_regex):
-                            messages_regex.append(error_string)
+                            messages_regex.extend(row[1:])
                         else:
-                            messages_regex.append(self.error_to_regx(error_string))
+                            messages_regex.append(self.error_to_regx(row[1:]))
 
                     except Exception as e:
                         print 'ERROR: line %d is formatted incorrectly in file %s. Skipping line' % (index, filename)
@@ -500,12 +514,10 @@ def write_result_file(run_id, out_dir, analysis_result_per_file, messages_regex_
         out_file.write('Total matches:%d\n' % match_cnt)
         # Find unused regex matches
         for regex in messages_regex_e:
-            regex_used = False
             for line in expected_lines_total:
                 if re.search(regex, line):
-                    regex_used = True
                     break
-            if not regex_used:
+            else:
                 unused_regex_messages.append(regex)
 
         out_file.write('Total expected and found matches:%d\n' % expected_cnt)
@@ -515,7 +527,6 @@ def write_result_file(run_id, out_dir, analysis_result_per_file, messages_regex_
 
         out_file.write("\n-------------------------------------------------\n\n")
         out_file.flush()
-
 #---------------------------------------------------------------------
 
 def write_summary_file(run_id, out_dir, analysis_result_per_file, unused_regex_messages):
