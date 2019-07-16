@@ -32,7 +32,7 @@ tokenizer = ','
 comment_key = '#'
 system_log_file = '/var/log/syslog'
 
-#-- List of ERROR codes to be returned by LogAnalyzer
+#-- List of ERROR codes to be returned by AnsibleLogAnalyzer
 err_duplicate_start_marker = -1
 err_duplicate_end_marker = -2
 err_no_end_marker = -3
@@ -40,7 +40,7 @@ err_no_start_marker = -4
 err_invalid_string_format = -5
 err_invalid_input = -6
 
-class LogAnalyzer:
+class AnsibleLogAnalyzer:
     '''
     @summary: Overview of functionality
 
@@ -52,10 +52,10 @@ class LogAnalyzer:
     AND will not match set of 'ignore' regex expressions, will be considered a
     'match' and will be reported.
 
-    LogAnalyzer will be called initially before any test has ran, and will be
+    AnsibleLogAnalyzer will be called initially before any test has ran, and will be
     instructed to place 'start' marker into all log files to be analyzed.
-    When tests have ran, LogAnalyzer will be instructed to place end-marker
-    into the log files. After this, LogAnalyzer will be invoked to perform the
+    When tests have ran, AnsibleLogAnalyzer will be instructed to place end-marker
+    into the log files. After this, AnsibleLogAnalyzer will be invoked to perform the
     analysis of logs. The analysis will be performed on specified log files.
     For each log file only the content between start/end markers will be analyzed.
 
@@ -108,8 +108,8 @@ class LogAnalyzer:
     def place_marker_to_file(self, log_file, marker):
         '''
         @summary: Place marker into each log file specified.
-        @param log_file_list : List of file paths, to be applied with marker.
-        @param marker:         Marker to be placed into log files.
+        @param log_file : File path, to be applied with marker.
+        @param marker:    Marker to be placed into log files.
         '''
         if not len(log_file) or self.is_filename_stdin(log_file):
             self.print_diagnostic_message('Log file {} not found. Skip adding marker.'.format(log_file))
@@ -618,7 +618,7 @@ def main(argv):
         usage()
         sys.exit(err_invalid_input)
 
-    analyzer = LogAnalyzer(run_id, verbose)
+    analyzer = AnsibleLogAnalyzer(run_id, verbose)
 
     log_file_list = filter(None, log_files_in.split(tokenizer))
 
@@ -654,3 +654,4 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+

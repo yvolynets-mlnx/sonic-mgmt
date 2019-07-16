@@ -9,9 +9,9 @@ import os
 import sys
 
 from ansible_host import ansible_host
-sys.path.append(os.path.join(os.path.split(__file__)[0], "pytest_loganalyzer"))
-from pytest_loganalyzer.pytest_loganalyzer import PytestLogAnalyzer
-from pytest_loganalyzer.pytest_loganalyzer import COMMON_MATCH
+sys.path.append(os.path.join(os.path.split(__file__)[0], "loganalyzer"))
+from loganalyzer.loganalyzer import LogAnalyzer
+from loganalyzer.loganalyzer import COMMON_MATCH
 
 
 def adder(x, y=10, z=0):
@@ -24,7 +24,7 @@ def test_loganalyzer_functionality(localhost, ansible_adhoc, testbed):
     hostname = testbed['dut']
     ans_host = ansible_host(ansible_adhoc, hostname)
 
-    log = PytestLogAnalyzer(ansible_host=ans_host, marker_prefix="test_loganalyzer")
+    log = LogAnalyzer(ansible_host=ans_host, marker_prefix="test_loganalyzer")
     # Read existed common regular expressions located with legacy loganalyzer module
     log.load_common_config()
     # Add start marker to the DUT syslog
@@ -66,3 +66,4 @@ def test_loganalyzer_functionality(localhost, ansible_adhoc, testbed):
     if not result:
         pytest.fail("Log analyzer failed.")
     assert result["total"]["match"] == 1, "Found errors: {}".format(result)
+
