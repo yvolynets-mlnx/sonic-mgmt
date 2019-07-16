@@ -18,11 +18,11 @@ SYSLOG_TEMP_FOLDER = "/tmp/pytest-run/syslog"
 
 
 class LogAnalyzer:
-    def __init__(self, ansible_host, marker_prefix, run_dir="/tmp"):
+    def __init__(self, ansible_host, marker_prefix, dut_run_dir="/tmp"):
         self.ansible_host = ansible_host
-        self.run_dir = run_dir
+        self.dut_run_dir = dut_run_dir
         self.run_id = None
-        self.extracted_syslog = os.path.join(self.run_dir, "syslog")
+        self.extracted_syslog = os.path.join(self.dut_run_dir, "syslog")
         self.marker_prefix = marker_prefix
 
         self.match_regex = []
@@ -80,10 +80,10 @@ class LogAnalyzer:
         """
         logging.debug("Loganalyzer initialization...")
 
-        self.ansible_host.copy(src=ANSIBLE_LOGANALYZER_MODULE, dest=self.run_dir)
+        self.ansible_host.copy(src=ANSIBLE_LOGANALYZER_MODULE, dest=self.dut_run_dir)
 
         self.run_id = ".".join((self.marker_prefix, strftime("%Y-%m-%d-%H:%M:%S", gmtime())))
-        cmd = "python {run_dir}/loganalyzer.py --action init --run_id {run_id}".format(run_dir=self.run_dir, run_id=self.run_id)
+        cmd = "python {run_dir}/loganalyzer.py --action init --run_id {run_id}".format(run_dir=self.dut_run_dir, run_id=self.run_id)
 
         logging.debug("Adding start marker '{}'".format(self.run_id))
         self.ansible_host.command(cmd)
