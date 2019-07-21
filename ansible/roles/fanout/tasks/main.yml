@@ -1,103 +1,36 @@
 ##############################################################################################
-### playbook to deploy the fanout swtich
-### Use this playbook to deploy the VLAN configurations of fanout leaf switch in SONiC testbed
-### This playbook will run based on hardware flatform. Each fanout switch hardware type has its
-### own unique feature and configuration command or format. Unless you use the hardware swtich
+### playbook to deploy the fanout switch
+### Use this playbook to deploy the VLAN configurations of fanout switch in SONiC testbed
+### This playbook will run based on hardware platform. Each fanout switch hardware type has its
+### own unique feature and configuration command or format. Unless you use the hardware switch
 ### specified in this playbook, you would need to come up with your own fanout switch deployment
 ### playbook
 ################################################################################################
-  # Gather minigraph facts
 - name: Gathering lab graph facts about the device
   conn_graph_facts: host={{ inventory_hostname }}
   connection: local
   tags: always
 
-- name: prepare fanout switch admin login info
-  set_fact: ansible_ssh_user={{ fanout_admin_user }} ansible_ssh_pass={{ fanout_admin_password }} peer_hwsku={{device_info['HwSku']}}
+- set_fact: sw_type='Fanout'
   tags: always
 
-- set_fact:
-    fanout_root_user: "root"
-    fanout_root_pass: "3tango"
-  tags: deploy,pfcwd_config,check_pfcwd_config
+- set_fact: os='eos'
+  when: os is not defined
 
- ##########################################################
- # deploy tasks to deploy default configuration on fanout #
- ##########################################################
+- include: fanout_eos.yml
+  when: os == 'eos'
 
-- block:
-  - name: build fanout startup config for Arista Fanout leaf
-    template: src=arista_7260_deploy.j2
-              dest=/mnt/flash/startup-config
-    notify:
-      - Restart the box
-  when: device_info.HwSku == "Arista-7260QX-64"
-  tags: deploy
+- include: fanout_sonic.yml
+  when: os == 'sonic'
 
-- name: build fanout startup config
-  action: apswitch template=force10_s6100_deploy.j2
-  connection: switch
-  args:
-    login: "{{ switch_login['Force10'] }}"
-  when: device_info.HwSku == "Force10-S6100"
-  tags: deploy
+- include: fanout_mlnx.yml
+  when: os == 'mellanox'
 
 - block:
-  - name: build fanout startup config
-    template: src=arista_7060_deploy.j2
-              dest=/mnt/flash/startup-config
-    notify:
-       - Restart the box
-  when: device_info.HwSku == "Arista-7060CX-32S"
-  tags: deploy
+  - set_fact:
+      leaf_name: "{{ inventory_hostname }}"
+      leaf: "{{ ansible_host }}"
 
-- block:
-  - debug: msg={{ inventory_hostname }}
-  - name: build fanout startup config for fanout mlnx-os-switch
-    action: apswitch template=mlnx_fanout.j2
-    connection: switch
-    args:
-      login: "{{ switch_login['MLNX-OS'] }}"
-    vars:
-      action_variable: "deploy"
-    when: peer_hwsku == "MLNX-OS"
-    tags: deploy
-
- ###################################################################
- # build, deploy and start docker images for the PFC WD test       #
- ###################################################################
-- include: mlnx_deploy_pfcwd_fanout.yml
-  when: peer_hwsku == "MLNX-OS"
-  tags: deploy,pfcwd_config
-
- ###################################################################
- # check and recover docker images for the PFC WD test             #
- ###################################################################
-- include: mlnx_check_pfcwd_fanout.yml
-  when: peer_hwsku == "MLNX-OS"
-  tags: check_pfcwd_config
-
-#- set_fact: os='eos'
-#  when: os is not defined
-
-#- include: fanout_eos.yml
-#  when: os == 'eos'
-
-#- include: fanout_sonic.yml
-#  when: os == 'sonic'
-
-#- block:
-#  - set_fact:
-#      leaf_name: "{{ inventory_hostname }}"
-#      leaf: "{{ ansible_host }}"
-
-#  - include: rootfanout_connect.yml
-#      deploy_leaf=true
-#  when: sw_type == 'FanoutLeaf'
-
- ###################################################################
- # build, deploy and start docker images for the PFC WD test       #
- ###################################################################
-- include: mlnx/deploy_pfcwd_fanout.yml
-  when: peer_hwsku == "MLNX-OS"
-  tags: deploy,pfcwd_config
+  - include: rootfanout_connect.yml
+      deploy_leaf=true
+  when: sw_type == 'FanoutLeaf'

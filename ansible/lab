@@ -81,18 +81,18 @@ mgmt_subnet_mask_length="24"
 str-7260-10       ansible_host=10.251.0.13
 str-7260-11       ansible_host=10.251.0.234
 str-msn2700-02    ansible_host=10.251.0.235 os=sonic
-arc-switch1007    ansible_host=10.210.25.42
-arc-switch1005    ansible_host=10.210.24.23
-arc-switch1016    ansible_host=10.210.25.116
-arc-switch1035    ansible_host=10.210.25.46
-mts-sonic-fanout  ansible_host=10.12.74.64
-arc-switch1039    ansible_host=10.210.25.47
-arc-switch1003    ansible_host=10.210.25.43
-arc-switchmtbc01  ansible_host=10.12.67.34
-arc-switchmtbc02  ansible_host=10.12.67.41
-r-panther-03      ansible_host=10.210.25.83
-r-panther-04      ansible_host=10.210.25.94
-mtbc-sonic-02-2700  ansible_host=10.12.67.45
+arc-switch1007    ansible_host=10.210.25.42 os=mellanox
+arc-switch1005    ansible_host=10.210.24.23 os=mellanox
+arc-switch1016    ansible_host=10.210.25.116 os=mellanox
+arc-switch1035    ansible_host=10.210.25.46 os=mellanox
+mts-sonic-fanout  ansible_host=10.12.74.64 os=mellanox
+arc-switch1039    ansible_host=10.210.25.47 os=mellanox
+arc-switch1003    ansible_host=10.210.25.43 os=mellanox
+arc-switchmtbc01  ansible_host=10.12.67.34 os=mellanox
+arc-switchmtbc02  ansible_host=10.12.67.41 os=mellanox
+r-panther-03      ansible_host=10.210.25.83 os=mellanox
+r-panther-04      ansible_host=10.210.25.94 os=mellanox
+mtbc-sonic-02-2700  ansible_host=10.12.67.45 os=mellanox
 arc-switch232-005 ansible_host=0.0.0.0
 arc-switch232-007 ansible_host=0.0.0.0
 arc-switch233-005 ansible_host=0.0.0.0
