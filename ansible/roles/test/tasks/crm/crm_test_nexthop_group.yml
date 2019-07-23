@@ -33,7 +33,7 @@
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds={{ crm_update_time }}
+      pause: seconds=2
 
     - name: Get new "crm_stats_nexthop_group_used" counter value
       command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_nexthop_group_used
@@ -56,7 +56,7 @@
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds={{ crm_update_time }}
+      pause: seconds=2
 
     - name: Get new "crm_stats_nexthop_group_used" counter value
       command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_nexthop_group_used
