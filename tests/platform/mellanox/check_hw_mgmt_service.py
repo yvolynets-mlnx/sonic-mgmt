@@ -4,6 +4,17 @@ Helper function for checking the hw-management service
 import logging
 import re
 
+from utilities import wait_until
+
+
+def fan_speed_set_to_default(dut):
+    fan_speed_setting = dut.command("cat /var/run/hw-management/thermal/pwm1")["stdout"].strip()
+    return fan_speed_setting == "153"
+
+
+def wait_until_fan_speed_set_to_default(dut):
+    wait_until(300, 10, fan_speed_set_to_default, dut)
+
 
 def check_hw_management_service(dut):
     """This function is to check the hw management service and related settings.
@@ -27,7 +38,7 @@ def check_hw_management_service(dut):
 
     logging.info("Check dmesg")
     dmesg = dut.command("sudo dmesg")
-    error_keywoards = ["crash", "Out of memory", "Call Trace", "Exception", "panic"]
-    for err_kw in error_keywoards:
+    error_keywords = ["crash", "Out of memory", "Call Trace", "Exception", "panic"]
+    for err_kw in error_keywords:
         assert not re.match(err_kw, dmesg["stdout"], re.I), \
             "Found error keyword %s in dmesg: %s" % (err_kw, dmesg["stdout"])

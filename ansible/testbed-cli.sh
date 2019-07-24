@@ -45,6 +45,10 @@ function usage
   echo "To deploy minigraph to DUT in a topology: $0 deploy-mg 'topo-name' 'inventory' ~/.password"
   echo "To reset a topology on a server: $0 reset-topo 'dut-name' 'topo-name' ~/.password"
   echo "To deploy image to the DUT with specific topology: $0 deploy 'switch-name' 'topo-name' 'image_url' ~/.password"
+  echo "    gen-mg, deploy-mg, test-mg supports enabling/disabling data ACL with parameter"
+  echo "        -e enable_data_plane_acl=true"
+  echo "        -e enable_data_plane_acl=false"
+  echo "        by default, data acl is enabled"
   echo
   echo "You should define your topology in testbed CSV file"
   echo
@@ -119,14 +123,12 @@ function add_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_add_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
 
-  # ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="${passwd}" -e "dut=$dut" $@
+  # ansible-playbook fanout_connect.yml -i $vmfile --limit "$server" --vault-password-file="${passwd}" -e "dut=$dut" $@
 
   # Delete the obsoleted arp entry for the PTF IP
   ip neighbor flush $ptf_ip
 
-  # Delete the obsoleted arp entry for the PTF IP
-  ip neighbor flush $ptf_ip
-
+  echo ${topology} > /tmp/topo-${dut}
   echo Done
 }
 
@@ -142,7 +144,7 @@ function remove_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_remove_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
 
-  rm /tmp/topo-$dut
+  rm -f /tmp/topo-${dut}
   echo Done
 }
 
@@ -158,7 +160,7 @@ function renumber_topo
 
   ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_renumber_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
 
-  # ansible-playbook fanout_connect.yml -i veos --limit "$server" --vault-password-file="${passwd}" -e "dut=$dut" $@
+  ansible-playbook fanout_connect.yml -i $vmfile --limit "$server" --vault-password-file="${passwd}" -e "dut=$dut" $@
 
   echo Done
 }
@@ -203,33 +205,54 @@ function disconnect_vms
 
 function generate_minigraph
 {
-  echo "Generating minigraph '$1'"
+  topology=$1
+  inventory=$2
+  passfile=$3
+  shift
+  shift
+  shift
 
-  read_file $1
+  echo "Generating minigraph '$topology'"
 
-  ansible-playbook -i "$2" config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -e testbed_file=$tbfile -v
+  read_file $topology
+
+  ansible-playbook -i "$inventory" config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e local_minigraph=true $@
 
   echo Done
 }
 
 function deploy_minigraph
 {
-  echo "Deploying minigraph '$1'"
+  topology=$1
+  inventory=$2
+  passfile=$3
+  shift
+  shift
+  shift
 
-  read_file $1
+  echo "Deploying minigraph '$topology'"
 
-  ansible-playbook -i "$2" config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -e testbed_file=$tbfile -e deploy=true -e save=true
+  read_file $topology
+
+  ansible-playbook -i "$inventory" config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e deploy=true -e save=true $@
 
   echo Done
 }
 
 function test_minigraph
 {
-  echo "Test minigraph generation '$1'"
+  topology=$1
+  inventory=$2
+  passfile=$3
+  shift
+  shift
+  shift
 
-  read_file $1
+  echo "Test minigraph generation '$topology'"
 
-  ansible-playbook -i "$2" --diff --connection=local --check config_sonic_basedon_testbed.yml --vault-password-file="$3" -l "$dut" -e testbed_name="$1" -vvvvv -e testbed_file=$tbfile -e local_minigraph=true
+  read_file $topology
+
+  ansible-playbook -i "$inventory" --diff --connection=local --check config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e local_minigraph=true $@
 
   echo Done
 }
@@ -274,11 +297,14 @@ function reset_topo
 
 function deploy
 {
-    local -r switch="$1"
-    local -r topo="$2"
-    local -r image_url="$3"
+    dut=$1
+    topo=$2
+    image_url=$3
+    shift
+    shift
+    shift
 
-    ANSIBLE_SCP_IF_SSH=y ansible-playbook  -i inventory --limit ${switch}-${topo} update_sonic.yml --tags update -b -e "image_url=${image_url}" -e "dut_minigraph=${switch}.${topo}.xml" -e topo="${topo}" -vvvvv
+    ANSIBLE_SCP_IF_SSH=y ansible-playbook -i inventory --limit ${dut}-${topo} update_sonic.yml --tags update -b -e "image_url=${image_url}" -e "dut_minigraph=${dut}.${topo}.xml" -e topo="${topo}" -vvvvv
 }
 
 function connect_topo
