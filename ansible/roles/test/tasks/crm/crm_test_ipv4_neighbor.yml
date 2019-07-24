@@ -15,24 +15,17 @@
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds={{ crm_update_time }}
+      pause: seconds=2
 
-    # - name: Get new "crm_stats_ipv4_neighbor_used" counter value
-    #   command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_used
-    #   register: out
-    # - set_fact: new_crm_stats_ipv4_neighbor_used={{out.stdout}}
-
-    # - name: Get new "crm_stats_ipv4_neighbor_available" counter value
-    #   command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_available
-    #   register: out
-    # - set_fact: new_crm_stats_ipv4_neighbor_available={{out.stdout}}
-
-    - name: Get new "crm_stats_ipv4_neighbor" used and available counter value
-      command: redis-cli --raw -r 5 -i 2 -n 2 HMGET CRM:STATS crm_stats_ipv4_neighbor_used crm_stats_ipv4_neighbor_available
+    - name: Get new "crm_stats_ipv4_neighbor_used" counter value
+      command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_used
       register: out
-    - set_fact:
-        new_crm_stats_ipv4_neighbor_used: "{{ out.stdout_lines[0] }}"
-        new_crm_stats_ipv4_neighbor_available: "{{ out.stdout_lines[1] }}"
+    - set_fact: new_crm_stats_ipv4_neighbor_used={{out.stdout}}
+
+    - name: Get new "crm_stats_ipv4_neighbor_available" counter value
+      command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_available
+      register: out
+    - set_fact: new_crm_stats_ipv4_neighbor_available={{out.stdout}}
 
     - name: Verify "crm_stats_ipv4_neighbor_used" counter was incremented
       assert: {that: "{{new_crm_stats_ipv4_neighbor_used|int - crm_stats_ipv4_neighbor_used|int >= 1}}"}
@@ -45,24 +38,17 @@
       become: yes
 
     - name: Make sure CRM counters updated
-      pause: seconds={{ crm_update_time }}
+      pause: seconds=2
 
-    # - name: Get new "crm_stats_ipv4_neighbor_used" counter value
-    #   command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_used
-    #   register: out
-    # - set_fact: new_crm_stats_ipv4_neighbor_used={{out.stdout}}
-
-    # - name: Get new "crm_stats_ipv4_neighbor_available" counter value
-    #   command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_available
-    #   register: out
-    # - set_fact: new_crm_stats_ipv4_neighbor_available={{out.stdout}}
-
-    - name: Get new "crm_stats_ipv4_neighbor" used and available counter value
-      command: redis-cli --raw -r 5 -i 2 -n 2 HMGET CRM:STATS crm_stats_ipv4_neighbor_used crm_stats_ipv4_neighbor_available
+    - name: Get new "crm_stats_ipv4_neighbor_used" counter value
+      command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_used
       register: out
-    - set_fact:
-        new_crm_stats_ipv4_neighbor_used: "{{ out.stdout_lines[0] }}"
-        new_crm_stats_ipv4_neighbor_available: "{{ out.stdout_lines[1] }}"
+    - set_fact: new_crm_stats_ipv4_neighbor_used={{out.stdout}}
+
+    - name: Get new "crm_stats_ipv4_neighbor_available" counter value
+      command: docker exec -i database redis-cli -n 2 HGET CRM:STATS crm_stats_ipv4_neighbor_available
+      register: out
+    - set_fact: new_crm_stats_ipv4_neighbor_available={{out.stdout}}
 
     - name: Verify "crm_stats_ipv4_neighbor_used" counter was decremented
       assert: {that: "{{new_crm_stats_ipv4_neighbor_used|int - crm_stats_ipv4_neighbor_used|int >= 0}}"}

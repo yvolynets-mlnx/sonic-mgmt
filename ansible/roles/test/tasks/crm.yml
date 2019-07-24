@@ -16,7 +16,6 @@
 
    - set_fact:
         ansible_date_time: "{{ansible_date_time}}"
-        crm_update_time: 2
 
    - name: Set polling interval
      command: crm config polling interval 1
