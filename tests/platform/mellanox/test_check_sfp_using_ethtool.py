@@ -8,7 +8,7 @@ import logging
 import os
 import json
 
-from ansible_host import ansible_host
+from ansible_host import AnsibleHost
 from check_hw_mgmt_service import check_hw_management_service
 
 
@@ -16,7 +16,7 @@ def test_check_sfp_using_ethtool(localhost, ansible_adhoc, testbed):
     """This test case is to check SFP using the ethtool.
     """
     hostname = testbed['dut']
-    ans_host = ansible_host(ansible_adhoc, hostname)
+    ans_host = AnsibleHost(ansible_adhoc, hostname)
     localhost.command("who")
     lab_conn_graph_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), \
         "../../../ansible/files/lab_connection_graph.xml")

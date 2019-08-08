@@ -6,14 +6,14 @@ https://github.com/Azure/SONiC/blob/master/doc/pmon/sonic_platform_test_plan.md
 """
 import logging
 
-from ansible_host import ansible_host
+from ansible_host import AnsibleHost
 
 
 def test_check_hw_mgmt_sysfs(localhost, ansible_adhoc, testbed):
     """This test case is to check the symbolic links under /var/run/hw-management
     """
     hostname = testbed['dut']
-    ans_host = ansible_host(ansible_adhoc, hostname)
+    ans_host = AnsibleHost(ansible_adhoc, hostname)
 
     logging.info("Check broken symbolinks")
     broken_symbolinks = ans_host.command("find /var/run/hw-management -xtype l")
@@ -82,7 +82,7 @@ def test_hw_mgmt_sysfs_mapped_to_pmon(localhost, ansible_adhoc, testbed):
     """This test case is to verify that the /var/run/hw-management folder is mapped to pmon container
     """
     hostname = testbed['dut']
-    ans_host = ansible_host(ansible_adhoc, hostname)
+    ans_host = AnsibleHost(ansible_adhoc, hostname)
 
     logging.info("Verify that the /var/run/hw-management folder is mapped to the pmon container")
     files_under_dut = set(ans_host.command("find /var/run/hw-management")["stdout_lines"])
