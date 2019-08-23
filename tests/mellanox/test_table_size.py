@@ -6,16 +6,17 @@ This script is to cover the SAI key value for table size configuration feature.
 import json
 import logging
 import re
-import os
 import time
 
 import pytest
 
-from lib.utilities import wait, wait_until
-from lib.mellanox_data import SWITCH_MODELS as models
+from common.utilities import wait, wait_until
+from common.mellanox_data import SWITCH_MODELS as models
+from common.errors import RunAnsibleModuleFail
+
 
 @pytest.fixture(scope="module")
-def common_setup_teardown():
+def common_setup_teardown(testbed_devices):
     """
     @summary: Fixture for setup and teardown for all the test cases in this script
 
@@ -24,66 +25,58 @@ def common_setup_teardown():
     after each test case is executed. Purpose of this fixture is to reboot to recover testbed after all the test cases
     in this script have been executed.
     """
-    logging.info("Start common setup")
+    logging.info("Start common setup, initialize instances for various devices")
 
-    # The factory pattern is used here. Why? It's a long story...
-    # Ideally, we should create device objects in the common setup section. But scope of this fixture need to be
-    # "module". To create device objects, the ansible_adhoc fixture will eventually be used. Scope of the
-    # ansible_adhoc fixture is "function". The pytest framework rejects using "function" scope fixture in "module"
-    # scope fixture. So, we can't create device objects here. The device objects can only be created in test cases
-    # and be passed into this fixture. Then we can call methods of the device objects to do the cleanup.
-
-    device_sets = []  # Store device objects passed in for later use in teardown.
-    def _register(device_set):
-        # Each device_set is expected to be a tuple with two items: (dut, localhost)
-        if len(device_sets) == 0:
-            # Each test case will create a pair of (dut, localhost). Only one pair is required for cleanup.
-            device_sets.append(device_set)
-    logging.info("Done common setup")
-
-    yield _register  # Test cases can call this function to pass in the (dut, localhost) objects for later cleanup
+    yield testbed_devices  # Test cases can call this function to pass in the (dut, localhost) objects for later cleanup
 
     logging.info("Start common teardown")
-    if len(device_sets) >= 1:
-        dut, localhost = device_sets[0]  # Get the dut and localhost object
-        dut_platform = dut.facts["platform"]
-        dut_hwsku = dut.facts["hwsku"]
-        reboot_required = False
 
-        # Recover sai.profile settings
-        sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
-        backup_sai_profile = sai_profile + ".backup"
-        logging.info("sai.profile: %s" % sai_profile)
-        if dut.stat(path=backup_sai_profile)["stat"]["exists"]:
-            logging.info("Restore %s to %s" % (backup_sai_profile, sai_profile))
-            dut.command("cp %s %s" % (backup_sai_profile, sai_profile))
-            dut.file(path=backup_sai_profile, state="absent")
+    dut = testbed_devices["dut"]
+    dut_platform = dut.facts["platform"]
+    dut_hwsku = dut.facts["hwsku"]
+    localhost = testbed_devices["localhost"]
+
+    reboot_required = False
+
+    # Recover sai.profile settings
+    sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
+    backup_sai_profile = sai_profile + ".backup"
+    logging.info("sai.profile: %s" % sai_profile)
+    if dut.stat(path=backup_sai_profile)["stat"]["exists"]:
+        logging.info("Restore %s to %s" % (backup_sai_profile, sai_profile))
+        dut.command("cp %s %s" % (backup_sai_profile, sai_profile))
+        dut.file(path=backup_sai_profile, state="absent")
+        reboot_required = True
+
+    # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
+    hwsku_digits = re.findall(r"\d+", dut_hwsku)[0]
+    sai_xml = "/usr/share/sonic/device/{}/{}/sai_{}.xml".format(dut_platform, dut_hwsku, hwsku_digits)
+    if models[dut_hwsku]["reboot"]["warm_reboot"]:
+        if dut.shell("grep '<issu-enabled>0</issu-enabled>' %s | wc -l" % sai_xml)["stdout"] == "1":
+            line = "<issu-enabled>1</issu-enabled>"
+            pattern = r"<issu-enabled>\d</issu-enabled>"
+            dut.lineinfile(dest=sai_xml, regexp=pattern, line=line)
             reboot_required = True
 
-        # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
-        hwsku_digits = re.findall(r"\d+", dut_hwsku)[0]
-        sai_xml = "/usr/share/sonic/device/{}/{}/sai_{}.xml".format(dut_platform, dut_hwsku, hwsku_digits)
-        if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
-            if dut.shell("grep '<issu-enabled>0</issu-enabled>' %s | wc -l" % sai_xml)["stdout"] == "1":
-                line = "<issu-enabled>1</issu-enabled>"
-                pattern = r"<issu-enabled>\d</issu-enabled>"
-                dut.lineinfile(dest=sai_xml, regexp=pattern, line=line)
-                reboot_required = True
+    if reboot_required:
+        logging.info("Reboot the DUT to restore")
+        reboot_task, reboot_res = dut.command("reboot", module_async=True)
+        logging.info("Wait for DUT to go down")
+        try:
+            localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
+        except RunAnsibleModuleFail as e:
+            logging.error("DUT did not go down, exception: " + repr(e))
+            if reboot_task.is_alive():
+                logging.error("Rebooting is not completed")
+                reboot_task.terminate()
+            logging.error("reboot result %s" % str(reboot_res.get()))
 
-        if reboot_required:
-            dut.command("reboot &")
+        logging.info("Wait for DUT to come back")
+        localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
 
-            logging.info("Wait for DUT to go down")
-            try:
-                localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=120)
-            except:
-                pass
+        logging.info("Wait until system is stable")
+        wait_until(300, 30, dut.critical_services_fully_started)
 
-            logging.info("Wait for DUT to come back")
-            localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
-
-            logging.info("Wait until system is stable")
-            wait_until(300, 30, dut.critical_services_fully_started)
     logging.info("Done common teardown")
 
 
@@ -134,11 +127,20 @@ def configure_issu(dut, localhost, issu_status="disabled"):
         line = "<issu-enabled>1</issu-enabled>"
         dut.lineinfile(dest=sai_xml, regexp=pattern, line=line)
 
-    dut.command("reboot &")
+    logging.info("Reboot the dut")
+    reboot_task, reboot_res = dut.command("reboot", module_async=True)
+
+    logging.info("Wait for DUT to go down")
     try:
-        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=120)
-    except:
-        pass
+        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
+    except RunAnsibleModuleFail as e:
+        logging.error("DUT did not go down, exception: " + repr(e))
+        if reboot_task.is_alive():
+            logging.error("Rebooting is not completed")
+            reboot_task.terminate()
+        logging.error("reboot result %s" % str(reboot_res.get()))
+        assert False, "Failed to reboot the DUT"
+
     localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
 
     logging.info("Wait until system is stable")
@@ -190,13 +192,18 @@ def configure_table_size_and_check(table_size, dut, localhost, request):
     set_table_size(dut, table_size)
 
     logging.info("Reboot the dut")
-    dut.command("reboot &")
+    reboot_task, reboot_res = dut.command("reboot", module_async=True)
 
     logging.info("Wait for DUT to go down")
     try:
-        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=120)
-    except:
-        pass
+        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
+    except RunAnsibleModuleFail as e:
+        logging.error("DUT did not go down, exception: " + repr(e))
+        if reboot_task.is_alive():
+            logging.error("Rebooting is not completed")
+            reboot_task.terminate()
+        logging.error("reboot result %s" % str(reboot_res.get()))
+        assert False, "Failed to reboot the DUT"
 
     logging.info("Wait for DUT to come back")
     localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
@@ -223,15 +230,14 @@ def configure_table_size_and_check(table_size, dut, localhost, request):
     compare_table_size(table_size, crm_stats)
 
 
-def test_typical_table_size(testbed_devices, request, common_setup_teardown):
+def test_typical_table_size(request, common_setup_teardown):
     """
     @summary: Test setting typical table size values and check the result.
     """
+    testbed_devices = common_setup_teardown
+
     dut = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
-
-    # Register setup and teardown operations for this case
-    common_setup_teardown((dut, localhost))
 
     logging.info("Find out whether warm-reboot is supported on this platform")
     try:
@@ -294,16 +300,14 @@ def test_typical_table_size(testbed_devices, request, common_setup_teardown):
         configure_table_size_and_check(table_size, dut, localhost, request)
 
 
-def test_more_resources_for_ipv6(testbed_devices, request, common_setup_teardown):
+def test_more_resources_for_ipv6(request, common_setup_teardown):
     """
     @summary: Configure more resources for IPv6 check the result.
     """
+    testbed_devices = common_setup_teardown
+
     dut = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
-    common_setup_teardown((dut, localhost))
-
-    # Register setup and teardown operations for this case
-    common_setup_teardown(dut)
 
     logging.info("Find out whether warm-reboot is supported on this platform")
     try:
