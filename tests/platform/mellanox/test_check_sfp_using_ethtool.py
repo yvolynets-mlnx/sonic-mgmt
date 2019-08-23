@@ -8,6 +8,7 @@ import logging
 import os
 import json
 
+<<<<<<< HEAD
 from ansible_host import AnsibleHost
 from check_hw_mgmt_service import check_hw_management_service
 
@@ -22,6 +23,16 @@ def test_check_sfp_using_ethtool(localhost, ansible_adhoc, testbed):
         "../../../ansible/files/lab_connection_graph.xml")
     conn_graph_facts = localhost.conn_graph_facts(host=hostname, filename=lab_conn_graph_file).\
         contacted["localhost"]["ansible_facts"]
+=======
+from platform_fixtures import conn_graph_facts
+from check_hw_mgmt_service import check_hw_management_service
+
+
+def test_check_sfp_using_ethtool(testbed_devices, conn_graph_facts):
+    """This test case is to check SFP using the ethtool.
+    """
+    ans_host = testbed_devices["dut"]
+>>>>>>> master-center
     ports_config = json.loads(ans_host.command("sudo sonic-cfggen -d --var-json PORT")["stdout"])
 
     logging.info("Use the ethtool to check SFP information")
@@ -38,7 +49,11 @@ def test_check_sfp_using_ethtool(localhost, ansible_adhoc, testbed):
                 "Unexpected line %s in %s" % (line, str(ethtool_sfp_output["stdout_lines"]))
 
     logging.info("Check interface status")
+<<<<<<< HEAD
     mg_facts = ans_host.minigraph_facts(host=hostname)["ansible_facts"]
+=======
+    mg_facts = ans_host.minigraph_facts(host=ans_host.hostname)["ansible_facts"]
+>>>>>>> master-center
     intf_facts = ans_host.interface_facts(up_ports=mg_facts["minigraph_ports"])["ansible_facts"]
     assert len(intf_facts["ansible_interface_link_down_ports"]) == 0, \
         "Some interfaces are down: %s" % str(intf_facts["ansible_interface_link_down_ports"])
