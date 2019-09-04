@@ -9,10 +9,11 @@
 - fail: msg="image_url variable should be provided."
   when: image_url is not defined
 
-- set_fact: timestamp="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+- name: Get timestamp
+  set_fact: timestamp="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
 
-- set_fact: filename="/tmp/update_image_{{ timestamp }}"
-- debug: var=filename
+- name: Get temporary filename
+  set_fact: filename="/tmp/update_image_{{ timestamp }}"
 
 - name: Download SONiC image.
   local_action: get_url url={{ image_url }} dest={{ filename }}
@@ -23,7 +24,7 @@
     dest: "{{ filename }}"
 
 - name: Extract version of the SONiC image file
-  command: "sonic_installer binary_version {{ filename }}"
+  command: sonic_installer binary_version {{ filename }}
   register: image_file_version
 
 - name: Remove SONiC image from local server.
@@ -36,151 +37,75 @@
   set_fact:
     update_required: "{{ ansible_image_facts['current'] != image_file_version.stdout }}"
 
-- name: Update SONiC image.
-  command: sonic_installer install {{ filename }} -y
-  register: update_output
-  ignore_errors: yes
+- block:
+
+  - name: Update SONiC image.
+    command: sonic_installer install {{ filename }} -y
+    register: update_output
+
+  - name: Show update result
+    debug: msg="{{ update_output.stdout_lines }}"
+
   when: update_required
 
 - name: Ensure that target image is always default after reboot
-  command: "sonic_installer set_default {{ image_file_version.stdout }}"
+  command: sonic_installer set_default {{ image_file_version.stdout }}
 
-- block:
-    - name: Reboot device.
-      command: reboot
-      async: 300
-      poll: 0
-      ignore_errors: true
+- name: Reboot device.
+  command: reboot
+  async: 300
+  poll: 0
+  ignore_errors: true
 
-    - name: Wait for device to go down.
-      wait_for:
-        host: "{{ ansible_ssh_host }}"
-        port: 22
-        state: stopped
-        delay: 10
-        timeout: 300
-      connection: local
+- name: Wait for device to go down.
+  wait_for:
+    host: "{{ ansible_ssh_host }}"
+    port: 22
+    state: stopped
+    delay: 10
+    timeout: 300
+  connection: local
 
-    - name: Wait for device to come back.
-      wait_for:
-        host: "{{ ansible_ssh_host }}"
-        port: 22
-        state: started
-        delay: 10
-        timeout: 900
-      connection: local
+- name: Wait for device to come back.
+  wait_for:
+    host: "{{ ansible_ssh_host }}"
+    port: 22
+    state: started
+    delay: 10
+    timeout: 900
+  connection: local
 
-  when: update_required
-
-- name: "Wait until SONiC init is done"
-  command: bash -c 'docker ps | grep [s]yncd'
+- name: Wait until all critical services are started
+  shell: bash -c 'docker ps | grep {{ item }}'
   register: result
   until: result.rc == 0
-  retries: 60
-  delay: 5
-  ignore_errors: yes
+  with_items:
+    - swss
+    - syncd
+    - bgp
+    - teamd
+    - pmon
+    - lldp
+    - snmp
+    - dhcp_relay
+  retries: 10
+  delay: 30
 
-- fail: msg="SONiC init is failed. Aborting..."
-  when: result.rc != 0
-
-# When running firmware version does not match current image, the output of mlxfwmanager --query
-# will have a line containing "FW (Running)".
-- name: Check current running firmware version
-  command: bash -c 'mlxfwmanager --query'
-  register: firmware_query_output
-  until: firmware_query_output.rc == 0
-  retries: 12
-  delay: 10
-  ignore_errors: true
-  when: simx != 'yes'
-
-- fail: msg="Unable to get firmware information. Aborting..."
-  when: simx != 'yes' and firmware_query_output.rc != 0
-
-- name: Firmware version info
-  debug: msg="{{ firmware_query_output.stdout_lines }}"
-  when: simx != 'yes'
+- name: Wait another minute to ensure that everything is working
+  pause: seconds=60
 
 - block:
 
-  - name: If unmached running FW ver, reboot to recover
-    command: reboot
-    async: 300
-    poll: 0
-    ignore_errors: true
+  - name: Get current running firmware version
+    shell: bash -c 'mlxfwmanager --query'
+    register: result
 
-  - name: Wait for device to go down.
-    wait_for:
-      host: "{{ ansible_ssh_host }}"
-      port: 22
-      state: stopped
-      delay: 10
-      timeout: 300
-    connection: local
+  - name: Show firmware version
+    debug: msg="{{ result.stdout_lines }}"
 
-  - name: Wait for device to come back.
-    wait_for:
-      host: "{{ ansible_ssh_host }}"
-      port: 22
-      state: started
-      delay: 10
-      timeout: 900
-    connection: local
-
-  - name: Wait until possible FW updating is done
-    command: bash -c 'ps aux | grep "[m]lxfwmanager" ; [ $? == 1 ]'
-    register: output
-    until: output.rc == 0
-    retries: 12
-    delay: 10
-    ignore_errors: true
-
-  - name: Check current running firmware version again
-    command: bash -c 'mlxfwmanager --query'
-    register: firmware_query_output_2
-    until: firmware_query_output_2.rc == 0
-    retries: 12
-    delay: 10
-    ignore_errors: true
-
-  - name: Firmware version info
-    debug: msg="{{ firmware_query_output_2.stdout_lines }}"
-
-  - name: If still unmatched running FW version, assert failure
-    fail: msg="Running firmware version does not match current image. Not recovered after reboot. Aborting..."
-    when: firmware_query_output_2.stdout.find("FW (Running)") != -1
-
-  when: simx != 'yes' and firmware_query_output.stdout.find("FW (Running)") != -1
+  when: simx != 'yes'
 
 - block:
-
-    # "config load_minigraph -y" needs to stop swss and some other services. If the service to be stopped is not fully
-    # started yet, stopping them may fail with error like 'service swss.service is canceled'. This is the workaround
-    # to wait until all critical services are fully started.
-    # According to current design of the services, a process 'docker wait <service_name>' would be started in the final
-    # stage of service starting. The trick is to check if there is such a process for all the critical services.
-    - name: Wait until all critical services are started
-      shell: 'ps -ef | grep "docker wait" | grep -v grep'
-      register: out
-      until: out.stdout.find('swss')>=0 and out.stdout.find('syncd')>=0 and out.stdout.find('bgp')>=0 and
-             out.stdout.find('teamd')>=0 and out.stdout.find('pmon')>=0 and out.stdout.find('lldp')>=0 and
-             out.stdout.find('snmp')>=0 and out.stdout.find('dhcp_relay')>=0
-      retries: 10
-      delay: 30
-      when: simx|bool == False
-
-    # simx is not updated to use new service design yet, keep using the old checking method
-    - name: Wait for syncd service to start
-      command: systemctl -p ActiveState -p SubState show syncd
-      register: service_syncd_state
-      until: (service_syncd_state.stdout.find("ActiveState=active") >= 0) and (service_syncd_state.stdout.find("SubState=running") >= 0)
-      retries: 10
-      delay: 30
-      when: simx|bool == True
-
-    # Wait another minute to ensure that everything is working
-    - name: Wait another minute to ensure that everything is working
-      pause: seconds=60
 
     - name: Deploy minigraph file.
       copy:
@@ -203,7 +128,6 @@
 
 - name: Gathering minigraph facts about the device
   minigraph_facts: host={{ inventory_hostname }}
-  become: no
   tags: always
 
 - block:
