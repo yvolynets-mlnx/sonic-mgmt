@@ -67,6 +67,28 @@
       pause: seconds=40
       when: (po1 is defined) or (po2 is defined)
 
+    # Below are code for debug purpose
+    # Make sure IP address was added successfully, debug purpose, should be removed later
+    - name: Check IP address on {{ intf1 }}
+      shell: ip addr show {{ intf1 }}
+      become: yes
+
+    - name: Check IP address on {{ intf2 }}
+      shell: ip addr show {{ intf2 }}
+      become: yes
+
+    # capture arp packets for debug purpose
+    - name: Start tcpdump on {{ intf1 }}
+      shell: sudo tcpdump -i {{ intf1 }} arp -v -w /tmp/intf1_arp_dump.pcap
+      async: 120
+      poll: 0
+
+    - name: Start tcpdump on {{ intf2 }}
+      shell: sudo tcpdump -i {{ intf2 }} arp -v -w /tmp/intf2_arp_dump.pcap
+      async: 120
+      poll: 0
+    # Debug code finish
+
     - name: copy test files over
       copy: src=roles/test/files/ptftests
             dest=/root
@@ -259,6 +281,10 @@
           - "{{ arptable['v4']['10.10.1.3']['interface'] == intf1 }}"
 
   always:
+    # Debug code, wait for 120 sec to make sure tcpdump finish
+    - name: wait 120 seconds for tcpdump finish
+      pause: seconds=120
+
     # Recover DUT interface IP Address before entering this test case
     - name: restore dut original state
       include: "roles/test/tasks/common_tasks/reload_config.yml"
