@@ -33,17 +33,17 @@ class TestbedInfo(object):
             topo = csv.DictReader(f)
             for line in topo:
                 tb_prop = {}
-                name = ''
+                name = ""
                 for key in line:
-                    if ('uniq-name' in key or 'conf-name' in key) and '#' in line[key]:
+                    if ("uniq-name" in key or "conf-name" in key) and "#" in line[key]:
                         ### skip comment line
                         continue
-                    elif 'uniq-name' in key or 'conf-name' in key:
+                    elif "uniq-name" in key or "conf-name" in key:
                         name = line[key]
-                    elif 'ptf_ip' in key and line[key]:
+                    elif "ptf_ip" in key and line[key]:
                         ptfaddress = ipaddress.IPNetwork(line[key])
-                        tb_prop['ptf_ip'] = str(ptfaddress.ip)
-                        tb_prop['ptf_netmask'] = str(ptfaddress.netmask)
+                        tb_prop["ptf_ip"] = str(ptfaddress.ip)
+                        tb_prop["ptf_netmask"] = str(ptfaddress.netmask)
                     else:
                         tb_prop[key] = line[key]
                 if name:
@@ -67,6 +67,8 @@ def testbed(request):
         raise ValueError("testbed and testbed_file are required!")
 
     tbinfo = TestbedInfo(tbfile)
+    tb_topo = tbinfo.testbed_topo[tbname]
+
     return tbinfo.testbed_topo[tbname]
 
 
@@ -103,7 +105,7 @@ def duthost(ansible_adhoc, testbed):
     Shortcut fixture for getting DUT host
     """
 
-    hostname = testbed['dut']
+    hostname = testbed["dut"]
     return AnsibleHost(ansible_adhoc, hostname)
 
 
@@ -113,14 +115,14 @@ def ptfhost(ansible_adhoc, testbed):
     Shortcut fixture for getting PTF host
     """
 
-    hostname = testbed['ptf']
+    hostname = testbed["ptf"]
     return AnsibleHost(ansible_adhoc, hostname)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def eos():
     """ read and yield eos configuration """
-    with open('eos/eos.yml') as stream:
+    with open("eos/eos.yml") as stream:
         eos = yaml.safe_load(stream)
         return eos
 
@@ -139,3 +141,9 @@ def loganalyzer(duthost, request):
         # Add end marker into DUT syslog
         loganalyzer._add_end_marker(marker)
 
+@pytest.fixture(scope="session")
+def creds():
+    """ read and yield eos configuration """
+    with open("../ansible/group_vars/lab/secrets.yml") as stream:
+        creds = yaml.safe_load(stream)
+        return creds
