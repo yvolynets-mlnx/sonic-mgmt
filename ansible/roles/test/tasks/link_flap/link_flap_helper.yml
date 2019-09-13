@@ -12,10 +12,6 @@
         link_timeout: 20
         link_delay: 5
 
-    - name: Set Mellanox custom link timeout
-      include: "roles/test/tasks/link_flap/mlnx/link_flap_timeout.yml"
-      when: sonic_asic_type == "mellanox"
-
     - set_fact:
         peer_device: "{{neighbors[interface]['peerdevice']}}"
         neighbor_interface: "{{neighbors[interface]['peerport']}}"
