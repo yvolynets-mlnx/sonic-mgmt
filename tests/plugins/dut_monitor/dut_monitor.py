@@ -42,8 +42,8 @@ def process_ram(log_file):
     @summary: Fetch RAM utilization and write it to the file. Use 'MemTotal' and 'MemAvailable' from '/proc/meminfo' to obtain used RAM amount.
     @param log_file: Opened file object to store fetched CPU utilization.
     """
-    with open('/proc/meminfo') as file:
-        for line in file:
+    with open('/proc/meminfo') as stream:
+        for line in stream:
             if 'MemAvailable' in line:
                 available_mem_in_kb = int(line.split()[1])
             if 'MemTotal' in line:
@@ -56,10 +56,12 @@ def process_ram(log_file):
 
 def process_hdd(log_file):
     """
-    @summary: Fetch used amount of HDD and write it to the file.
+    @summary: Fetch used amount of HDD and write it to the file. Execute command defined in FETCH_HDD_CMD.
     @param log_file: Opened file object to store fetched CPU utilization.
     """
-    hdd_usage = os.popen(FETCH_HDD_CMD).read().split("\n")[1].split()[4].rstrip("%")
+    output_line_id = 1
+    use_value_id = 4
+    hdd_usage = os.popen(FETCH_HDD_CMD).read().split("\n")[output_line_id].split()[use_value_id].rstrip("%")
     log_file.write("\"{date}\": {used_ram}\n".format(date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), used_ram=hdd_usage))
 
 

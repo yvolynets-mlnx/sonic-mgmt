@@ -9,7 +9,8 @@ import ipaddr as ipaddress
 from ansible_host import AnsibleHost
 from loganalyzer import LogAnalyzer
 
-pytest_plugins = ('ptf_fixtures', 'ansible_fixtures')
+
+pytest_plugins = ('ptf_fixtures', 'ansible_fixtures', 'plugins.dut_monitor.pytest_dut_monitor')
 
 # Add the tests folder to sys.path, for importing the lib package
 _current_file_dir = os.path.dirname(os.path.realpath(__file__))
@@ -33,17 +34,17 @@ class TestbedInfo(object):
             topo = csv.DictReader(f)
             for line in topo:
                 tb_prop = {}
-                name = ""
+                name = ''
                 for key in line:
-                    if ("uniq-name" in key or "conf-name" in key) and "#" in line[key]:
+                    if ('uniq-name' in key or 'conf-name' in key) and '#' in line[key]:
                         ### skip comment line
                         continue
-                    elif "uniq-name" in key or "conf-name" in key:
+                    elif 'uniq-name' in key or 'conf-name' in key:
                         name = line[key]
-                    elif "ptf_ip" in key and line[key]:
+                    elif 'ptf_ip' in key and line[key]:
                         ptfaddress = ipaddress.IPNetwork(line[key])
-                        tb_prop["ptf_ip"] = str(ptfaddress.ip)
-                        tb_prop["ptf_netmask"] = str(ptfaddress.netmask)
+                        tb_prop['ptf_ip'] = str(ptfaddress.ip)
+                        tb_prop['ptf_netmask'] = str(ptfaddress.netmask)
                     else:
                         tb_prop[key] = line[key]
                 if name:
@@ -67,8 +68,6 @@ def testbed(request):
         raise ValueError("testbed and testbed_file are required!")
 
     tbinfo = TestbedInfo(tbfile)
-    tb_topo = tbinfo.testbed_topo[tbname]
-
     return tbinfo.testbed_topo[tbname]
 
 
@@ -105,7 +104,7 @@ def duthost(ansible_adhoc, testbed):
     Shortcut fixture for getting DUT host
     """
 
-    hostname = testbed["dut"]
+    hostname = testbed['dut']
     return AnsibleHost(ansible_adhoc, hostname)
 
 
@@ -115,14 +114,14 @@ def ptfhost(ansible_adhoc, testbed):
     Shortcut fixture for getting PTF host
     """
 
-    hostname = testbed["ptf"]
+    hostname = testbed['ptf']
     return AnsibleHost(ansible_adhoc, hostname)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def eos():
     """ read and yield eos configuration """
-    with open("eos/eos.yml") as stream:
+    with open('eos/eos.yml') as stream:
         eos = yaml.safe_load(stream)
         return eos
 

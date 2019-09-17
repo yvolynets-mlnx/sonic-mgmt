@@ -2,13 +2,14 @@ import pytest
 import paramiko
 import threading
 import logging
-import pprint
 import time
 import os
 import yaml
 
 from collections import OrderedDict
 from  datetime import datetime
+from errors import HDDMonitorError, RAMMonitorError, CPUMonitorError
+
 
 logger = logging.getLogger(__name__)
 DUT_MONITOR = "/tmp/dut_monitor.py"
@@ -21,11 +22,15 @@ THRESHOLDS = os.path.join(os.path.split(__file__)[0], "thresholds.yml")
 def pytest_addoption(parser):
     """Describe plugin specified options"""
     parser.addoption("--dut_monitor", action="store_true", default=False, help="Enable DUT hardware resources monitoring")
+    parser.addoption("--thresholds_file", action="store", default=None, help="Path to the custom thresholds file")
 
 
 def pytest_configure(config):
     if config.option.dut_monitor:
         config.pluginmanager.register(DUTMonitorPlugin(), "dut_monitor")
+        if config.option.thresholds_file:
+            global THRESHOLDS
+            THRESHOLDS = config.option.thresholds_file
 
 
 def pytest_unconfigure(config):
@@ -33,24 +38,6 @@ def pytest_unconfigure(config):
     if dut_monitor:
         del config.dut_monitor
         config.pluginmanager.unregister(dut_monitor)
-
-
-class HDDMonitorError(Exception):
-    """Raised when HDD consumption on DUT exceed threshold"""
-    def __repr__(self):
-        return pprint.pformat(self.message)
-
-
-class RAMMonitorError(Exception):
-    """Raised when RAM consumption on DUT exceed threshold"""
-    def __repr__(self):
-        return pprint.pformat(self.message)
-
-
-class CPUMonitorError(Exception):
-    """Raised when CPU consumption on DUT exceed threshold"""
-    def __repr__(self):
-        return pprint.pformat(self.message)
 
 
 class DUTMonitorPlugin(object):
@@ -63,44 +50,46 @@ class DUTMonitorPlugin(object):
     @pytest.fixture(autouse=True, scope="session")
     def dut_ssh(self, testbed, creds):
         """Establish SSH connection with DUT"""
-
         ssh = DUTMonitorClient(host=testbed["dut"], user=creds["sonicadmin_user"], password=creds["sonicadmin_password"])
         yield ssh
 
     @pytest.fixture(autouse=True, scope="function")
-    def dut_monitor(self, dut_ssh, localhost, duthost):
+    def dut_monitor(self, dut_ssh, localhost, duthost, testbed_devices):
         """
         For each test item starts monitoring of hardware resources consumption on the DUT
         """
         # Start monitoring on DUT
         dut_ssh.start()
-        yield
+        # Read file with defined thresholds
+        with open(THRESHOLDS) as stream:
+            general_thresholds = yaml.safe_load(stream)
+        # Verify hardware resources consumption does not exceed defined threshold
+        monitor_exceptions = []
+
+        platform = testbed_devices["dut"].facts["hwsku"] if testbed_devices["dut"].facts["hwsku"] in general_thresholds else "defaults"
+        dut_thresholds = general_thresholds[platform]
+
+        yield dut_thresholds
+
         # Stop monitoring on DUT
         dut_ssh.stop()
         # Download log files with CPU, RAM and HDD measurements data
         measurements = dut_ssh.get_log_files()
-
-        # Read file with defined thresholds
-        with open(THRESHOLDS) as stream:
-            thresholds = yaml.safe_load(stream)
-
-        # Verify hardware resources consumption does not exceed defined threshold
-        monitor_exceptions = []
         if measurements["hdd"]:
             try:
-                self.assert_hhd(hdd_meas=measurements["hdd"], thresholds=thresholds[dut_ssh.host])
+                self.assert_hhd(hdd_meas=measurements["hdd"], thresholds=dut_thresholds)
             except HDDMonitorError as err:
                 monitor_exceptions.append(err)
 
         if measurements["ram"]:
             try:
-                self.assert_ram(ram_meas=measurements["ram"], thresholds=thresholds[dut_ssh.host])
+                self.assert_ram(ram_meas=measurements["ram"], thresholds=dut_thresholds)
             except RAMMonitorError as err:
                 monitor_exceptions.append(err)
 
         if measurements["cpu"]:
             try:
-                self.assert_cpu(cpu_meas=measurements["cpu"], thresholds=thresholds[dut_ssh.host])
+                self.assert_cpu(cpu_meas=measurements["cpu"], thresholds=dut_thresholds)
             except CPUMonitorError as err:
                 monitor_exceptions.append(err)
 
