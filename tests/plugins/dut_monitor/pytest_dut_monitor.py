@@ -8,7 +8,7 @@ import yaml
 
 from collections import OrderedDict
 from  datetime import datetime
-from errors import HDDMonitorError, RAMMonitorError, CPUMonitorError
+from errors import HDDThresholdExceeded, RAMThresholdExceeded, CPUThresholdExceeded
 
 
 logger = logging.getLogger(__name__)
@@ -58,16 +58,22 @@ class DUTMonitorPlugin(object):
         """
         For each test item starts monitoring of hardware resources consumption on the DUT
         """
+        dut_thresholds = {}
+        monitor_exceptions = []
         # Start monitoring on DUT
         dut_ssh.start()
+
         # Read file with defined thresholds
         with open(THRESHOLDS) as stream:
             general_thresholds = yaml.safe_load(stream)
-        # Verify hardware resources consumption does not exceed defined threshold
-        monitor_exceptions = []
+        dut_thresholds = general_thresholds["default"]
 
-        platform = testbed_devices["dut"].facts["hwsku"] if testbed_devices["dut"].facts["hwsku"] in general_thresholds else "defaults"
-        dut_thresholds = general_thresholds[platform]
+        dut_platform = testbed_devices["dut"].facts["platform"]
+        dut_hwsku = testbed_devices["dut"].facts["hwsku"]
+        if dut_platform in general_thresholds:
+            dut_thresholds.update(general_thresholds[dut_platform]["default"])
+            if dut_hwsku in general_thresholds[dut_platform]["hwsku"]:
+                dut_thresholds.update(general_thresholds[dut_platform]["hwsku"][dut_hwsku])
 
         yield dut_thresholds
 
@@ -75,22 +81,23 @@ class DUTMonitorPlugin(object):
         dut_ssh.stop()
         # Download log files with CPU, RAM and HDD measurements data
         measurements = dut_ssh.get_log_files()
+        # Verify hardware resources consumption does not exceed defined threshold
         if measurements["hdd"]:
             try:
                 self.assert_hhd(hdd_meas=measurements["hdd"], thresholds=dut_thresholds)
-            except HDDMonitorError as err:
+            except HDDThresholdExceeded as err:
                 monitor_exceptions.append(err)
 
         if measurements["ram"]:
             try:
                 self.assert_ram(ram_meas=measurements["ram"], thresholds=dut_thresholds)
-            except RAMMonitorError as err:
+            except RAMThresholdExceeded as err:
                 monitor_exceptions.append(err)
 
         if measurements["cpu"]:
             try:
                 self.assert_cpu(cpu_meas=measurements["cpu"], thresholds=dut_thresholds)
-            except CPUMonitorError as err:
+            except CPUThresholdExceeded as err:
                 monitor_exceptions.append(err)
 
         if monitor_exceptions:
@@ -108,7 +115,7 @@ class DUTMonitorPlugin(object):
                 overused.append((timestamp, used_hdd))
 
         if overused:
-            raise HDDMonitorError(fail_msg + "\n".join(str(item) for item in overused))
+            raise HDDThresholdExceeded(fail_msg + "\n".join(str(item) for item in overused))
 
     def assert_ram(self, ram_meas, thresholds):
         """
@@ -139,7 +146,7 @@ class DUTMonitorPlugin(object):
             failed = True
 
         if failed:
-            raise RAMMonitorError(fail_msg)
+            raise RAMThresholdExceeded(fail_msg)
 
     def assert_cpu(self, cpu_meas, thresholds):
         """
@@ -216,7 +223,7 @@ class DUTMonitorPlugin(object):
             fail_msg += "\n> Average CPU consumption during test run {}; Threshold - {}\n".format(total_sum / len(cpu_meas), thresholds["cpu_total_average"])
 
         if fail_msg:
-            raise CPUMonitorError(cpu_thresholds + fail_msg)
+            raise CPUThresholdExceeded(cpu_thresholds + fail_msg)
 
 
 class DUTMonitorClient(object):

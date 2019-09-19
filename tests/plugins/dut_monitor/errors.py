@@ -1,18 +1,18 @@
 import pprint
 
-class HDDMonitorError(Exception):
+class HDDThresholdExceeded(Exception):
     """Raised when HDD consumption on DUT exceed threshold"""
     def __repr__(self):
         return pprint.pformat(self.message)
 
 
-class RAMMonitorError(Exception):
+class RAMThresholdExceeded(Exception):
     """Raised when RAM consumption on DUT exceed threshold"""
     def __repr__(self):
         return pprint.pformat(self.message)
 
 
-class CPUMonitorError(Exception):
+class CPUThresholdExceeded(Exception):
     """Raised when CPU consumption on DUT exceed threshold"""
     def __repr__(self):
         return pprint.pformat(self.message)
