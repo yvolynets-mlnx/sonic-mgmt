@@ -14,6 +14,8 @@ from common.utilities import wait, wait_until
 from common.mellanox_data import SWITCH_MODELS as models
 from common.errors import RunAnsibleModuleFail
 
+pytestmark = [pytest.mark.disable_loganalyzer]
+
 
 @pytest.fixture(scope="module")
 def common_setup_teardown(testbed_devices):
