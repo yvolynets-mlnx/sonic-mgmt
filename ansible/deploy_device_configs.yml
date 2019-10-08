@@ -9,6 +9,9 @@
         port_config:
           src: "roles/sonicv2/files/ssw/ACS-MSN2010/port_config_boxer01.ini"
           dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/port_config.ini"
+        sai_xml:
+          src: "roles/sonicv2/files/ssw/ACS-MSN2010/sai_config_boxer01.xml"
+          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/sai_2010.xml"
       arc-switch1004:
         port_config:
           src: "roles/sonicv2/files/ssw/ACS-MSN2700/port_config1004.ini"
