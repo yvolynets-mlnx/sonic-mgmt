@@ -46,10 +46,10 @@ r-tigris-04-t1,vm-t1,t1,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigri
 r-tigris-04-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 r-tigris-04-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 
-arc-mtbc-1001-t0,vm-t1,t0,docker-ptf-mlnx,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
-arc-mtbc-1001-t1,vm-t1,t1,docker-ptf-mlnx,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
-arc-mtbc-1001-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
-arc-mtbc-1001-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.12.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
+arc-mtbc-1001-t0,vm-t1,t0,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
+arc-mtbc-1001-t1,vm-t1,t1,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
+arc-mtbc-1001-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
+arc-mtbc-1001-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 
 mtbc-sonic-01-2410-t0,vm-t1,t0,docker-ptf-mlnx,10.12.207.41/24,server_8,VM0801,mtbc-sonic-01-2410,Mellanox MTBC testbed
 mtbc-sonic-01-2410-t1,vm-t1,t1,docker-ptf-mlnx,10.12.207.41/24,server_8,VM0801,mtbc-sonic-01-2410,Mellanox MTBC testbed

@@ -595,7 +595,7 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.43/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switchmtbc01">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.34/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.112.67.34/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switchmtbc02">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.41/24"/>
