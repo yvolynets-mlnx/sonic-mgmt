@@ -8,7 +8,7 @@ arc-switch1025     ansible_host=10.210.25.45 sonic_version=v2 hwsku="ACS-MSN2700
 arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701
 r-anaconda-10      ansible_host=10.210.25.3 sonic_version=v2 hwsku="ACS-MSN3700C" iface_speed=100000  mgmt_subnet_mask_length=22 vm_base=VM1101
 r-tigris-04        ansible_host=10.210.25.93 sonic_version=v2 hwsku="ACS-MSN3800" iface_speed=100000 mgmt_subnet_mask_length=22 vm_base=VM1201
-mtbc-sonic-01-2410 ansible_host=10.12.71.4 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0801
+mtbc-sonic-01-2410 ansible_host=10.112.71.4 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0801
 mtbc-sonic-03-2700 ansible_host=10.112.71.251 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=100000 mgmt_subnet_mask_length=24 vm_base=VM1001
 r-boxer-sw01       ansible_host=10.210.25.53 sonic_version=v2 hwsku="ACS-MSN2010" iface_speed=25000 mgmt_subnet_mask_length=22 vm_base=VM0901
 dev-r-vrt-232-005  ansible_host=10.212.232.5 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
@@ -89,7 +89,7 @@ mts-sonic-fanout  ansible_host=10.12.74.64 os=mellanox
 arc-switch1039    ansible_host=10.210.25.47 os=mellanox
 arc-switch1003    ansible_host=10.210.25.43 os=mellanox
 arc-switchmtbc01  ansible_host=10.112.67.34 os=mellanox
-arc-switchmtbc02  ansible_host=10.12.67.41 os=mellanox
+arc-switchmtbc02  ansible_host=10.112.67.41 os=mellanox
 r-panther-03      ansible_host=10.210.25.83 os=mellanox
 r-panther-04      ansible_host=10.210.25.94 os=mellanox
 mtbc-sonic-02-2700  ansible_host=10.112.67.45 os=mellanox
