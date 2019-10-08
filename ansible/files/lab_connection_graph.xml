@@ -601,7 +601,7 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.41/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="mtbc-sonic-02-2700">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.12.67.45/25"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.112.67.45/25"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="r-panther-03">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.83/22"/>
