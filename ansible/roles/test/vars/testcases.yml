@@ -189,9 +189,13 @@ testcases:
       filename: port_toggle.yml
       topologies: [t0, t0-64, t0-64-32, t0-116, t1, t1-lag, t1-64-lag, ptf32, ptf64]
 
-    qos:
+    qos_sai_mlnx:
+      filename: qos_sai_mlnx.yml
+      topologies: [ptf32, ptf64, t1, t1-lag, t0, t0-64, t0-116]
+
+    qos_sai:
       filename: qos_sai.yml
-      topologies: [t1, t1-lag, ptf32]
+      topologies: [ptf32, ptf64, t1, t1-lag, t0, t0-64, t0-116]
     
     reboot:
       filename: reboot.yml
