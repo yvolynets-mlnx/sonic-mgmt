@@ -1,0 +1,412 @@
+# To run ecn test the host system where ptf container resides should have
+# optimized sysctl parameter "net.core.rmem_max". Now it's set to 4194304
+# Also the NICs supposed to have maximum buffer size of RX queue
+# See: ethtool -g
+#      ethtool -G p4p1 rx 8192
+
+- include_vars: group_vars/str/str.yml
+
+- set_fact:
+    run_dir: /home/admin/qos_tests
+    out_dir: /home/admin/qos_tests/results
+
+- name: Create run_dir for LogAnalyzer
+  file:
+    path: "{{ run_dir }}"
+    state: directory
+
+- block:
+    - name: Getting minigraph facts
+      minigraph_facts: host={{ inventory_hostname }}
+      become: no
+
+    - name: set qos parameters for the device
+      set_fact: qp={{ qos_params }}
+
+    - name: set ASIC parameters for SPC1
+      set_fact:
+        ap={{ ASIC_params['SPC1'] }}
+      when: sonic_hwsku in mellanox_spc1_hwskus
+
+    - name: set ASIC parameters for SPC2
+      set_fact:
+        ap={{ ASIC_params['SPC2'] }}
+      when: sonic_hwsku in mellanox_spc2_hwskus
+
+    - name: Update ASIC dependant values
+      set_fact:
+        qp: "{{ qp | combine(ap) }}"
+
+    - debug: var=qp
+
+    - name: Ensure LLDP Daemon stopped
+      become: yes
+      service: name=lldpd
+               state=stopped
+               enabled=no
+      vars:
+        ansible_shell_type: docker
+        ansible_python_interpreter: docker exec -i lldp python
+
+    - name: Disable bgpd
+      become: yes
+      shell: docker exec -i bgp supervisorctl stop bgpd
+
+    - meta: flush_handlers
+
+    - block:
+        - name: Deploy script to DUT/syncd
+          template: src=roles/test/files/mlnx/packets_aging_mlnx.py dest=/root/packets_aging.py
+
+        - name: Disable Mellanox packet aging
+          shell: python /root/packets_aging.py disable
+
+      vars:
+        ansible_shell_type: docker
+        ansible_python_interpreter: docker exec -i syncd python
+
+    - name: copy sai tests
+      copy: src=roles/test/files/saitests dest=/root
+      delegate_to: "{{ ptf_host }}"
+
+    - name: copy portmap
+      copy: src={{ ptf_portmap }} dest=/root
+      delegate_to: "{{ ptf_host }}"
+
+    - name: Init PTF base test parameters
+      set_fact: 
+        ptf_base_params:
+        - router_mac='{{ ansible_Ethernet0['macaddress'] }}'
+        - server='{{ ansible_host }}'
+        - port_map_file='/root/{{ ptf_portmap | basename }}'
+
+    - name: Get ports info.
+      include: roles/test/tasks/qos_get_ports_mlnx.yml
+      
+    # Unpause all paused port
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: release all paused ports
+        test_path: sai_qos_tests_mlnx.ReleaseAllPorts
+        test_params: []
+
+    - set_fact:
+        cmd: 'replace'
+
+    - name: Generate ARP populate script
+      template:
+        src: roles/test/templates/arp_populate.sh.j2
+        dest: /tmp/arp_populate.sh
+
+    - set_fact:
+        cmd: 'delete'
+
+    - name: Generate ARP delete script
+      template:
+        src: roles/test/templates/arp_populate.sh.j2
+        dest: /tmp/arp_populate_delete.sh
+
+    # Populate permanent ARP entries
+    - name: Populate ARP on DUT
+      shell: /bin/bash /tmp/arp_populate.sh
+      become: true
+
+    - name: Set testing buffer profile for PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_test_profile.json --write-to-db
+
+    #XON limit
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: xon limit ptf test dscp = {{ qp.xon_1.dscp }}, ecn = {{ qp.xon_1.ecn }}
+        test_path: sai_qos_tests_mlnx.PFCXonTest
+        test_params:
+        - dscp='{{ qp.xon_1.dscp }}'
+        - ecn='{{ qp.xon_1.ecn }}'
+        - pg='{{ qp.xon_1.pg }}'
+        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: xon limit ptf test dscp = {{ qp.xon_2.dscp }}, ecn = {{ qp.xon_2.ecn }}
+        test_path: sai_qos_tests_mlnx.PFCXonTest
+        test_params:
+        - dscp='{{ qp.xon_2.dscp }}'
+        - ecn='{{ qp.xon_2.ecn }}'
+        - pg='{{ qp.xon_2.pg }}'
+        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    #XOFF limit
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: xoff limit ptf test dscp = {{ qp.xoff_1.dscp }}, ecn = {{ qp.xoff_1.ecn }}
+        test_path: sai_qos_tests_mlnx.PFCtest
+        test_params:
+        - dscp='{{ qp.xoff_1.dscp }}'
+        - ecn='{{ qp.xoff_1.ecn }}'
+        - pg='{{ qp.xoff_1.pg }}'
+        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
+        - queue_max_size='{{ lossless_queue_max_size|int }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
+        test_path: sai_qos_tests_mlnx.PFCtest
+        test_params:
+        - dscp='{{ qp.xoff_2.dscp }}'
+        - ecn='{{ qp.xoff_2.ecn }}'
+        - pg='{{ qp.xoff_2.pg }}'
+        - buffer_max_size='{{ lossless_buffer_max_size|int }}'
+        - queue_max_size='{{ lossless_queue_max_size|int }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - name: Restore origin buffer profile after PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
+
+    #DSCP MAPPING
+#    - command: sonic-cfggen -d --var-json DSCP_TO_TC_MAP
+#      register: config_output
+#
+#    - copy: content={{ config_output.stdout | from_json }}
+#            dest=/root/dscp_to_tc_map.txt
+#      delegate_to: "{{ ptf_host }}"
+#
+#    - include: qos_sai_ptf_mlnx.yml
+#      vars:
+#        test_name: dscp mapping ptf test
+#        test_path: sai_qos_tests_mlnx.DscpMappingPB
+#        test_params:
+#        - dst_port_id='{{ dst_port_id }}'
+#        - dst_port_ip='{{ dst_port_ip }}'
+#        - src_port_id='{{ src_port_id }}'
+#        - src_port_ip='{{ src_port_ip }}'
+
+    #ECN limit
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_1.dscp }}, ecn = {{ qp.ecn_1.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_1.dscp }}'
+        - ecn='{{  qp.ecn_1.ecn }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_1.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_2.dscp }}, ecn = {{ qp.ecn_2.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_2.dscp }}'
+        - ecn='{{  qp.ecn_2.ecn }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_2.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_3.dscp }}, ecn = {{ qp.ecn_3.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_3.dscp }}'
+        - ecn='{{  qp.ecn_3.ecn }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_3.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_4.dscp }}, ecn = {{ qp.ecn_4.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_4.dscp }}'
+        - ecn='{{  qp.ecn_4.ecn }}'
+        - green_min_limit='{{ green_min_threshold }}'
+        - green_max_limit='{{ green_max_threshold }}'
+        - num_of_pkts='{{ qp.ecn_4.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - name: Test ECN with different thresholds
+      include: qos_ecn_range.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_range.dscp }}, ecn = {{ qp.ecn_range.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        cell_size: '{{ qp.cell_size }}'
+        test_params_part:
+        - dscp='{{ qp.ecn_range.dscp }}'
+        - ecn='{{  qp.ecn_range.ecn }}'
+        - num_of_pkts='{{ qp.ecn_range.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+      with_items: "{{qp.ecn_range_threshold}}"
+
+    - name: Set testing buffer profile for lossy test
+      shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
+
+    #Lossy queue
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: Lossy queue, shared buffer dynamic allocation.
+        test_path: sai_qos_tests_mlnx.LossyQueueTest
+        test_params:
+        - dscp='{{ qp.lossy_queue.dscp }}'
+        - ecn='{{ qp.lossy_queue.ecn }}'
+        - buffer_max_size='{{ lossy_buffer_max_size|int }}'
+        - headroom_size='{{ lossy_headroom_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - dst_port_2_id='{{ dst_port_2_id }}'
+        - dst_port_2_ip='{{ dst_port_2_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+
+    - name: Restore origin buffer profile after lossy tests
+      shell: sonic-cfggen -j /tmp/pfc_lossy_base_profile.json --write-to-db
+
+    #WRR test
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: WRR
+        test_path: sai_qos_tests_mlnx.WRRtest
+        test_params:
+        - ecn='{{ qp.wrr.ecn }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        - q0_num_of_pkts='{{ qp.wrr.q0_num_of_pkts }}'
+        - q1_num_of_pkts='{{ qp.wrr.q1_num_of_pkts }}'
+        - q3_num_of_pkts='{{ qp.wrr.q3_num_of_pkts }}'
+        - q4_num_of_pkts='{{ qp.wrr.q4_num_of_pkts }}'
+        - limit='{{ qp.wrr.limit }}'
+
+    # Buffer utilization
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: Buffer utilization ptf test dscp = {{ qp.buff_util_1.dscp }}, ecn = {{ qp.buff_util_1.ecn }}
+        test_path: sai_qos_tests_mlnx.BufferUtilizationTest
+        test_params:
+        - dscp='{{ qp.buff_util_1.dscp }}'
+        - ecn='{{ qp.buff_util_1.ecn }}'
+        - pg='{{ qp.buff_util_1.pg }}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - buffer_utilization_tolerance='{{ qp.buffer_utilization_tolerance }}'
+        - cell_size='{{ qp.cell_size }}'
+        - default_port_mtu=9100
+        - packet_send_rate='{{ item }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+      with_items: '{{ qp.buff_util_1.packet_send_rates }}'
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: Buffer utilization ptf test dscp = {{ qp.buff_util_2.dscp }}, ecn = {{ qp.buff_util_2.ecn }}
+        test_path: sai_qos_tests_mlnx.BufferUtilizationTest
+        test_params:
+        - dscp='{{ qp.buff_util_2.dscp }}'
+        - ecn='{{ qp.buff_util_2.ecn }}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - buffer_utilization_tolerance='{{ qp.buffer_utilization_tolerance }}'
+        - cell_size='{{ qp.cell_size }}'
+        - default_port_mtu=9100
+        - packet_send_rate='{{ item }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+      with_items: '{{ qp.buff_util_2.packet_send_rates }}'
+
+  always:
+    - name: Restore LLDP Daemon
+      become: yes
+      service: name=lldpd
+               state=started
+               enabled=yes
+      vars:
+        ansible_shell_type: docker
+        ansible_python_interpreter: docker exec -i lldp python
+
+    - name: Enable bgpd
+      become: yes
+      shell: docker exec -i bgp supervisorctl start bgpd
+
+    - name: Restore origin buffer profile after PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
+      ignore_errors: yes
+
+    - name: Restore origin buffer profile after lossy tests
+      shell: sonic-cfggen -j /tmp/pfc_lossy_base_profile.json --write-to-db
+      ignore_errors: yes
+
+    - name: Remove extra record for lossy pg profile
+      shell: redis-cli -n 4 del 'BUFFER_PG|{{dut_switch_ports[src_port_id|int]}}|0-1'
+      ignore_errors: yes
+
+    - name: Enable Mellanox packet aging
+      shell: python /root/packets_aging.py enable
+      ignore_errors: yes
+      vars:
+        ansible_shell_type: docker
+        ansible_python_interpreter: docker exec -i syncd python
+      when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740' or sonic_hwsku == 'ACS-MSN3700' or sonic_hwsku == 'ACS-MSN3700C')
+
+    - name: Remove populate ARP entries on DUT
+      shell: /bin/bash /tmp/arp_populate_delete.sh
+      become: true
+      ignore_errors: yes
+
+    - name: Restore ECN settings
+      shell: ecnconfig -p AZURE_LOSSY -gmin {{ green_min_threshold }} -gmax {{ green_max_threshold }}
+      become: true
+      ignore_errors: yes
+      when: green_min_threshold is defined and green_max_threshold is defined
+
+    - meta: flush_handlers
