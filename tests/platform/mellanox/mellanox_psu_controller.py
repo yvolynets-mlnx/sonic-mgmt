@@ -234,11 +234,10 @@ class SentrySwitchedCDU(PsuControllerBase):
             for line in stdout.splitlines():
                 for idx, port in enumerate(self.pdu_ports):
                     port_oid = self.PORT_STATUS_BASE_OID + port
-                    if port_oid in line:
-                        fields = line.strip().split()
-                        if len(fields) == 2:
-                            status = {"psu_id": idx, "psu_on": True if fields[1] == self.STATUS_ON else False}
-                            results.append(status)
+                    fields = line.strip().split()
+                    if len(fields) == 2 and fields[0] == port_oid:
+                        status = {"psu_id": idx, "psu_on": True if fields[1] == self.STATUS_ON else False}
+                        results.append(status)
             if psu_id is not None:
                 idx = int(psu_id) % len(self.pdu_ports)
                 results = results[idx:idx+1]
