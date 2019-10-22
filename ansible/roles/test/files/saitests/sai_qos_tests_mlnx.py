@@ -791,3 +791,218 @@ class BufferUtilizationTest(sai_base_test.ThriftInterfaceDataPlane):
         finally:
             # RELEASE PORT
             sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], RELEASE_PORT_MAX_RATE)
+
+class PGHeadroomWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):  
+
+    def runTest(self):
+        time.sleep(5)
+        switch_init(self.client)
+
+        # Parse input parameters
+        dscp = int(self.test_params['dscp'])
+        ecn = int(self.test_params['ecn'])
+        router_mac = self.test_params['router_mac']
+        buffer_headroom = int(self.test_params['buffer_headroom'])
+        buffer_alpha = float(self.test_params['buffer_alpha'])
+        buffer_pool_size = int(self.test_params['buffer_pool_size'])
+        buffer_xon = int(self.test_params['buffer_xon'])
+        cell_size = int(self.test_params['cell_size'])
+        num_of_pkts = int(self.test_params['num_of_pkts'])
+        dst_port_id = int(self.test_params['dst_port_id'])
+        dst_port_ip = self.test_params['dst_port_ip']
+        dst_port_mac = self.dataplane.get_mac(0, dst_port_id)
+        src_port_id = int(self.test_params['src_port_id'])
+        src_port_ip = self.test_params['src_port_ip']
+        src_port_mac = self.dataplane.get_mac(0, src_port_id)
+
+        logging.info('Buffer headroom: %d' % buffer_headroom)
+        logging.info('Buffer pool size: %d' % buffer_pool_size)
+        logging.info('Buffer alpha: %d' % buffer_alpha)
+        logging.info('Cell size: %d' % cell_size)
+
+        # calculate the exact max packets number that buffer can hold
+        cell_size = float(cell_size)
+        xon_cells = int(math.ceil(buffer_xon / cell_size))
+        headroom_cells = math.ceil(buffer_headroom / cell_size)
+        pool_cells = math.ceil(math.ceil(buffer_pool_size / cell_size) * (buffer_alpha / (buffer_alpha + 1)))
+
+        # Close DST port
+        sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], STOP_PORT_MAX_RATE)
+
+        # Clear Counters
+        sai_thrift_clear_all_counters(self.client)
+
+        #send packets
+        try:
+            tos = dscp << 2
+            tos |= ecn
+            ttl=64
+            default_packet_length = 64
+
+            q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])
+            
+            logging.info("Pre-test watermark\nShared:{}\nHeadroom{}".format(pg_shared_wm_res, pg_headroom_wm_res))
+            assert pg_headroom_wm_res[dscp] == 0, "PG headroom WM is not zero at the beginning of the test!"
+            # Send the packets untill PFC counter will be trigerred or max pkts reached
+            pkt = simple_tcp_packet(pktlen=default_packet_length,
+                                    eth_dst=router_mac,
+                                    eth_src=src_port_mac,
+                                    ip_src=src_port_ip,
+                                    ip_dst=dst_port_ip,
+                                    ip_tos=tos,
+                                    ip_ttl=ttl)
+
+            testutils.send_packet(self, src_port_id, pkt, num_of_pkts + xon_cells)
+
+            q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])
+            
+            logging.info("Post-test watermark\nShared:{}\nHeadroom{}".format(pg_shared_wm_res, pg_headroom_wm_res))
+
+            expected_wm = num_of_pkts*cell_size
+            assert pg_headroom_wm_res[dscp] == expected_wm, "Priority-group headroom WM is not what is expected! {} != {}".format(pg_headroom_wm_res[dscp], expected_wm)
+
+        finally:
+            # RELEASE PORTS
+            sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], RELEASE_PORT_MAX_RATE)
+
+
+class QSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):  
+    def runTest(self):
+        time.sleep(5)
+        switch_init(self.client)
+        
+        # Parse input parameters
+        dscp = int(self.test_params['dscp'])
+        ecn = int(self.test_params['ecn'])
+        router_mac = self.test_params['router_mac']
+        buffer_headroom = int(self.test_params['buffer_headroom'])
+        buffer_alpha = float(self.test_params['buffer_alpha'])
+        buffer_pool_size = int(self.test_params['buffer_pool_size'])
+        cell_size = int(self.test_params['cell_size'])
+        num_of_pkts = int(self.test_params['num_of_pkts'])
+        dst_port_id = int(self.test_params['dst_port_id'])
+        dst_port_ip = self.test_params['dst_port_ip']
+        dst_port_mac = self.dataplane.get_mac(0, dst_port_id)
+        src_port_id = int(self.test_params['src_port_id'])
+        src_port_ip = self.test_params['src_port_ip']
+        src_port_mac = self.dataplane.get_mac(0, src_port_id)
+
+        # Close DST port
+        sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], STOP_PORT_MAX_RATE)
+
+        # Clear Counters
+        sai_thrift_clear_all_counters(self.client)
+
+        #send packets
+        try:
+            tos = dscp << 2
+            tos |= ecn
+            ttl=64
+            default_packet_length = 64
+
+            
+            q_wm_res, _, _ = sai_thrift_read_port_watermarks(self.client, port_list[dst_port_id])
+            logging.info("Pre-test watermark\nShared:{}".format(q_wm_res))
+            assert q_wm_res[dscp] == 0, "Queue shared WM is not zero at the beginning of the test!"
+
+            # Send the packets untill PFC counter will be trigerred or max pkts reached
+            pkt = simple_tcp_packet(pktlen=default_packet_length,
+                                    eth_dst=router_mac,
+                                    eth_src=src_port_mac,
+                                    ip_src=src_port_ip,
+                                    ip_dst=dst_port_ip,
+                                    ip_tos=tos,
+                                    ip_ttl=ttl)
+
+            testutils.send_packet(self, src_port_id, pkt, num_of_pkts)
+            
+            q_wm_res, _, _ = sai_thrift_read_port_watermarks(self.client, port_list[dst_port_id])
+            logging.info("Post-test watermark\nShared:{}".format(q_wm_res))
+
+            expected_wm = num_of_pkts*cell_size
+
+            assert q_wm_res[dscp] == expected_wm, "Queue shared WM is not what is expected! {} != {}".format(q_wm_res[dscp], expected_wm)
+
+        finally:
+            # RELEASE PORTS
+            sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], RELEASE_PORT_MAX_RATE)
+
+class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
+
+    def runTest(self):
+        time.sleep(5)
+        switch_init(self.client)
+        
+        # Parse input parameters
+        dscp = int(self.test_params['dscp'])
+        ecn = int(self.test_params['ecn'])
+        router_mac = self.test_params['router_mac']
+        buffer_headroom = int(self.test_params['buffer_headroom'])
+        buffer_alpha = float(self.test_params['buffer_alpha'])
+        buffer_pool_size = int(self.test_params['buffer_pool_size'])
+        buffer_xon = 192*96*1000  #int(self.test_params['buffer_xon'])
+        cell_size = int(self.test_params['cell_size'])
+        num_of_pkts = int(self.test_params['num_of_pkts'])
+        default_port_mtu = int(self.test_params['default_port_mtu'])
+        cell_size = int(self.test_params['cell_size'])
+        dst_port_id = int(self.test_params['dst_port_id'])
+        dst_port_ip = self.test_params['dst_port_ip']
+        src_port_id = int(self.test_params['src_port_id'])
+        src_port_ip = self.test_params['src_port_ip']
+        dst_port_mac = self.dataplane.get_mac(0, dst_port_id)
+        src_port_mac = self.dataplane.get_mac(0, src_port_id)
+
+
+        cell_size = float(cell_size)
+        mtu_cells = math.ceil(default_port_mtu / cell_size)
+        headroom_cells = math.ceil(buffer_headroom / cell_size)
+        xon_cells = math.ceil(buffer_xon / cell_size)
+        pool_cells = math.ceil(math.ceil(buffer_pool_size / cell_size) * (buffer_alpha / (buffer_alpha + 1)))
+        buffer_max_pkts_capacity = (headroom_cells - mtu_cells + pool_cells)
+
+        logging.info('Cell size: %d' % cell_size)
+        logging.info('Buffer alpha: %d' % buffer_alpha)
+        logging.info('MTU cells: {} / {}'.format(mtu_cells, mtu_cells*cell_size))
+        logging.info('Headroom cells: {} / {}'.format(headroom_cells, headroom_cells*cell_size))
+        logging.info('Pool cells: {} / {}'.format(pool_cells, pool_cells*cell_size))
+        logging.info('Buffer max cap: {} / {}'.format(buffer_max_pkts_capacity, buffer_max_pkts_capacity*cell_size))
+
+        # Close DST port
+        sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], STOP_PORT_MAX_RATE)
+
+        # Clear Counters
+        sai_thrift_clear_all_counters(self.client)
+
+        #send packets
+        try:
+            tos = dscp << 2
+            tos |= ecn
+            ttl=64
+            default_packet_length = 64
+
+            q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])            
+            logging.info("Pre-test watermark\nShared:{}\nHeadroom{}".format(pg_shared_wm_res, pg_headroom_wm_res))
+            assert pg_shared_wm_res[dscp] == 0, "PG shared WM is not zero at the beginning of the test!"
+
+            pkt = simple_tcp_packet(pktlen=default_packet_length,
+                                    eth_dst=router_mac,
+                                    eth_src=src_port_mac,
+                                    ip_src=src_port_ip,
+                                    ip_dst=dst_port_ip,
+                                    ip_tos=tos,
+                                    ip_ttl=ttl)
+
+            pkts_bunch_size = int(num_of_pkts)
+
+            testutils.send_packet(self, src_port_id, pkt, pkts_bunch_size)
+
+            q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])            
+            logging.info("Post-test watermark\nShared:{}\nHeadroom{}".format(pg_shared_wm_res, pg_headroom_wm_res))
+
+            expected_wm = num_of_pkts*cell_size
+
+            assert pg_shared_wm_res[dscp] == expected_wm, "PG shared WM is not what is expected! {} != {}".format(pg_shared_wm_res[dscp], expected_wm)
+
+        finally:
+            # RELEASE PORTS
+            sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], RELEASE_PORT_MAX_RATE)

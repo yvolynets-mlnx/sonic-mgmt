@@ -113,6 +113,10 @@
   set_fact:
     lossless_buffer_alpha: "{{ buffer_alpha }}"
 
+- name: Set lossless buffer xon
+  set_fact:
+    lossless_buffer_xon: "{{ buffer_xon.stdout|int }}"
+
 - name: Store current lossless buffer profile
   template: src=qos_pfc_profile.j2 dest=/tmp/pfc_lossless_base_profile.json
   vars:

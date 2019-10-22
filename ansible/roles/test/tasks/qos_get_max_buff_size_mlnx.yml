@@ -75,3 +75,6 @@
   set_fact:
     buffer_max_size="{{ buffer_headroom.stdout|int + ((buffer_alpha|int / (buffer_alpha|int + 1)) * buffer_pool_size.stdout|int) }}"
   
+- name: Get the watermark polling status before the test
+  shell: redis-cli -n 4 HGET "FLEX_COUNTER_TABLE|QUEUE_WATERMARK" FLEX_COUNTER_STATUS
+  register: watermark_status

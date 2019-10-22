@@ -83,6 +83,10 @@
     - name: Get ports info.
       include: roles/test/tasks/qos_get_ports_mlnx.yml
       
+    - name: Ensure watermark polling is ebabled
+      shell: counterpoll watermark enable
+      when: watermark_status == "disable"
+
     # Unpause all paused port
     - include: qos_sai_ptf_mlnx.yml
       vars:
@@ -364,6 +368,83 @@
         - src_port_ip='{{ src_port_ip }}'
       with_items: '{{ qp.buff_util_2.packet_send_rates }}'
 
+    # Clear all the WMs before each test
+    - name: Toggle watermark polling
+      shell: bash -c 'counterpoll watermark enable ; sleep 20 ; counterpoll watermark disable'
+
+    # Queue Shared watermark test
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: Queue Shared watermark test
+        test_path: sai_qos_tests_mlnx.QSharedWatermarkTest
+        test_params:
+        - dscp='{{ qp.wm_q_shared.dscp }}'
+        - ecn='{{ qp.wm_q_shared.ecn }}'
+        - queue='{{qp.wm_q_shared_lossless.queue}}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - num_of_pkts='{{ qp.wm_q_shared.num_of_pkts }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        - cell_size='{{ qp.wm_q_shared.cell_size }}'
+
+    # Clear all the WMs before each test
+    - name: Toggle watermark polling
+      shell: bash -c 'counterpoll watermark enable ; sleep 20 ; counterpoll watermark disable'
+
+    # PG Shared watermark test
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: PG Shared watermark test
+        test_path: sai_qos_tests_mlnx.PGSharedWatermarkTest
+        test_params:
+        - dscp='{{ qp.wm_pg_shared.dscp }}'
+        - ecn='{{ qp.wm_pg_shared.ecn }}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - default_port_mtu='9100'
+        - num_of_pkts='{{ qp.wm_pg_shared.num_of_pkts }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        - cell_size='{{ qp.wm_pg_shared.cell_size }}'
+
+    # Reuse the PFC test config, it has 0 alfa
+    - name: Set testing buffer profile for PG headroom test
+      shell: sonic-cfggen -j /tmp/pfc_lossless_test_profile.json --write-to-db
+
+    # Clear all the WMs before each test
+    - name: Toggle watermark polling
+      shell: bash -c 'counterpoll watermark enable ; sleep 20 ; counterpoll watermark disable'
+
+    # PG Headroom watermark test
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: PG Headroom watermark test
+        test_path: sai_qos_tests_mlnx.PGHeadroomWatermarkTest
+        test_params:
+        - dscp='{{ qp.wm_pg_headroom.dscp }}'
+        - ecn='{{ qp.wm_pg_headroom.ecn }}'
+        - buffer_headroom='{{ lossless_buffer_max_size }}'
+        - buffer_alpha='{{ lossless_buffer_alpha }}'
+        - buffer_pool_size='{{ lossless_buffer_pool_size }}'
+        - num_of_pkts='{{ qp.wm_pg_headroom.num_of_pkts }}'
+        - buffer_xon='{{ lossless_buffer_xon }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        - cell_size='{{ qp.wm_pg_headroom.cell_size }}'
+
+    - name: Restore origin buffer profile after PG headroom tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
+
+      
   always:
     - name: Restore LLDP Daemon
       become: yes
@@ -373,6 +454,10 @@
       vars:
         ansible_shell_type: docker
         ansible_python_interpreter: docker exec -i lldp python
+
+    - name: Restore original watermark polling status
+      shell: counterpoll watermark {{ watermark_status }}
+      when: watermark_status == "enable" or watermark_status == "disable"
 
     - name: Enable bgpd
       become: yes

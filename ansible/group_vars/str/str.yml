@@ -124,3 +124,18 @@ qos_params:
                 - 700
                 - 1000
                 - 1200
+        wm_pg_shared:
+            dscp: 3
+            ecn: 1
+            num_of_pkts: 100
+            cell_size: 96
+        wm_pg_headroom:
+            dscp: 3
+            ecn: 1
+            num_of_pkts: 50
+            cell_size: 96
+        wm_q_shared:
+            dscp: 3
+            ecn: 1
+            num_of_pkts: 100
+            cell_size: 96
