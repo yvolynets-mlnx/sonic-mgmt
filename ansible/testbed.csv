@@ -13,7 +13,7 @@ mts-sonic-dut-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.12.78.237/24,server_2,VM0201,
 arc-switch1041-t0,vm-t1,t0,docker-ptf-mlnx,10.213.86.93/16,server_3,VM0301,arc-switch1041,Mellanox MTR testbed
 arc-switch1041-t1,vm-t1,t1,docker-ptf-mlnx,10.213.86.93/16,server_3,VM0301,arc-switch1041,Mellanox MTR testbed
 arc-switch1041-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.86.93/16,server_3,VM0301,arc-switch1041,Mellanox MTR testbed
-arc-switch1041-ptf32,vm-t1,t0,docker-ptf-mlnx,10.213.86.93/16,server_3,VM0301,arc-switch1041,Mellanox MTR testbed
+arc-switch1041-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.86.93/16,server_3,VM0301,arc-switch1041,Mellanox MTR testbed
 
 arc-switch1029-t0,vm-t1,t0,docker-ptf-mlnx,10.213.84.98/16,server_4,VM0401,arc-switch1029,Mellanox MTR testbed
 arc-switch1029-t1,vm-t1,t1,docker-ptf-mlnx,10.213.84.98/16,server_4,VM0401,arc-switch1029,Mellanox MTR testbed
