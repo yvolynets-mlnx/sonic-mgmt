@@ -24,7 +24,9 @@ from switch import (switch_init,
                     port_list,
                     sai_thrift_read_port_watermarks,
                     sai_thrift_read_pg_counters,
-                    sai_thrift_read_buffer_pool_watermark)
+                    sai_thrift_read_buffer_pool_watermark,
+                    sai_thrift_port_tx_disable,
+                    sai_thrift_port_tx_enable)
 from switch_sai_thrift.ttypes import (sai_thrift_attribute_value_t,
                                       sai_thrift_attribute_t)
 from switch_sai_thrift.sai_headers import (SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID,
@@ -78,17 +80,7 @@ class ReleaseAllPorts(sai_base_test.ThriftInterfaceDataPlane):
 
         asic_type = self.test_params['sonic_asic_type']
 
-        if asic_type == 'mellanox':
-            sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-        else:
-            # Resume egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=1)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-
-        for port in sai_port_list:
-            self.client.sai_thrift_set_port_attribute(port, attr)
+        sai_thrift_port_tx_enable(self.client, asic_type, port_list.keys())
 
 # DSCP to queue mapping
 class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
@@ -521,17 +513,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         # or the leak out is simply less than expected as we have occasionally observed
         margin = 2
 
-        if asic_type == 'mellanox':
-            # Close DST port
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         try:
             # send packets short of triggering pfc
@@ -598,17 +580,7 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
             assert(xmit_counters[EGRESS_DROP] == xmit_counters_base[EGRESS_DROP])
 
         finally:
-            if asic_type == 'mellanox':
-                # Release port
-                sched_prof_id = sai_thrift_create_scheduler_profile(self.client,RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id],attr)
-            else:
-                # Resume egress of dut xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
 # This test looks to measure xon threshold (pg_reset_floor)
 class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
@@ -659,21 +631,7 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
         # the ingress may not trigger PFC sharp at its boundary
         margin = 1
 
-        if asic_type == 'mellanox':
-            # Stop function of dst xmit ports
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_3_id], attr)
-        else:
-            # Pause egress of dut xmit ports
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_3_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id, dst_port_2_id, dst_port_3_id])
 
         try:
             # send packets to dst port 0
@@ -721,17 +679,7 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             assert(xmit_2_counters[EGRESS_DROP] == xmit_2_counters_base[EGRESS_DROP])
             assert(xmit_3_counters[EGRESS_DROP] == xmit_3_counters_base[EGRESS_DROP])
 
-            if asic_type == 'mellanox':
-                # Release dst port 1
-                sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-            else:
-                # Resume egress of dst port 1
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_2_id])
 
             # allow enough time for the dut to sync up the counter values in counters_db
             time.sleep(8)
@@ -751,17 +699,7 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             assert(xmit_2_counters[EGRESS_DROP] == xmit_2_counters_base[EGRESS_DROP])
             assert(xmit_3_counters[EGRESS_DROP] == xmit_3_counters_base[EGRESS_DROP])
 
-            if asic_type == 'mellanox':
-                # Release dst port 2
-                sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_3_id], attr)
-            else:
-                # Resume egress of dst port 2
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_3_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_3_id])
 
             # allow enough time for the dut to sync up the counter values in counters_db
             time.sleep(8)
@@ -788,21 +726,7 @@ class PFCXonTest(sai_base_test.ThriftInterfaceDataPlane):
             assert(xmit_3_counters[EGRESS_DROP] == xmit_3_counters_base[EGRESS_DROP])
 
         finally:
-            if asic_type == 'mellanox':
-                # Release dst ports
-                sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_3_id], attr)
-            else:
-                # Resume egress of dut xmit ports
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_3_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id, dst_port_2_id, dst_port_3_id])
 
 class HdrmPoolSizeTest(sai_base_test.ThriftInterfaceDataPlane):
     def runTest(self):
@@ -844,17 +768,7 @@ class HdrmPoolSizeTest(sai_base_test.ThriftInterfaceDataPlane):
         xmit_counters_base, queue_counters = sai_thrift_read_port_counters(self.client, port_list[dst_port_id])
 
         # Pause egress of dut xmit port
-        if asic_type == 'mellanox':
-            # Close DST port
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         try:
             # send packets to leak out
@@ -968,17 +882,7 @@ class HdrmPoolSizeTest(sai_base_test.ThriftInterfaceDataPlane):
             sys.stderr.flush()
 
         finally:
-            if asic_type == 'mellanox':
-                # Release port
-                sched_prof_id = sai_thrift_create_scheduler_profile(self.client,RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id],attr)
-            else:
-                # Resume egress of dur xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
 # TODO: remove sai_thrift_clear_all_counters and change to use incremental counter values
 class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
@@ -1135,16 +1039,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
         limit = int(self.test_params['limit'])
         pkts_num_leak_out = int(self.test_params['pkts_num_leak_out'])
 
-        if asic_type == 'mellanox':
-            # Stop port function
-            sched_prof_id=sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         # Send packets to leak out
         pkt = simple_tcp_packet(pktlen=64,
@@ -1255,16 +1150,7 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
             p.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 41943040)
 
         # Release port
-        if asic_type == 'mellanox':
-            sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Resume egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=1)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
         cnt = 0
         pkts = []
@@ -1361,18 +1247,7 @@ class LossyQueueTest(sai_base_test.ThriftInterfaceDataPlane):
         # or the leak out is simply less than expected as we have occasionally observed
         margin = 2
 
-        if asic_type == 'mellanox':
-            # Stop port function
-            sched_prof_id=sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         try:
             # send packets short of triggering egress drop
@@ -1406,18 +1281,7 @@ class LossyQueueTest(sai_base_test.ThriftInterfaceDataPlane):
             assert(xmit_counters[EGRESS_DROP] > xmit_counters_base[EGRESS_DROP])
 
         finally:
-            if asic_type == 'mellanox':
-                # Release ports
-                sched_prof_id=sai_thrift_create_scheduler_profile(self.client, RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_2_id], attr)
-            else:
-                # Resume egress of dut xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
 # pg shared pool applied to both lossy and lossless traffic
 class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
@@ -1461,17 +1325,7 @@ class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
         # or the leak out is simply less than expected as we have occasionally observed
         margin = 2
 
-        if asic_type == 'mellanox':
-            # Close DST port
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         # send packets
         try:
@@ -1509,7 +1363,7 @@ class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
                 send_packet(self, src_port_id, pkt, pkts_num)
                 time.sleep(8)
                 q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])
-                print >> sys.stderr, "lower bound: %d, actual value: %d, upper bound: %d" % (expected_wm * cell_size, pg_shared_wm_res[pg], (expected_wm + margin) * cell_size)
+                print >> sys.stderr, "lower bound: %d, actual value: %d, upper bound (+%d): %d" % (expected_wm * cell_size, pg_shared_wm_res[pg], margin, (expected_wm + margin) * cell_size)
                 assert(pg_shared_wm_res[pg] <= (expected_wm + margin) * cell_size)
                 assert(expected_wm * cell_size <= pg_shared_wm_res[pg])
 
@@ -1525,17 +1379,7 @@ class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             assert(pg_shared_wm_res[pg] <= (expected_wm + margin) * cell_size)
 
         finally:
-            if asic_type == 'mellanox':
-                # Release port
-                sched_prof_id = sai_thrift_create_scheduler_profile(self.client,RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id],attr)
-            else:
-                # Resume egress of dut xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
 # pg headroom is a notion for lossless traffic only
 class PGHeadroomWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
@@ -1579,17 +1423,7 @@ class PGHeadroomWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
         # or the leak out is simply less than expected as we have occasionally observed
         margin = 0
 
-        if asic_type == 'mellanox':
-            # Close DST port
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         # send packets
         try:
@@ -1630,17 +1464,7 @@ class PGHeadroomWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             assert(pg_headroom_wm_res[pg] == expected_wm * cell_size)
 
         finally:
-            if asic_type == 'mellanox':
-                # Release port
-                sched_prof_id = sai_thrift_create_scheduler_profile(self.client,RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id],attr)
-            else:
-                # Resume egress of dut xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
 class QSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
     def runTest(self):
@@ -1681,29 +1505,28 @@ class QSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
         # Add slight tolerance in threshold characterization to consider
         # the case that cpu puts packets in the egress queue after we pause the egress
         # or the leak out is simply less than expected as we have occasionally observed
-        margin = 0
+        #
+        # On TH2 using scheduler-based TX enable, we find the Q min being inflated
+        # to have 0x10 = 16 cells. This effect is captured in lossy traffic queue
+        # shared test, so the margin here actually means extra capacity margin
+        margin = 8
 
-        if asic_type == 'mellanox':
-            # Close DST port
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+        sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
 
         # send packets
         try:
             # send packets to fill queue min but not trek into shared pool
             # so if queue min is zero, it will directly trek into shared pool by 1
+            # TH2 uses scheduler-based TX enable, this does not require sending packets
+            # to leak out
             send_packet(self, src_port_id, pkt, pkts_num_leak_out + pkts_num_fill_min)
             time.sleep(8)
             q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[dst_port_id])
             print >> sys.stderr, "Init pkts num sent: %d, min: %d, actual watermark value to start: %d" % ((pkts_num_leak_out + pkts_num_fill_min), pkts_num_fill_min, q_wm_res[queue])
-            assert(q_wm_res[queue] == (0 if pkts_num_fill_min else (1 * cell_size)))
+            if pkts_num_fill_min:
+                assert(q_wm_res[queue] == 0)
+            else:
+                assert(q_wm_res[queue] <= 1 * cell_size)
 
             # send packet batch of fixed packet numbers to fill queue shared
             # first round sends only 1 packet
@@ -1721,9 +1544,9 @@ class QSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
                 send_packet(self, src_port_id, pkt, pkts_num)
                 time.sleep(8)
                 q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[dst_port_id])
-                print >> sys.stderr, "lower bound: %d, actual value: %d, upper bound: %d" % ((expected_wm - margin) * cell_size, q_wm_res[queue], (expected_wm * cell_size))
+                print >> sys.stderr, "lower bound: %d, actual value: %d, upper bound: %d" % (expected_wm * cell_size, q_wm_res[queue], (expected_wm * cell_size))
                 assert(q_wm_res[queue] <= expected_wm * cell_size)
-                assert((expected_wm - margin) * cell_size <= q_wm_res[queue])
+                assert(expected_wm * cell_size <= q_wm_res[queue])
 
                 pkts_num = pkts_inc
 
@@ -1731,22 +1554,13 @@ class QSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             send_packet(self, src_port_id, pkt, pkts_num)
             time.sleep(8)
             q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[dst_port_id])
-            print >> sys.stderr, "exceeded pkts num sent: %d, actual value: %d, expected watermark: %d" % (pkts_num, q_wm_res[queue], (expected_wm * cell_size))
+            print >> sys.stderr, "exceeded pkts num sent: %d, expected watermark: %d, actual value: %d" % (pkts_num, (expected_wm * cell_size), q_wm_res[queue])
             assert(expected_wm == total_shared)
-            assert(q_wm_res[queue] == expected_wm * cell_size)
+            assert(expected_wm * cell_size <= q_wm_res[queue])
+            assert(q_wm_res[queue] <= (expected_wm + margin) * cell_size)
 
         finally:
-            if asic_type == 'mellanox':
-                # Release port
-                sched_prof_id = sai_thrift_create_scheduler_profile(self.client,RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id],attr)
-            else:
-                # Resume egress of dut xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
 
 # TODO: buffer pool roid should be obtained via rpc calls
 # based on the pg or queue index
@@ -1796,20 +1610,20 @@ class BufferPoolWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
         # Add slight tolerance in threshold characterization to consider
         # the case that cpu puts packets in the egress queue after we pause the egress
         # or the leak out is simply less than expected as we have occasionally observed
-        margin = 2
+        upper_bound_margin = 2
+        # On TD2, we found the watermark value is always short of the expected
+        # value by 1
+        lower_bound_margin = 1
+        # On TH2 using scheduler-based TX enable, we find the Q min being inflated
+        # to have 0x10 = 16 cells. This effect is captured in lossy traffic ingress
+        # buffer pool test and lossy traffic egress buffer pool test to illusively
+        # have extra capacity in the buffer pool space
+        extra_cap_margin = 8
 
-        if asic_type == 'mellanox':
-            # Close DST port
-            sched_prof_id = sai_thrift_create_scheduler_profile(self.client, STOP_PORT_MAX_RATE)
-            attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-        else:
-            # Pause egress of dut xmit port
-            attr_value = sai_thrift_attribute_value_t(booldata=0)
-            attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-            self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
-
+        # Adjust the methodology to enable TX for each incremental watermark value test
+        # To this end, send the total # of packets instead of the incremental amount
+        # to refill the buffer to the exepected level
+        pkts_num_to_send = 0
         # send packets
         try:
             # send packets to fill min but not trek into shared pool
@@ -1818,27 +1632,31 @@ class BufferPoolWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             # Because lossy and lossless traffic use the same pool at ingress, even if
             # lossless traffic has pg min not equal to zero, we still need to consider
             # the impact caused by lossy traffic
-            send_packet(self, src_port_id, pkt, pkts_num_leak_out + pkts_num_fill_min)
+            #
+            # TH2 uses scheduler-based TX enable, this does not require sending packets to leak out
+            sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
+            pkts_num_to_send += (pkts_num_leak_out + pkts_num_fill_min)
+            send_packet(self, src_port_id, pkt, pkts_num_to_send)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
             time.sleep(8)
             buffer_pool_wm = sai_thrift_read_buffer_pool_watermark(self.client, buf_pool_roid)
             print >> sys.stderr, "Init pkts num sent: %d, min: %d, actual watermark value to start: %d" % ((pkts_num_leak_out + pkts_num_fill_min), pkts_num_fill_min, buffer_pool_wm)
             if pkts_num_fill_min:
-                assert(buffer_pool_wm <= margin * cell_size)
+                assert(buffer_pool_wm <= upper_bound_margin * cell_size)
             else:
                 # on t1-lag, we found vm will keep sending control
                 # packets, this will cause the watermark to be 2 * 208 bytes
                 # as all lossy packets are now mapped to single pg 0
                 # so we remove the strict equity check, and use upper bound
                 # check instead
-                assert(1 * cell_size <= buffer_pool_wm)
-                assert(buffer_pool_wm <= margin * cell_size)
+                assert(buffer_pool_wm <= upper_bound_margin * cell_size)
 
             # send packet batch of fixed packet numbers to fill shared
             # first round sends only 1 packet
             expected_wm = 0
             total_shared = pkts_num_fill_shared - pkts_num_fill_min
             pkts_inc = total_shared >> 2
-            pkts_num = 1 + margin
+            pkts_num = 1 + upper_bound_margin
             while (expected_wm < total_shared):
                 expected_wm += pkts_num
                 if (expected_wm > total_shared):
@@ -1846,33 +1664,29 @@ class BufferPoolWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
                     expected_wm = total_shared
                 print >> sys.stderr, "pkts num to send: %d, total pkts: %d, shared: %d" % (pkts_num, expected_wm, total_shared)
 
-                send_packet(self, src_port_id, pkt, pkts_num)
+                sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
+                pkts_num_to_send += pkts_num
+                send_packet(self, src_port_id, pkt, pkts_num_to_send)
+                sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
                 time.sleep(8)
                 buffer_pool_wm = sai_thrift_read_buffer_pool_watermark(self.client, buf_pool_roid)
-                print >> sys.stderr, "lower bound: %d, actual value: %d, upper bound: %d" % (expected_wm * cell_size, buffer_pool_wm, (expected_wm + margin) * cell_size)
-                assert(buffer_pool_wm <= (expected_wm + margin) * cell_size)
-                assert(expected_wm * cell_size <= buffer_pool_wm)
+                print >> sys.stderr, "lower bound (-%d): %d, actual value: %d, upper bound (+%d): %d" % (lower_bound_margin, (expected_wm - lower_bound_margin)* cell_size, buffer_pool_wm, upper_bound_margin, (expected_wm + upper_bound_margin) * cell_size)
+                assert(buffer_pool_wm <= (expected_wm + upper_bound_margin) * cell_size)
+                assert((expected_wm - lower_bound_margin)* cell_size <= buffer_pool_wm)
 
                 pkts_num = pkts_inc
 
             # overflow the shared pool
-            send_packet(self, src_port_id, pkt, pkts_num)
+            sai_thrift_port_tx_disable(self.client, asic_type, [dst_port_id])
+            pkts_num_to_send += pkts_num
+            send_packet(self, src_port_id, pkt, pkts_num_to_send)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
             time.sleep(8)
             buffer_pool_wm = sai_thrift_read_buffer_pool_watermark(self.client, buf_pool_roid)
             print >> sys.stderr, "exceeded pkts num sent: %d, expected watermark: %d, actual value: %d" % (pkts_num, (expected_wm * cell_size), buffer_pool_wm)
             assert(expected_wm == total_shared)
-            assert(expected_wm * cell_size <= buffer_pool_wm)
-            assert(buffer_pool_wm <= (expected_wm + margin) * cell_size)
+            assert((expected_wm - lower_bound_margin)* cell_size <= buffer_pool_wm)
+            assert(buffer_pool_wm <= (expected_wm + extra_cap_margin) * cell_size)
 
         finally:
-            if asic_type == 'mellanox':
-                # Release port
-                sched_prof_id = sai_thrift_create_scheduler_profile(self.client,RELEASE_PORT_MAX_RATE)
-                attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id],attr)
-            else:
-                # Resume egress of dut xmit port
-                attr_value = sai_thrift_attribute_value_t(booldata=1)
-                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_PKT_TX_ENABLE, value=attr_value)
-                self.client.sai_thrift_set_port_attribute(port_list[dst_port_id], attr)
+            sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
