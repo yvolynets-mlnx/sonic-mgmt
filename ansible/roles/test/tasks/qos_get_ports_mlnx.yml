@@ -162,7 +162,7 @@
     lossless_queue_max_size: "{{ buffer_max_size }}"
 
 - name: Get the WRED profile key for "{{ dut_switch_ports[dst_port_id|int] }}"
-  shell: docker exec database redis-cli -n 4 KEYS "QUEUE|*{{ dut_switch_ports[dst_port_id|int] }}*|0-1"
+  shell: docker exec database redis-cli -n 4 KEYS "QUEUE|*{{ dut_switch_ports[dst_port_id|int] }}*|0"
   register: wred_profile_name
   
 - fail:
