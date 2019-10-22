@@ -380,7 +380,6 @@
         test_params:
         - dscp='{{ qp.wm_q_shared.dscp }}'
         - ecn='{{ qp.wm_q_shared.ecn }}'
-        - queue='{{qp.wm_q_shared_lossless.queue}}'
         - buffer_headroom='{{ lossless_buffer_max_size }}'
         - buffer_alpha='{{ lossless_buffer_alpha }}'
         - buffer_pool_size='{{ lossless_buffer_pool_size }}'
