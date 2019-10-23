@@ -66,12 +66,18 @@ reboot_ctrl_dict = {
 }
 
 
+sku_supporting_reboot_cause_test = ['ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8']
+
 def check_reboot_cause(dut, reboot_cause_expected):
     """
     @summary: Check the reboot cause on DUT.
     @param dut: The AnsibleHost object of DUT.
     @param reboot_cause_expected: The expected reboot cause.
     """
+    if dut.facts["hwsku"] not in sku_supporting_reboot_cause_test:
+        logging.info("Reboot-cause check skipped because %s doesn't support it" % dut.facts["hwsku"])
+        return
+
     logging.info("Check the reboot cause")
     output = dut.shell("show reboot-cause")
     reboot_cause_got = output["stdout"]
@@ -241,6 +247,9 @@ def test_power_off_reboot(testbed_devices, conn_graph_facts, psu_controller, pow
     ans_host = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
 
+    if dut.facts["hwsku"] not in sku_supporting_reboot_cause_test:
+        pytest.skip("Reboot-cause check skipped because %s doesn't support it" % dut.facts["hwsku"])
+
     psu_ctrl = psu_controller(ans_host.hostname, ans_host.facts["asic_type"])
     if psu_ctrl is None:
         pytest.skip("No PSU controller for %s, skip rest of the testing in this case" % ans_host.hostname)
@@ -276,6 +285,9 @@ def test_watchdog_reboot(testbed_devices, conn_graph_facts):
     """
     ans_host = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
+
+    if dut.facts["hwsku"] not in sku_supporting_reboot_cause_test:
+        pytest.skip("Reboot-cause check skipped because %s doesn't support it" % dut.facts["hwsku"])
 
     test_watchdog_supported = "python -c \"import sonic_platform.platform as P; P.Platform().get_chassis().get_watchdog(); exit()\""
 
