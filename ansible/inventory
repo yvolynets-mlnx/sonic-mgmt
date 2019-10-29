@@ -344,7 +344,7 @@ ptf-r-anaconda-10 ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pa
 # MTR r-tigris-04 PTF host
 ptf-r-tigris-04 ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
 # MTS mts-sonic-dut-t1 PTF host
-mts-ptf ansible_host=10.12.78.237 ansible_ssh_user=root ansible_ssh_pass=root
+mts-ptf ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1041 PTF host
 ptf-1041 ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1029 PTF host
