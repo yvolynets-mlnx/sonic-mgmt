@@ -388,7 +388,7 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        - cell_size='{{ qp.wm_q_shared.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
 
     # Clear all the WMs before each test
     - name: Toggle watermark polling
@@ -411,7 +411,7 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        - cell_size='{{ qp.wm_pg_shared.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
 
     # Reuse the PFC test config, it has 0 alfa
     - name: Set testing buffer profile for PG headroom test
@@ -438,7 +438,7 @@
         - dst_port_ip='{{ dst_port_ip }}'
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
-        - cell_size='{{ qp.wm_pg_headroom.cell_size }}'
+        - cell_size='{{ qp.cell_size }}'
 
     - name: Restore origin buffer profile after PG headroom tests
       shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
