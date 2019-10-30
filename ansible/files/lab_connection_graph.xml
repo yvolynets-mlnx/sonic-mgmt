@@ -586,7 +586,7 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.46/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="mts-sonic-fanout">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.12.74.64/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.9.74.64/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch1039">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.47/24"/>
