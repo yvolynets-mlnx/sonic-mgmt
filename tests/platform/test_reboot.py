@@ -66,7 +66,7 @@ reboot_ctrl_dict = {
 }
 
 
-sku_supporting_reboot_cause_test = ['ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8']
+sku_supporting_reboot_cause_test = ['ACS-MSN2410', 'ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8', 'ACS-MSN3700', 'ACS-MSN3700C', 'ACS-MSN3800']
 
 def check_reboot_cause(dut, reboot_cause_expected):
     """
