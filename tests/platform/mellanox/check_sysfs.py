@@ -65,27 +65,23 @@ def check_sysfs(dut):
         except Exception as e:
             assert "Get content from %s failed, exception: %s" % (fan_max, repr(e))
 
-        # skip the following checking for known issue 1890087 reboot test failed due to fan speed hasn't been set to 60%
-        # TODO: revert this commit after issue fixed
-        logging.info("Skip checking fan speed setting due to known issue 1890087")
+        fan_speed_set = "/var/run/hw-management/thermal/fan{}_speed_set".format(fan_id)
+        fan_speed_set_content = dut.command("cat %s" % fan_speed_set)
+        assert fan_speed_set_content["stdout"] == "153", "Fan speed should be set to 60%, 153/255"
+        fan_set_speed = int(fan_speed_set_content["stdout"])
 
-#        fan_speed_set = "/var/run/hw-management/thermal/fan{}_speed_set".format(fan_id)
-#        fan_speed_set_content = dut.command("cat %s" % fan_speed_set)
-#        assert fan_speed_set_content["stdout"] == "153", "Fan speed should be set to 60%, 153/255"
-#        fan_set_speed = int(fan_speed_set_content["stdout"])
+        fan_speed_get = "/var/run/hw-management/thermal/fan{}_speed_get".format(fan_id)
+        try:
+            fan_speed_get_content = dut.command("cat %s" % fan_speed_get)
+            fan_speed = int(fan_speed_get_content["stdout"])
+            assert fan_min_speed < fan_speed < fan_max_speed, "Bad fan speed: %s" % str(fan_speed)
+        except Exception as e:
+            assert "Get content from %s failed, exception: %s" % (fan_speed_get, repr(e))
 
-#        fan_speed_get = "/var/run/hw-management/thermal/fan{}_speed_get".format(fan_id)
-#        try:
-#            fan_speed_get_content = dut.command("cat %s" % fan_speed_get)
-#            fan_speed = int(fan_speed_get_content["stdout"])
-#            assert fan_min_speed < fan_speed < fan_max_speed, "Bad fan speed: %s" % str(fan_speed)
-#        except Exception as e:
-#            assert "Get content from %s failed, exception: %s" % (fan_speed_get, repr(e))
-
-#        max_tolerance_speed = ((float(fan_set_speed)/256)*fan_max_speed)*(1 + 0.3)
-#        min_tolerance_speed = ((float(fan_set_speed)/256)*fan_max_speed)*(1 - 0.3)
-#        assert min_tolerance_speed < fan_speed < max_tolerance_speed, "Speed out of tolerance speed range (%d, %d)" \
-#                                                                      % (min_tolerance_speed, max_tolerance_speed)
+        max_tolerance_speed = ((float(fan_set_speed)/256)*fan_max_speed)*(1 + 0.3)
+        min_tolerance_speed = ((float(fan_set_speed)/256)*fan_max_speed)*(1 - 0.3)
+        assert min_tolerance_speed < fan_speed < max_tolerance_speed, "Speed out of tolerance speed range (%d, %d)" \
+                                                                      % (min_tolerance_speed, max_tolerance_speed)
 
     cpu_pack_count = SWITCH_MODELS[dut_hwsku]["cpu_pack"]["number"]
     if cpu_pack_count != 0:
