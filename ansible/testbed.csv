@@ -46,6 +46,17 @@ r-tigris-04-t1,vm-t1,t1,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigri
 r-tigris-04-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 r-tigris-04-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 
+r-tigris-13-t0,vm-t1,t0,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t0-16,vm-t1,t0-16,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t0-52,vm-t1,t0-52,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t0-56,vm-t1,t0-56,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t0-64,vm-t1,t0-64,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t1,vm-t1,t1,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-t1-64-lag,vm-t1,t1-64-lag,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+r-tigris-13-ptf64,vm-t1,ptf64,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
+
 arc-mtbc-1001-t0,vm-t1,t0,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1,vm-t1,t1,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.112.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
@@ -77,6 +88,7 @@ arc-switch1025-fastreboot,ptf-1025,t0,vm-t1,10.213.84.213/16,server_6,VM0601,arc
 arc-switch1004-fastreboot,ptf-1004,t0,vm-t1,10.213.80.153/16,server_7,VM0701,arc-switch1004,Mellanox MTR testbed
 r-anaconda-10-fastreboot,ptf-r-anaconda-10,t0,vm-t1,10.213.103.5/16,server_11,VM1101,r-anaconda-10,Mellanox MTR testbed
 r-tigris-04-fastreboot,ptf-r-tigris-04,t0,vm-t1,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-13-fastreboot,ptf-r-tigris-13,t0-64,vm-t1,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
 
 vms-sn2700-t1,vms1-1,t1,docker-ptf-sai-mlnx,10.255.0.178/24,server_1,VM0100,str-msn2700-01,Tests Mellanox SN2700 vms
 vms-sn2700-t1-lag,vms1-1,t1-lag,docker-ptf-sai-mlnx,10.255.0.178/24,server_1,VM0100,str-msn2700-01,Tests Mellanox SN2700 vms

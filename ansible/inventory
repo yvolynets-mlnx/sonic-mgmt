@@ -33,6 +33,19 @@ r-tigris-04-t1  ansible_host=r-tigris-04 sonic_version=v2 sonic_hwsku=ACS-MSN380
 r-tigris-04-t1-lag  ansible_host=r-tigris-04 sonic_version=v2 sonic_hwsku=ACS-MSN3800 ptf_host=ptf-r-tigris-04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=r-panther-04 dut_mac="98:03:9b:a8:ba:ca" serial_console="ssh -l rcon:7021 10.208.0.70"
 r-tigris-04-ptf32   ansible_host=r-tigris-04 sonic_version=v2 sonic_hwsku=ACS-MSN3800 ptf_host=ptf-r-tigris-04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" fanout_switch=r-panther-04 dut_mac="98:03:9b:a8:ba:ca" serial_console="ssh -l rcon:7021 10.208.0.70"
 
+# MTR testbed r-tigris-13 topologies
+r-tigris-13 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini"
+r-tigris-13-t0 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t0-16 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t0-52 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t0-56 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t0-64 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t1 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t1-lag ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-t1-64-lag ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-ptf32 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+r-tigris-13-ptf64 ansible_host=r-tigris-13 sonic_version=v2 sonic_hwsku=ACS-MSN3800 fanout_switch=r-anaconda-43 ptf_host=ptf-r-tigris-13 ptf_portmap="roles/test/files/mlnx/ptf-map/default_fp64_interface_to_front_map.ini" dut_mac="b8:59:9f:a9:2a:00"
+
 # MTR testbed arc-switch1025 topologies
 arc-switch1025  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81" ptf_host=ptf-1025 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 arc-switch1025-t0  ansible_host=arc-switch1025  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:7024 10.224.2.81" ptf_host=ptf-1025 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
@@ -107,6 +120,7 @@ arc-switchmtbc01 ansible_host=arc-switchmtbc01 ansible_ssh_user=admin ansible_ss
 arc-switchmtbc02 ansible_host=arc-switchmtbc02 ansible_ssh_user=admin ansible_ssh_pass=admin
 r-panther-03 ansible_host=r-panther-03 ansible_ssh_user=admin ansible_ssh_pass=admin
 r-panther-04 ansible_host=r-panther-04 ansible_ssh_user=admin ansible_ssh_pass=admin
+r-anaconda-43 ansible_host=r-anaconda-43 ansible_ssh_user=admin ansible_ssh_pass=admin
 
 [sonic:children]
 sonic_latest
@@ -151,6 +165,19 @@ r-tigris-04-t0-64-32
 r-tigris-04-t1
 r-tigris-04-t1-lag
 r-tigris-04-ptf32
+
+# MTR r-tigris-13 topologies
+r-tigris-13
+r-tigris-13-t0
+r-tigris-13-t0-16
+r-tigris-13-t0-52
+r-tigris-13-t0-56
+r-tigris-13-t0-64
+r-tigris-13-t1
+r-tigris-13-t1-lag
+r-tigris-13-t1-64-lag
+r-tigris-13-ptf32
+r-tigris-13-ptf64
 
 # MTR arc-switch1041 topologies
 arc-switch1041
@@ -252,6 +279,19 @@ r-tigris-04-t1
 r-tigris-04-t1-lag
 r-tigris-04-ptf32
 
+# MTR r-tigris-13 topologies
+r-tigris-13
+r-tigris-13-t0
+r-tigris-13-t0-16
+r-tigris-13-t0-52
+r-tigris-13-t0-56
+r-tigris-13-t0-64
+r-tigris-13-t1
+r-tigris-13-t1-lag
+r-tigris-13-t1-64-lag
+r-tigris-13-ptf32
+r-tigris-13-ptf64
+
 # MTR arc-switch1029 topologies
 arc-switch1029
 arc-switch1029-t0
@@ -325,6 +365,8 @@ ptf-1004 ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-anaconda-10 ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR r-tigris-04 PTF host
 ptf-r-tigris-04 ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR r-tigris-13 PTF host
+ptf-r-tigris-13 ansible_host=10.215.0.61 ansible_ssh_user=root ansible_ssh_pass=root
 # MTS mts-sonic-dut-t1 PTF host
 mts-ptf ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR arc-switch1041 PTF host

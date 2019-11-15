@@ -8,6 +8,7 @@ arc-switch1025     ansible_host=10.210.25.45 sonic_version=v2 hwsku="ACS-MSN2700
 arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701
 r-anaconda-10      ansible_host=10.210.25.3 sonic_version=v2 hwsku="ACS-MSN3700C" iface_speed=100000  mgmt_subnet_mask_length=22 vm_base=VM1101
 r-tigris-04        ansible_host=10.210.25.93 sonic_version=v2 hwsku="ACS-MSN3800" iface_speed=100000 mgmt_subnet_mask_length=22 vm_base=VM1201
+r-tigris-13        ansible_host=10.210.24.22 sonic_version=v2 hwsku="ACS-MSN3800" iface_speed=50000 mgmt_subnet_mask_length=22 vm_base=VM1301
 mtbc-sonic-01-2410 ansible_host=10.112.71.4 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0801
 mtbc-sonic-03-2700 ansible_host=10.112.71.251 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=100000 mgmt_subnet_mask_length=24 vm_base=VM1001
 r-boxer-sw01       ansible_host=10.210.25.53 sonic_version=v2 hwsku="ACS-MSN2010" iface_speed=25000 mgmt_subnet_mask_length=22 vm_base=VM0901
@@ -61,6 +62,7 @@ ptf-1025    ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=ro
 ptf-1004    ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-anaconda-10    ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-tigris-04    ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-r-tigris-13    ansible_host=10.215.0.61 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc03  ansible_host=10.112.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-005 ansible_host=10.212.232.6 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=root
@@ -90,6 +92,7 @@ arc-switchmtbc01  ansible_host=10.112.67.34 os=mellanox
 arc-switchmtbc02  ansible_host=10.112.67.41 os=mellanox
 r-panther-03      ansible_host=10.210.25.83 os=mellanox
 r-panther-04      ansible_host=10.210.25.94 os=mellanox
+r-anaconda-43     ansible_host=10.210.25.21 os=mellanox
 mtbc-sonic-02-2700  ansible_host=10.112.67.45 os=mellanox
 arc-switch232-005 ansible_host=0.0.0.0
 arc-switch232-007 ansible_host=0.0.0.0

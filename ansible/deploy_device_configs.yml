@@ -26,6 +26,10 @@
         sai_xml:
            src: "roles/sonicv2/files/ssw/ACS-MSN3700/sai_3700_1038.xml"
            dest: "/usr/share/sonic/device/x86_64-mlnx_msn3700-r0/ACS-MSN3700/sai_3700.xml"
+      r-tigris-13:
+        port_config:
+           src: "roles/sonicv2/files/mlnx/hwsku/r-tigris-13/port_config.ini"
+           dest: "/usr/share/sonic/device/x86_64-mlnx_msn3800-r0/ACS-MSN3800/port_config.ini"
 
 - name: Find specific configs if defined for this dut
   set_fact:

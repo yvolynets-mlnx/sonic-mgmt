@@ -16,3 +16,4 @@ arc-switch233-005,0.0.0.0/0,Mellanox-2700,FanoutLeaf
 arc-switch233-007,0.0.0.0/0,Mellanox-3700,FanoutLeaf
 r-panther-03,10.210.25.83/22,Mellanox-2700,FanoutLeaf
 r-panther-04,10.210.25.94/22,Mellanox-2700,FanoutLeaf
+r-anaconda-43,10.210.25.21/22,ACS-MSN3700,FanoutLeaf

@@ -34,6 +34,9 @@ R-SONIC-03 ansible_host=r-sonic-03
 [vm_host_12]
 R-SONIC-04 ansible_host=r-sonic-04
 
+[vm_host_13]
+R-SONIC-07 ansible_host=r-sonic-07
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -53,6 +56,7 @@ vm_host_9
 vm_host_10
 vm_host_11
 vm_host_12
+vm_host_13
 vm_host_50
 vm_host_52
 
@@ -464,6 +468,40 @@ VM1230 ansible_host=10.213.104.35
 VM1231 ansible_host=10.213.104.36
 VM1232 ansible_host=10.213.104.37
 
+[vms_13]
+VM1301 ansible_host=10.215.0.62
+VM1302 ansible_host=10.215.0.63
+VM1303 ansible_host=10.215.0.64
+VM1304 ansible_host=10.215.0.65
+VM1305 ansible_host=10.215.0.66
+VM1306 ansible_host=10.215.0.67
+VM1307 ansible_host=10.215.0.68
+VM1308 ansible_host=10.215.0.69
+VM1309 ansible_host=10.215.0.70
+VM1310 ansible_host=10.215.0.71
+VM1311 ansible_host=10.215.0.72
+VM1312 ansible_host=10.215.0.73
+VM1313 ansible_host=10.215.0.74
+VM1314 ansible_host=10.215.0.75
+VM1315 ansible_host=10.215.0.76
+VM1316 ansible_host=10.215.0.77
+VM1317 ansible_host=10.215.0.78
+VM1318 ansible_host=10.215.0.79
+VM1319 ansible_host=10.215.0.80
+VM1320 ansible_host=10.215.0.81
+VM1321 ansible_host=10.215.0.82
+VM1322 ansible_host=10.215.0.83
+VM1323 ansible_host=10.215.0.84
+VM1324 ansible_host=10.215.0.85
+VM1325 ansible_host=10.215.0.86
+VM1326 ansible_host=10.215.0.87
+VM1327 ansible_host=10.215.0.88
+VM1328 ansible_host=10.215.0.89
+VM1329 ansible_host=10.215.0.90
+VM1330 ansible_host=10.215.0.91
+VM1331 ansible_host=10.215.0.92
+VM1332 ansible_host=10.215.0.93
+
 [vms_50]
 VM5001 ansible_host=10.212.232.5
 VM5002 ansible_host=10.212.232.6
@@ -489,6 +527,7 @@ vms_9
 vms_10
 vms_11
 vms_12
+vms_13
 vms_50
 vms_52
 
@@ -577,6 +616,13 @@ vms_12
 [server_12:vars]
 host_var_file=host_vars/R-SONIC-04.yml
 
+[server_13:children]
+vm_host_13
+vms_13
+
+[server_13:vars]
+host_var_file=host_vars/R-SONIC-07.yml
+
 [server_50:children]
 vm_host_50
 vms_50
@@ -599,7 +645,6 @@ host_var_file=host_vars/DEV-R-VRT-233.yml
 host_var_file=host_vars/DEV-R-VRT-233.yml
 mgmt_prefixlen=16
 
-
 [servers:children]
 server_1
 server_2
@@ -613,6 +658,7 @@ server_9
 server_10
 server_11
 server_12
+server_13
 server_50
 server_52
 
