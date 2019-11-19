@@ -34,6 +34,9 @@ R-SONIC-03 ansible_host=r-sonic-03
 [vm_host_12]
 R-SONIC-04 ansible_host=r-sonic-04
 
+[vm_host_13]
+MTBC-R730-04 ansible_host=mtbc-r730-04
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -59,6 +62,7 @@ vm_host_9
 vm_host_10
 vm_host_11
 vm_host_12
+vm_host_13
 vm_host_50
 vm_host_51
 vm_host_52
@@ -472,6 +476,12 @@ VM1230 ansible_host=10.213.104.35
 VM1231 ansible_host=10.213.104.36
 VM1232 ansible_host=10.213.104.37
 
+[vms_13]
+VM1301 ansible_host=10.112.205.202
+VM1302 ansible_host=10.112.205.203
+VM1303 ansible_host=10.112.205.204
+VM1304 ansible_host=10.112.205.205
+
 [vms_50]
 VM5001 ansible_host=0.0.0.0
 VM5002 ansible_host=0.0.0.0
@@ -621,6 +631,7 @@ vms_9
 vms_10
 vms_11
 vms_12
+vms_13
 vms_50
 vms_51
 vms_52
@@ -711,6 +722,13 @@ vms_12
 [server_12:vars]
 host_var_file=host_vars/R-SONIC-04.yml
 
+[server_13:children]
+vm_host_13
+vms_13
+
+[server_13:vars]
+host_var_file=host_vars/MTBC-R730-04.yml
+
 [server_50:children]
 vm_host_50
 vms_50
@@ -753,6 +771,7 @@ server_9
 server_10
 server_11
 server_12
+server_13
 server_50
 server_51
 server_52
