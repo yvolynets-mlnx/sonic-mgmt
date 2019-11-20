@@ -37,13 +37,7 @@ R-SONIC-04 ansible_host=r-sonic-04
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
-[vm_host_51]
-DEV-R-VRT-232 ansible_host=dev-r-vrt-232
-
 [vm_host_52]
-DEV-R-VRT-233 ansible_host=dev-r-vrt-233
-
-[vm_host_53]
 DEV-R-VRT-233 ansible_host=dev-r-vrt-233
 
 [vm_host:children]
@@ -60,9 +54,7 @@ vm_host_10
 vm_host_11
 vm_host_12
 vm_host_50
-vm_host_51
 vm_host_52
-vm_host_53
 
 [vms_1]
 VM0101 ansible_host=10.213.84.17
@@ -473,140 +465,16 @@ VM1231 ansible_host=10.213.104.36
 VM1232 ansible_host=10.213.104.37
 
 [vms_50]
-VM5001 ansible_host=0.0.0.0
-VM5002 ansible_host=0.0.0.0
-VM5003 ansible_host=0.0.0.0
-VM5004 ansible_host=0.0.0.0
-VM5005 ansible_host=0.0.0.0
-VM5006 ansible_host=0.0.0.0
-VM5007 ansible_host=0.0.0.0
-VM5008 ansible_host=0.0.0.0
-VM5009 ansible_host=0.0.0.0
-VM5010 ansible_host=0.0.0.0
-VM5011 ansible_host=0.0.0.0
-VM5012 ansible_host=0.0.0.0
-VM5013 ansible_host=0.0.0.0
-VM5014 ansible_host=0.0.0.0
-VM5015 ansible_host=0.0.0.0
-VM5016 ansible_host=0.0.0.0
-VM5017 ansible_host=0.0.0.0
-VM5018 ansible_host=0.0.0.0
-VM5019 ansible_host=0.0.0.0
-VM5020 ansible_host=0.0.0.0
-VM5021 ansible_host=0.0.0.0
-VM5022 ansible_host=0.0.0.0
-VM5023 ansible_host=0.0.0.0
-VM5024 ansible_host=0.0.0.0
-VM5025 ansible_host=0.0.0.0
-VM5026 ansible_host=0.0.0.0
-VM5027 ansible_host=0.0.0.0
-VM5028 ansible_host=0.0.0.0
-VM5029 ansible_host=0.0.0.0
-VM5030 ansible_host=0.0.0.0
-VM5031 ansible_host=0.0.0.0
-VM5032 ansible_host=0.0.0.0
-
-[vms_51]
-VM5101 ansible_host=0.0.0.0
-VM5102 ansible_host=0.0.0.0
-VM5103 ansible_host=0.0.0.0
-VM5104 ansible_host=0.0.0.0
-VM5105 ansible_host=0.0.0.0
-VM5106 ansible_host=0.0.0.0
-VM5107 ansible_host=0.0.0.0
-VM5108 ansible_host=0.0.0.0
-VM5109 ansible_host=0.0.0.0
-VM5110 ansible_host=0.0.0.0
-VM5111 ansible_host=0.0.0.0
-VM5112 ansible_host=0.0.0.0
-VM5113 ansible_host=0.0.0.0
-VM5114 ansible_host=0.0.0.0
-VM5115 ansible_host=0.0.0.0
-VM5116 ansible_host=0.0.0.0
-VM5117 ansible_host=0.0.0.0
-VM5118 ansible_host=0.0.0.0
-VM5119 ansible_host=0.0.0.0
-VM5120 ansible_host=0.0.0.0
-VM5121 ansible_host=0.0.0.0
-VM5122 ansible_host=0.0.0.0
-VM5123 ansible_host=0.0.0.0
-VM5124 ansible_host=0.0.0.0
-VM5125 ansible_host=0.0.0.0
-VM5126 ansible_host=0.0.0.0
-VM5127 ansible_host=0.0.0.0
-VM5128 ansible_host=0.0.0.0
-VM5129 ansible_host=0.0.0.0
-VM5130 ansible_host=0.0.0.0
-VM5131 ansible_host=0.0.0.0
-VM5132 ansible_host=0.0.0.0
+VM5001 ansible_host=10.212.232.5
+VM5002 ansible_host=10.212.232.6
+VM5003 ansible_host=10.212.232.7
+VM5004 ansible_host=10.212.232.8
 
 [vms_52]
-VM5201 ansible_host=0.0.0.0
-VM5202 ansible_host=0.0.0.0
-VM5203 ansible_host=0.0.0.0
-VM5204 ansible_host=0.0.0.0
-VM5205 ansible_host=0.0.0.0
-VM5206 ansible_host=0.0.0.0
-VM5207 ansible_host=0.0.0.0
-VM5208 ansible_host=0.0.0.0
-VM5209 ansible_host=0.0.0.0
-VM5210 ansible_host=0.0.0.0
-VM5211 ansible_host=0.0.0.0
-VM5212 ansible_host=0.0.0.0
-VM5213 ansible_host=0.0.0.0
-VM5214 ansible_host=0.0.0.0
-VM5215 ansible_host=0.0.0.0
-VM5216 ansible_host=0.0.0.0
-VM5217 ansible_host=0.0.0.0
-VM5218 ansible_host=0.0.0.0
-VM5219 ansible_host=0.0.0.0
-VM5220 ansible_host=0.0.0.0
-VM5221 ansible_host=0.0.0.0
-VM5222 ansible_host=0.0.0.0
-VM5223 ansible_host=0.0.0.0
-VM5224 ansible_host=0.0.0.0
-VM5225 ansible_host=0.0.0.0
-VM5226 ansible_host=0.0.0.0
-VM5227 ansible_host=0.0.0.0
-VM5228 ansible_host=0.0.0.0
-VM5229 ansible_host=0.0.0.0
-VM5230 ansible_host=0.0.0.0
-VM5231 ansible_host=0.0.0.0
-VM5232 ansible_host=0.0.0.0
-
-[vms_53]
-VM5301 ansible_host=0.0.0.0
-VM5302 ansible_host=0.0.0.0
-VM5303 ansible_host=0.0.0.0
-VM5304 ansible_host=0.0.0.0
-VM5305 ansible_host=0.0.0.0
-VM5306 ansible_host=0.0.0.0
-VM5307 ansible_host=0.0.0.0
-VM5308 ansible_host=0.0.0.0
-VM5309 ansible_host=0.0.0.0
-VM5310 ansible_host=0.0.0.0
-VM5311 ansible_host=0.0.0.0
-VM5312 ansible_host=0.0.0.0
-VM5313 ansible_host=0.0.0.0
-VM5314 ansible_host=0.0.0.0
-VM5315 ansible_host=0.0.0.0
-VM5316 ansible_host=0.0.0.0
-VM5317 ansible_host=0.0.0.0
-VM5318 ansible_host=0.0.0.0
-VM5319 ansible_host=0.0.0.0
-VM5320 ansible_host=0.0.0.0
-VM5321 ansible_host=0.0.0.0
-VM5322 ansible_host=0.0.0.0
-VM5323 ansible_host=0.0.0.0
-VM5324 ansible_host=0.0.0.0
-VM5325 ansible_host=0.0.0.0
-VM5326 ansible_host=0.0.0.0
-VM5327 ansible_host=0.0.0.0
-VM5328 ansible_host=0.0.0.0
-VM5329 ansible_host=0.0.0.0
-VM5330 ansible_host=0.0.0.0
-VM5331 ansible_host=0.0.0.0
-VM5332 ansible_host=0.0.0.0
+VM5201 ansible_host=10.212.233.5
+VM5202 ansible_host=10.212.233.6
+VM5203 ansible_host=10.212.233.7
+VM5204 ansible_host=10.212.233.8
 
 [eos:children]
 vms_1
@@ -622,9 +490,7 @@ vms_10
 vms_11
 vms_12
 vms_50
-vms_51
 vms_52
-vms_53
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -718,12 +584,9 @@ vms_50
 [server_50:vars]
 host_var_file=host_vars/DEV-R-VRT-232.yml
 
-[server_51:children]
-vm_host_51
-vms_51
-
-[server_51:vars]
+[vms_50:vars]
 host_var_file=host_vars/DEV-R-VRT-232.yml
+mgmt_prefixlen=16
 
 [server_52:children]
 vm_host_52
@@ -732,12 +595,9 @@ vms_52
 [server_52:vars]
 host_var_file=host_vars/DEV-R-VRT-233.yml
 
-[server_53:children]
-vm_host_53
-vms_53
-
-[server_53:vars]
+[vms_52:vars]
 host_var_file=host_vars/DEV-R-VRT-233.yml
+mgmt_prefixlen=16
 
 
 [servers:children]
@@ -754,9 +614,11 @@ server_10
 server_11
 server_12
 server_50
-server_51
 server_52
-server_53
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't0', 't0-16', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']
+
+[sonic_latest]
+dev-r-vrt-233-010  ansible_host=10.212.233.10 type=simx sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
+dev-r-vrt-232-010  ansible_host=10.212.232.10 type=simx sonic_version=v2 hwsku="ACS-MSN3700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001

@@ -1,4 +1,6 @@
 mgmt_bridge: br0
 mgmt_prefixlen: 16
 mgmt_gw: 10.212.0.1
-external_port: none
+vm_mgmt_gw: 10.212.0.1
+
+internal_mgmt_port: True

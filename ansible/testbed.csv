@@ -61,11 +61,10 @@ mtbc-sonic-03-2700-t1,vm-t1,t1,docker-ptf-mlnx,10.112.207.38/24,server_10,VM1001
 mtbc-sonic-03-2700-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.112.207.38/24,server_10,VM1001,mtbc-sonic-03-2700,Mellanox MTBC testbed
 mtbc-sonic-03-2700-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.112.207.38/24,server_10,VM1001,mtbc-sonic-03-2700,Mellanox MTBC testbed
 
-dev-r-vrt-232-005-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.232.6/16,server_50,VM5001,dev-r-vrt-232-005,Mellanox MTR SimX testbed
-dev-r-vrt-232-007-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.232.8/16,server_51,VM5101,dev-r-vrt-232-007,Mellanox MTR SimX testbed
-
-dev-r-vrt-233-005-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.233.6/16,server_52,VM5201,dev-r-vrt-233-005,Mellanox MTR SimX testbed
-dev-r-vrt-233-007-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.212.233.8/16,server_53,VM5301,dev-r-vrt-233-007,Mellanox MTR SimX testbed
+dev-r-vrt-233-010-t0,vms6-1,t0,docker-ptf-mlnx,10.212.233.9/16,server_52,VM5201,dev-r-vrt-233-010,Mellanox virtual SID testbed
+dev-r-vrt-233-010-ptf32,vms6-1,ptf32,docker-ptf-mlnx,10.212.233.9/16,server_52,VM5201,dev-r-vrt-233-010,Mellanox virtual SID testbed
+dev-r-vrt-232-010-t0,vms6-2,t0,docker-ptf-mlnx,10.212.232.9/16,server_50,VM5001,dev-r-vrt-232-010,Mellanox virtual SID testbed
+dev-r-vrt-232-010-ptf32,vms6-2,ptf32,docker-ptf-mlnx,10.212.232.9/16,server_50,VM5001,dev-r-vrt-232-010,Mellanox virtual SID testbed
 
 ptf1,ptf1,ptf32,docker-ptf,10.213.84.41/24,server_1,,arc-switch1038,Tests ptf
 ptf1-m,ptf1,ptf32,docker-ptf-sai-mlnx,10.255.0.188/24,server_1,,str-msn2700-01,Test ptf Mellanox

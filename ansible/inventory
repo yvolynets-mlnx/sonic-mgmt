@@ -89,21 +89,15 @@ r-boxer-sw01-t1  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MS
 r-boxer-sw01-t1-lag  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 r-boxer-sw01-ptf32   ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
-# MTR SimX testbed dev-r-vrt-232-005 topologies
-dev-r-vrt-232-005 ansible_host=dev-r-vrt-232-005 sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.212.232.1 5005" ptf_host=ptf-232-005 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-dev-r-vrt-232-005-ptf32 ansible_host=dev-r-vrt-232-005 sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.212.232.1 5005" ptf_host=ptf-232-005 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+# MTR SimX testbed dev-r-vrt-232-010 topologies
+dev-r-vrt-232-010 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-vms6-2 sonic_version=v2 sonic_hwsku=ACS-MSN3700 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
+dev-r-vrt-232-010-ptf32 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-vms6-2 sonic_version=v2 sonic_hwsku=ACS-MSN3700 iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
+dev-r-vrt-232-010-t0 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-vms6-2 sonic_version=v2 sonic_hwsku=ACS-MSN3700 iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
 
-# MTR SimX testbed dev-r-vrt-232-007 topologies
-dev-r-vrt-232-007 ansible_host=dev-r-vrt-232-007 sonic_version=v2 sonic_hwsku=ACS-MSN3700 serial_console="telnet 10.212.232.1 5007" ptf_host=ptf-232-007 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-dev-r-vrt-232-007-ptf32 ansible_host=dev-r-vrt-232-007 sonic_version=v2 sonic_hwsku=ACS-MSN3700 serial_console="telnet 10.212.232.1 5007" ptf_host=ptf-232-007 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-
-# MTR SimX testbed dev-r-vrt-233-005 topologies
-dev-r-vrt-233-005 ansible_host=dev-r-vrt-233-005 sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.212.233.1 5005" ptf_host=ptf-233-005 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-dev-r-vrt-233-005-ptf32 ansible_host=dev-r-vrt-233-005 sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.212.233.1 5005" ptf_host=ptf-233-005 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-
-# MTR SimX testbed dev-r-vrt-233-007 topologies
-dev-r-vrt-233-007 ansible_host=dev-r-vrt-233-007 sonic_version=v2 sonic_hwsku=ACS-MSN3700 serial_console="telnet 10.212.233.1 5007" ptf_host=ptf-233-007 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
-dev-r-vrt-233-007-ptf32 ansible_host=dev-r-vrt-233-007 sonic_version=v2 sonic_hwsku=ACS-MSN3700 serial_console="telnet 10.212.233.1 5007" ptf_host=ptf-233-007 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+# MTR vtestbed dev-r-vrt-233-010 topologies
+dev-r-vrt-233-010  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
+dev-r-vrt-233-010-ptf32  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
+dev-r-vrt-233-010-t0  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
 
 # MTR Lab devices info
 arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=3tango
@@ -207,21 +201,15 @@ r-boxer-sw01-t1
 r-boxer-sw01-t1-lag
 r-boxer-sw01-ptf32
 
-# MTR SimX dev-r-vrt-232-005 topologies
-dev-r-vrt-232-005
-dev-r-vrt-232-005-ptf32
+# MTR SimX dev-r-vrt-232-010 topologies
+dev-r-vrt-232-010
+dev-r-vrt-232-010-t0
+dev-r-vrt-232-010-ptf32
 
-# MTR SimX dev-r-vrt-232-007 topologies
-dev-r-vrt-232-007
-dev-r-vrt-232-007-ptf32
-
-# MTR SimX dev-r-vrt-233-005 topologies
-dev-r-vrt-233-005
-dev-r-vrt-233-005-ptf32
-
-# MTR SimX dev-r-vrt-233-007 topologies
-dev-r-vrt-233-007
-dev-r-vrt-233-007-ptf32
+# MTR SimX dev-r-vrt-233-010 topologies
+dev-r-vrt-233-010
+dev-r-vrt-233-010-t0
+dev-r-vrt-233-010-ptf32
 
 [lab]
 # MTR arc-switch1038 topologies
@@ -313,21 +301,15 @@ r-boxer-sw01-t1
 r-boxer-sw01-t1-lag
 r-boxer-sw01-ptf32
 
-# MTR SimX dev-r-vrt-232-005 topologies
-dev-r-vrt-232-005
-dev-r-vrt-232-005-ptf32
+# MTR SimX dev-r-vrt-232-010 topologies
+dev-r-vrt-232-010
+dev-r-vrt-232-010-ptf32
+dev-r-vrt-232-010-t0
 
-# MTR SimX dev-r-vrt-232-007 topologies
-dev-r-vrt-232-007
-dev-r-vrt-232-007-ptf32
-
-# MTR SimX dev-r-vrt-233-005 topologies
-dev-r-vrt-233-005
-dev-r-vrt-233-005-ptf32
-
-# MTR SimX dev-r-vrt-233-007 topologies
-dev-r-vrt-233-007
-dev-r-vrt-233-007-ptf32
+# MTR SimX dev-r-vrt-233-010 topologies
+dev-r-vrt-233-010
+dev-r-vrt-233-010-ptf32
+dev-r-vrt-233-010-t0
 
 [leaf_topo_1:vars]
 podset_number=200
@@ -359,11 +341,7 @@ ptf-mtbc02 ansible_host=10.112.207.41 ansible_ssh_user=root ansible_ssh_pass=roo
 ptf-mtbc03 ansible_host=10.112.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 # MTBC r-boxer-sw01 PTF host
 ptf-boxer-sw01 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
-# MTR SimX dev-r-vrt-232-005 PTF host
-ptf-232-005 ansible_host=10.212.232.6 ansible_ssh_user=root ansible_ssh_pass=root
-# MTR SimX dev-r-vrt-232-007 PTF host
-ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=root
-# MTR SimX dev-r-vrt-233-005 PTF host
-ptf-233-005 ansible_host=10.212.233.6 ansible_ssh_user=root ansible_ssh_pass=root
-# MTR SimX dev-r-vrt-233-007 PTF host
-ptf-233-007 ansible_host=10.212.233.8 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR Virtual testbed PTF host
+ptf-vms6-1 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
+# MTR Virtual testbed PTF host
+ptf-vms6-2 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
