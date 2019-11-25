@@ -95,6 +95,14 @@ mtbc-sonic-03-2700-t1  ansible_host=mtbc-sonic-03-2700  sonic_version=v2  sonic_
 mtbc-sonic-03-2700-t1-lag  ansible_host=mtbc-sonic-03-2700  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:2027 10.112.68.208" ptf_host=ptf-mtbc03 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 mtbc-sonic-03-2700-ptf32   ansible_host=mtbc-sonic-03-2700  sonic_version=v2  sonic_hwsku=ACS-MSN2700 serial_console="ssh -l rcon:2027 10.112.68.208" ptf_host=ptf-mtbc03 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
+# MTBC testbed mtbc-3700c-01 topologies
+mtbc-3700c-01 ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:2001 10.112.68.204" ptf_host=ptf-mtbc04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-3700c-01-t0  ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:2001 10.112.68.204" ptf_host=ptf-mtbc04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-3700c-01-t1  ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:2001 10.112.68.204" ptf_host=ptf-mtbc04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-3700c-01-t1-lag  ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:2001 10.112.68.204" ptf_host=ptf-mtbc04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+mtbc-3700c-01-ptf32   ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:2001 10.112.68.204" ptf_host=ptf-mtbc04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+
+
 # MTR testbed r-boxer-sw01 topologies
 r-boxer-sw01 ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 r-boxer-sw01-t0  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
@@ -221,6 +229,13 @@ mtbc-sonic-03-2700-t1
 mtbc-sonic-03-2700-t1-lag
 mtbc-sonic-03-2700-ptf32
 
+# MTBC mtbc-3700c-01 topologies
+mtbc-3700c-01
+mtbc-3700c-01-t0
+mtbc-3700c-01-t1
+mtbc-3700c-01-t1-lag
+mtbc-3700c-01-ptf32
+
 # MTR r-boxer-sw01 topologies
 r-boxer-sw01
 r-boxer-sw01-t0
@@ -334,6 +349,13 @@ mtbc-sonic-03-2700-t1
 mtbc-sonic-03-2700-t1-lag
 mtbc-sonic-03-2700-ptf32
 
+# MTBC mtbc-3700c-01 topologies
+mtbc-3700c-01
+mtbc-3700c-01-t0
+mtbc-3700c-01-t1
+mtbc-3700c-01-t1-lag
+mtbc-3700c-01-ptf32
+
 # MTR r-boxer-sw01 topologies
 r-boxer-sw01
 r-boxer-sw01-t0
@@ -381,6 +403,8 @@ ptf-mtbc01 ansible_host=10.112.206.220 ansible_ssh_user=root ansible_ssh_pass=ro
 ptf-mtbc02 ansible_host=10.112.207.41 ansible_ssh_user=root ansible_ssh_pass=root
 # MTBC mtbc-sonic-03-2700 PTF host
 ptf-mtbc03 ansible_host=10.112.207.38 ansible_ssh_user=root ansible_ssh_pass=root
+# MTBC mtbc-3700c-01 PTF host
+ptf-mtbc04 ansible_host=10.112.205.201 ansible_ssh_user=root ansible_ssh_pass=root
 # MTBC r-boxer-sw01 PTF host
 ptf-boxer-sw01 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
 # MTR Virtual testbed PTF host
