@@ -5,6 +5,7 @@ import logging
 import os
 import json
 import time
+import pytest
 
 from platform_fixtures import conn_graph_facts
 from check_interface_status import parse_intf_status
@@ -64,6 +65,7 @@ def verify_sfp_presence_sysfs_status(dut, sfp_id, presence_expected):
         assert check_sysfs_output["stdout"] == '0', "Content of qsfp_status of sfp%s is not correct" % str(sfp_id)
 
 
+@pytest.mark.skip(reason="skip due to open issue: https://redmine.mellanox.com/issues/1915043")
 def test_check_sfp_plug_in_out_sim(testbed_devices, conn_graph_facts):
     """This test case is to check SFP presence, sysfs status
        and interface status by simulating SFP plug in/out via PMAOS
