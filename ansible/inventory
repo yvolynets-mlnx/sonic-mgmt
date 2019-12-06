@@ -379,35 +379,67 @@ podset_number=200
 [ptf]
 # MTR arc-switch1038 PTF host
 ptf-1038 ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.84.41 ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root  # Workaround for ansible inventory parsing issue
+
 # MTR arc-switch1025 PTF host
 ptf-1025 ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.84.213 ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR arc-switch1004 PTF host
 ptf-1004 ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.80.153 ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR r-anaconda-10 PTF host
 ptf-r-anaconda-10 ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.103.5 ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR r-tigris-04 PTF host
 ptf-r-tigris-04 ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.104.5 ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR r-tigris-13 PTF host
 ptf-r-tigris-13 ansible_host=10.215.0.61 ansible_ssh_user=root ansible_ssh_pass=root
+10.215.0.61 ansible_host=10.215.0.61 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTS mts-sonic-dut-t1 PTF host
 mts-ptf ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
+10.9.78.237 ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR arc-switch1041 PTF host
 ptf-1041 ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.86.93 ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR arc-switch1029 PTF host
 ptf-1029 ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.84.98 ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR dev setup PTF host
 ptf-arc-host61-005 ansible_host=arc-host61-005 ansible_ssh_user=root ansible_ssh_pass=3tango
+
 # MTBC arc-mtbc-1001 PTF host
 ptf-mtbc01 ansible_host=10.112.206.220 ansible_ssh_user=root ansible_ssh_pass=root
+10.112.206.220 ansible_host=10.112.206.220 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTBC mtbc-sonic-01-2410 PTF host
 ptf-mtbc02 ansible_host=10.112.207.41 ansible_ssh_user=root ansible_ssh_pass=root
+10.112.207.41 ansible_host=10.112.207.41 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTBC mtbc-sonic-03-2700 PTF host
 ptf-mtbc03 ansible_host=10.112.207.38 ansible_ssh_user=root ansible_ssh_pass=root
+10.112.207.38 ansible_host=10.112.207.38 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTBC mtbc-3700c-01 PTF host
 ptf-mtbc04 ansible_host=10.112.205.201 ansible_ssh_user=root ansible_ssh_pass=root
+10.112.205.201 ansible_host=10.112.205.201 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTBC r-boxer-sw01 PTF host
 ptf-boxer-sw01 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
+10.213.88.5 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR Virtual testbed PTF host
 ptf-vms6-1 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
+10.212.233.9 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
+
 # MTR Virtual testbed PTF host
 ptf-vms6-2 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
+10.212.232.9 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root

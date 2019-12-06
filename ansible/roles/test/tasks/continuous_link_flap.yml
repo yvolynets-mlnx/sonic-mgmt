@@ -51,7 +51,7 @@
 
     - name: Gathering lab graph facts about the device
       conn_graph_facts: host={{ inventory_hostname }}
-      connection: local
+      delegate_to: localhost
       tags: always
 
     - debug: msg="{{ device_conn }}"
@@ -64,7 +64,7 @@
 
     - name: Gathering lab graph facts about the device
       conn_graph_facts: host={{ inventory_hostname }}
-      connection: local
+      delegate_to: localhost
       tags: always
 
     - name: include continuous_link_flap_helper.yml
@@ -75,7 +75,7 @@
 
     - name: Gathering lab graph facts about the device
       conn_graph_facts: host={{ inventory_hostname }}
-      connection: local
+      delegate_to: localhost
       tags: always
 
     - name: include continuous_link_flap_helper.yml
@@ -86,7 +86,7 @@
 
     - name: Gathering lab graph facts about the device
       conn_graph_facts: host={{ inventory_hostname }}
-      connection: local
+      delegate_to: localhost
       tags: always
 
     - debug: msg="{{ device_conn }}"
@@ -102,7 +102,7 @@
 
     - name: Gathering lab graph facts about the device
       conn_graph_facts: host={{ inventory_hostname }}
-      connection: local
+      delegate_to: localhost
       tags: always
 
     - set_fact:
@@ -116,7 +116,7 @@
 
     - name: Gathering lab graph facts about the device
       conn_graph_facts: host={{ inventory_hostname }}
-      connection: local
+      delegate_to: localhost
       tags: always
 
     - set_fact:

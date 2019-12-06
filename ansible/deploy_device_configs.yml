@@ -34,7 +34,7 @@
 - name: Find specific configs if defined for this dut
   set_fact:
     dut_configs: "{{ item.value }}"
-  with_dict: device_configs
+  with_dict: "{{ device_configs }}"
   when: item.key == "{{ dut_hwsku }}" or item.key == "{{ dut_hostname }}"
 
 - debug:

@@ -19,7 +19,7 @@ EXAMPLES = '''
 - name: Generate FIB facts
   fib_facts:
     fib: /tmp/fib_info.txt
-  connection: local
+  delegate_to: localhost
 '''
 
 

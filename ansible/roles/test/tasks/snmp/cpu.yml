@@ -14,7 +14,7 @@
 #
 # TODO: abstract the snmp OID by SKU
 
-- block: 
+- block:
     - name: Start cpu load generation
       shell: cpu_load() { yes > /dev/null & }; cpu_load && cpu_load && cpu_load && cpu_load
       become: yes
@@ -25,7 +25,7 @@
     # Gather facts with SNMP version 2
     - name: Gathering basic snmp facts about the device
       snmp_facts: host={{ ansible_host }} version=v2c community={{ snmp_rocommunity }} is_dell=yes
-      connection: local
+      delegate_to: localhost
 
     - name: Pull CPU utilization via shell
     # Explanation: Run top command with 2 iterations, 5sec delay. Discard the first iteration, then grap the CPU line from the second,
@@ -52,7 +52,7 @@
     - name: 'Validating SNMP CPU utilization matches shell "top" result'
       assert:
         that: "{{ ((ansible_ChStackUnitCpuUtil5sec) - (shell_cpu_usage.stdout|int)) | abs() }} <= 5"
-  
+
   always:
     - name: Stop cpu load generation
       shell: killall yes

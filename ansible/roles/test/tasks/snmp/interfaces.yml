@@ -1,17 +1,17 @@
 # Gather facts with SNMP version 2
 - name: Gathering basic snmp facts about the device
   snmp_facts: host={{ ansible_host }} version=v2c community={{ snmp_rocommunity }}
-  connection: local
+  delegate_to: localhost
 
 - set_fact:
     snmp_intf: []
     mg_intf: []
 
 - name: Create snmp interfaces list
-  set_fact: 
+  set_fact:
     snmp_intf: "{{ snmp_intf + [item.value.name] }}"
   with_dict: "{{ snmp_interfaces }}"
-  when: "{{item.value.name is defined}}"  
+  when: "{{item.value.name is defined}}"
 
 - name: Create minigraph interfaces list
   set_fact:
