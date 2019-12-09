@@ -682,7 +682,7 @@ server_50
 server_52
 
 [servers:vars]
-topologies=['t1', 't1-lag', 't1-64-lag', 't0', 't0-16', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']
+topologies=['t1', 't1-lag', 't1-64-lag', 't1-64-lag-clet', 't0', 't0-16', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']
 
 [sonic_latest]
 dev-r-vrt-233-010  ansible_host=10.212.233.10 type=simx sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201

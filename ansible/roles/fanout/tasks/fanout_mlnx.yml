@@ -24,16 +24,16 @@
     when: peer_hwsku == "MLNX-OS"
     tags: deploy
 
-###################################################################
-# build, deploy and start docker images for the PFC WD test       #
-###################################################################
-- include: mlnx/deploy_pfcwd_fanout.yml
+ ###################################################################
+ # build, deploy and start docker images for the PFC WD test       #
+ ###################################################################
+- include_tasks: mlnx/deploy_pfcwd_fanout.yml
   when: peer_hwsku == "MLNX-OS"
   tags: deploy,pfcwd_config
 
-###################################################################
-# check and recover docker images for the PFC WD test             #
-###################################################################
-- include: mlnx/check_pfcwd_fanout.yml
+ ###################################################################
+ # check and recover docker images for the PFC WD test             #
+ ###################################################################
+- include_tasks: mlnx/check_pfcwd_fanout.yml
   when: peer_hwsku == "MLNX-OS"
   tags: check_pfcwd_config
