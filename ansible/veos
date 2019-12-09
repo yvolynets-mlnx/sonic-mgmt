@@ -1,41 +1,41 @@
 [vm_host_1]
-ARC-HOST60 ansible_host=arc-host60
+ARC-HOST60 ansible_host=arc-host60 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_2]
-MTS-SAI-HOST-3 ansible_host=mts-sai-host-3
+MTS-SAI-HOST-3 ansible_host=mts-sai-host-3 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_3]
-ARC-HOST83 ansible_host=arc-host83
+ARC-HOST83 ansible_host=arc-host83 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_4]
 ARC-HOST62 ansible_host=arc-host62 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_5]
-DEV-R730-01 ansible_host=dev-r730-01
+DEV-R730-01 ansible_host=dev-r730-01 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_6]
-ARC-HOST121 ansible_host=arc-host121
+ARC-HOST121 ansible_host=arc-host121 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_7]
-ARC-HOST26 ansible_host=arc-host26
+ARC-HOST26 ansible_host=arc-host26 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_8]
-DEV-R730-02 ansible_host=dev-r730-02
+DEV-R730-02 ansible_host=dev-r730-02 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_9]
-R-SONIC-02 ansible_host=r-sonic-02
+R-SONIC-02 ansible_host=r-sonic-02 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_10]
 DEV-R730-03 ansible_host=dev-r730-03
 
 [vm_host_11]
-R-SONIC-03 ansible_host=r-sonic-03
+R-SONIC-03 ansible_host=r-sonic-03 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_12]
-R-SONIC-04 ansible_host=r-sonic-04
+R-SONIC-04 ansible_host=r-sonic-04 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_13]
-R-SONIC-07 ansible_host=r-sonic-07
+R-SONIC-07 ansible_host=r-sonic-07 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_14]
 MTBC-R730-04 ansible_host=mtbc-r730-04
