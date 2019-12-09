@@ -86,10 +86,8 @@ def setup(duthost, testbed):
     for dut_port, neigh in mg_facts['minigraph_neighbors'].items():
         neighbor_sniff_ports.append(mg_facts['minigraph_port_indices'][dut_port])
 
-    for vlan_name in mg_facts["minigraph_vlans"].keys():
-        match = re.findall("\d{1,4}", vlan_name)
-        if match:
-            configured_vlans.append(int(match[0]))
+    for vlan_name, vlans_data in mg_facts["minigraph_vlans"].items():
+        configured_vlans.append(int(vlans_data["vlanid"]))
 
     setup_information = {
         "port_channel_members": port_channel_members,
@@ -98,7 +96,7 @@ def setup(duthost, testbed):
         "dut_to_ptf_port_map": mg_facts["minigraph_port_indices"],
         "combined_drop_counter": combined_drop_counter,
         "neighbor_sniff_ports": neighbor_sniff_ports,
-        "vlans": configured_vlans
+        "vlans": configured_vlans,
     }
 
     return setup_information
@@ -266,7 +264,7 @@ def test_equal_smac_dmac_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fiel
         eth_dst=dst_mac, # DUT port
         eth_src=dst_mac, # PTF port
         ip_src=pkt_fields["ip_src"], # PTF source
-        ip_dst=pkt_fields["ip_dst"], # DUT source
+        ip_dst=pkt_fields["ip_dst"], # VM source
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
@@ -288,9 +286,9 @@ def test_multicast_smac_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_field
 
     pkt = testutils.simple_tcp_packet(
         eth_dst=dst_mac, # DUT port
-        eth_src=multicast_smac, # PTF port
+        eth_src=multicast_smac,
         ip_src=pkt_fields["ip_src"], # PTF source
-        ip_dst=pkt_fields["ip_dst"], # DUT source
+        ip_dst=pkt_fields["ip_dst"], # VM source
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
@@ -314,10 +312,10 @@ def test_reserved_dmac_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields
     for reserved_dmac in reserved_mac_addr:
         log_pkt_params(dut_iface, dst_mac, reserved_dmac, pkt_fields["ip_dst"], pkt_fields["ip_src"])
         pkt = testutils.simple_tcp_packet(
-            eth_dst=dst_mac, # DUT port
-            eth_src=reserved_dmac, # PTF port
+            eth_dst=reserved_dmac, # DUT port
+            eth_src=src_mac,
             ip_src=pkt_fields["ip_src"], # PTF source
-            ip_dst=pkt_fields["ip_dst"], # DUT source
+            ip_dst=pkt_fields["ip_dst"], # VM source
             tcp_sport=pkt_fields["tcp_sport"],
             tcp_dport=pkt_fields["tcp_dport"])
 
@@ -348,7 +346,7 @@ def test_not_expected_vlan_tag_drop(ptfadapter, duthost, setup, tx_dut_ports, pk
         eth_dst=dst_mac, # DUT port
         eth_src=src_mac, # PTF port
         ip_src=pkt_fields["ip_src"], # PTF source
-        ip_dst=pkt_fields["ip_dst"], # DUT source
+        ip_dst=pkt_fields["ip_dst"], # VM source
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"],
         dl_vlan_enable=True,
@@ -375,7 +373,7 @@ def test_dst_ip_is_loopback_addr(ptfadapter, duthost, setup, tx_dut_ports, pkt_f
         eth_dst=dst_mac, # DUT port
         eth_src=src_mac, # PTF port
         ip_src=pkt_fields["ip_src"], # PTF source
-        ip_dst=ip_dst, # DUT source
+        ip_dst=ip_dst, # VM source
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
@@ -399,7 +397,7 @@ def test_src_ip_is_loopback_addr(ptfadapter, duthost, setup, tx_dut_ports, pkt_f
         eth_dst=dst_mac, # DUT port
         eth_src=src_mac, # PTF port
         ip_src=ip_src, # PTF source
-        ip_dst=pkt_fields["ip_dst"], # DUT source
+        ip_dst=pkt_fields["ip_dst"], # VM source
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
@@ -422,7 +420,7 @@ def test_dst_ip_absent(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
         eth_dst=dst_mac, # DUT port
         eth_src=src_mac, # PTF port
         ip_src=pkt_fields["ip_src"], # PTF source
-        ip_dst="", # DUT source
+        ip_dst="", # VM source
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
