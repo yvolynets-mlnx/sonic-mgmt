@@ -189,11 +189,10 @@ def test_fdb(ansible_adhoc, testbed, ptfadapter, pkt_type, testbed_devices):
             vlan_table[vlan['subnet']].append(mg_facts['minigraph_port_indices'][ifname])
 
     fdb = setup_fdb(ptfadapter, vlan_table, router_mac, pkt_type)
-    if pkt_type == "ethernet":
-        for vlan in vlan_table:
-            for src, dst in itertools.combinations(vlan_table[vlan], 2):
-                for src_mac, dst_mac in itertools.product(fdb[src], fdb[dst]):
-                    send_recv_eth(ptfadapter, src, src_mac, dst, dst_mac)
+    for vlan in vlan_table:
+        for src, dst in itertools.combinations(vlan_table[vlan], 2):
+            for src_mac, dst_mac in itertools.product(fdb[src], fdb[dst]):
+                send_recv_eth(ptfadapter, src, src_mac, dst, dst_mac)
 
     # Should we have fdb_facts ansible module for this test?
     res = duthost.command('show mac')
