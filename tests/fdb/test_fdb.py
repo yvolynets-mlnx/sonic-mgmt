@@ -12,6 +12,7 @@ DEFAULT_FDB_ETHERNET_TYPE = 0x1234
 DUMMY_MAC_PREFIX = "02:11:22:33"
 DUMMY_MAC_COUNT = 10
 FDB_POPULATE_SLEEP_TIMEOUT = 2
+PKT_TYPES = ["ethernet", "arp_request", "arp_reply"]
 
 logger = logging.getLogger(__name__)
 
@@ -106,10 +107,9 @@ def setup_fdb(ptfadapter, vlan_table, router_mac, pkt_type):
     :param vlan_table: VLAN table map: VLAN subnet -> list of VLAN members
     :return: FDB table map : VLAN member -> MAC addresses set
     """
-    pkt_types = ["ethernet", "arp_request", "arp_reply"]
     fdb = {}
 
-    assert pkt_type in pkt_types
+    assert pkt_type in PKT_TYPES
 
     for vlan in vlan_table:
         for member in vlan_table[vlan]:
@@ -130,8 +130,11 @@ def setup_fdb(ptfadapter, vlan_table, router_mac, pkt_type):
                     send_eth(ptfadapter, member, dummy_mac, router_mac)
                 elif pkt_type == "arp_request":
                     send_arp_request(ptfadapter, member, dummy_mac, router_mac)
-                else:
+                elif pkt_type == "arp_reply":
                     send_arp_reply(ptfadapter, member, dummy_mac, router_mac)
+                else:
+                    pytest.fail("Unknown option '{}'".format(pkt_type))
+
             # put in set learned dummy MACs
             fdb[member].update(dummy_macs)
 
@@ -146,17 +149,15 @@ def fdb_cleanup(ansible_adhoc, testbed):
     duthost = AnsibleHost(ansible_adhoc, testbed['dut'])
     try:
         duthost.command('sonic-clear fdb all')
-        time.sleep(5)
         yield
     finally:
         # in any case clear fdb after test
         duthost.command('sonic-clear fdb all')
-        time.sleep(5)
 
 
 @pytest.mark.usefixtures('fdb_cleanup')
-@pytest.mark.parametrize("pkt_type", ["ethernet", "arp_request", "arp_reply"])
-def test_fdb(ansible_adhoc, testbed, ptfadapter, pkt_type):
+@pytest.mark.parametrize("pkt_type", PKT_TYPES)
+def test_fdb(ansible_adhoc, testbed, ptfadapter, pkt_type, testbed_devices):
     """
     1. verify fdb forwarding in T0 topology.
     2. verify show mac command on DUT for learned mac.
@@ -165,8 +166,8 @@ def test_fdb(ansible_adhoc, testbed, ptfadapter, pkt_type):
     if testbed['topo'] not in ['t0', 't0-64', 't0-116']:
         pytest.skip('unsupported testbed type')
 
-    duthost = AnsibleHost(ansible_adhoc, testbed['dut'])
-    ptfhost = AnsibleHost(ansible_adhoc, testbed['ptf_ip'])
+    duthost = testbed_devices["dut"]
+    ptfhost = testbed_devices["ptf"]
 
     host_facts  = duthost.setup()['ansible_facts']
     mg_facts = duthost.minigraph_facts(host=duthost.hostname)['ansible_facts']
