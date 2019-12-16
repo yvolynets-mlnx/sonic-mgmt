@@ -42,9 +42,15 @@ r-anaconda-10-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.103.5/16,server_11,VM11
 r-anaconda-10-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.103.5/16,server_11,VM1101,r-anaconda-10,Mellanox MTR testbed
 
 r-tigris-04-t0,vm-t1,t0,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t0-16,vm-t1,t0-16,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t0-52,vm-t1,t0-52,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t0-56,vm-t1,t0-56,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t0-64,vm-t1,t0-64,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 r-tigris-04-t1,vm-t1,t1,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 r-tigris-04-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-t1-64-lag,vm-t1,t1-64-lag,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 r-tigris-04-ptf32,vm-t1,ptf32,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
+r-tigris-04-ptf64,vm-t1,ptf64,docker-ptf-mlnx,10.213.104.5/16,server_12,VM1201,r-tigris-04,Mellanox MTR testbed
 
 r-tigris-13-t0,vm-t1,t0,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
 r-tigris-13-t0-16,vm-t1,t0-16,docker-ptf-mlnx,10.215.0.61/16,server_13,VM1301,r-tigris-13,Mellanox MTR testbed
