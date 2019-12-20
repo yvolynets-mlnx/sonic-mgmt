@@ -6,6 +6,14 @@
 
 - include_vars: group_vars/str/str.yml
 
+- include_tasks: add_container_to_inventory.yml
+  vars:
+    container_name: "{{ item }}"
+  with_items:
+    - "lldp"
+    - "bgp"
+    - "syncd"
+
 - set_fact:
     run_dir: /home/admin/qos_tests
     out_dir: /home/admin/qos_tests/results
@@ -41,12 +49,11 @@
 
     - name: Ensure LLDP Daemon stopped
       become: yes
-      service: name=lldpd
-               state=stopped
-               enabled=no
-      vars:
-        ansible_shell_type: docker
-        ansible_python_interpreter: docker exec -i lldp python
+      supervisorctl: state=stopped name={{item}}
+      delegate_to: "{{ ansible_host }}_lldp"
+      with_items:
+        - lldpd
+        - lldp-syncd
 
     - name: Disable bgpd
       become: yes
@@ -60,10 +67,7 @@
 
         - name: Disable Mellanox packet aging
           shell: python /root/packets_aging.py disable
-
-      vars:
-        ansible_shell_type: docker
-        ansible_python_interpreter: docker exec -i syncd python
+      delegate_to: "{{ ansible_host }}_syncd"
 
     - name: copy sai tests
       copy: src=roles/test/files/saitests dest=/root
@@ -447,12 +451,11 @@
   always:
     - name: Restore LLDP Daemon
       become: yes
-      service: name=lldpd
-               state=started
-               enabled=yes
-      vars:
-        ansible_shell_type: docker
-        ansible_python_interpreter: docker exec -i lldp python
+      supervisorctl: state=started name={{item}}
+      delegate_to: "{{ ansible_host }}_lldp"
+      with_items:
+        - lldpd
+        - lldp-syncd
 
     - name: Restore original watermark polling status
       shell: counterpoll watermark {{ watermark_status }}
@@ -477,9 +480,7 @@
     - name: Enable Mellanox packet aging
       shell: python /root/packets_aging.py enable
       ignore_errors: yes
-      vars:
-        ansible_shell_type: docker
-        ansible_python_interpreter: docker exec -i syncd python
+      delegate_to: "{{ ansible_host }}_syncd"
       when: sonic_hwsku is defined and (sonic_hwsku == 'ACS-MSN2700' or sonic_hwsku == 'ACS-MSN2740' or sonic_hwsku == 'ACS-MSN3700' or sonic_hwsku == 'ACS-MSN3700C')
 
     - name: Remove populate ARP entries on DUT
