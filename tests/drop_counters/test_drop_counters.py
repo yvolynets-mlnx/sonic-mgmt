@@ -719,7 +719,6 @@ def test_unicast_ip_incorrect_eth_dst(ptfadapter, duthost, setup, tx_dut_ports, 
     """
     dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
 
-    print(pkt_fields["ipv4_dst"])
 
     if  "vlan" in tx_dut_ports[dut_iface].lower():
         pytest.skip("Test case is not supported on VLAN interface")
