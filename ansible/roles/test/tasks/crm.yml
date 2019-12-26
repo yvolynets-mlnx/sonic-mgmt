@@ -58,11 +58,12 @@
      include_tasks: roles/test/tasks/crm/crm_test_fdb_entry.yml
      when: testbed_type == "t0"
 
-   - name: Run test case "CRM VNET resources"
-     include: roles/test/tasks/crm/crm_test_vnet_bitmap.yml
-     when:
-       - testbed_type == "t0"
-       - sonic_asic_type == "mellanox"
+#   Removed temporarily for issue Bug SW #2003610: [VNET] Orchagent crashes during applying VNET route
+#   - name: Run test case "CRM VNET resources"
+#     include: roles/test/tasks/crm/crm_test_vnet_bitmap.yml
+#     when:
+#       - testbed_type == "t0"
+#       - sonic_asic_type == "mellanox"
 
 
   always:
