@@ -53,7 +53,7 @@
 
 # Get MAC addresses on PTF host
 - name: Find testing PTF ports MAC addresses
-  shell: bash -c "cat /sys/class/net/eth{0..31}/address"
+  shell: bash -c "cat /sys/class/net/eth*/address"
   register: lladdrs
   delegate_to: '{{ ptf_host }}'
 
