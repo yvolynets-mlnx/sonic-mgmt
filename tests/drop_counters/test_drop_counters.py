@@ -25,7 +25,10 @@ L3_DISCARD_KEY = "RX_ERR"
 GET_L2_COUNTERS = "portstat -j"
 GET_L3_COUNTERS = "intfstat -j"
 ACL_COUNTERS_UPDATE_INTERVAL = 10
-
+LOG_EXPECT_ACL_RULE_CREATE_RE = ".*Successfully created ACL rule.*"
+LOG_EXPECT_ACL_RULE_REMOVE_RE = ".*Successfully deleted ACL rule.*"
+LOG_EXPECT_PORT_ADMIN_DOWN_RE = ".*Configure {} admin status to down.*"
+LOG_EXPECT_PORT_ADMIN_UP_RE = ".*Port {} oper state set from down to up.*"
 
 @pytest.fixture(scope="module")
 def pkt_fields(duthost):
@@ -142,14 +145,17 @@ def enable_counters(duthost):
 
     for cmd in cmd_list:
         duthost.command(cmd)
-    yield
-    for port, status in previous_cnt_status.items():
-        if status == "disable":
-            logger.info("Restoring counter '{}' state to disable".format(port))
-            duthost.command("counterpoll {} disable".format(port))
+    try:
+        yield
+    finally:
+        for port, status in previous_cnt_status.items():
+            if status == "disable":
+                logger.info("Restoring counter '{}' state to disable".format(port))
+                duthost.command("counterpoll {} disable".format(port))
+
 
 @pytest.fixture
-def acl_setup(duthost):
+def acl_setup(duthost, loganalyzer):
     """ Create acl rule defined in config file. Delete rule after test case finished """
     base_dir = os.path.dirname(os.path.realpath(__file__))
     template_dir = os.path.join(base_dir, 'acl_templates')
@@ -167,16 +173,24 @@ def acl_setup(duthost):
     duthost.template(src=os.path.join(template_dir, del_acl_rules_template), dest=dut_clear_conf_file_path)
 
     logger.info("Applying {}".format(dut_conf_file_path))
-    duthost.command("config acl update full {}".format(dut_conf_file_path))
-    yield
-    logger.info("Applying {}".format(dut_clear_conf_file_path))
-    duthost.command("config acl update full {}".format(dut_clear_conf_file_path))
-    logger.info("Removing {}".format(dut_tmp_dir))
-    duthost.command("rm -rf {}".format(dut_tmp_dir))
+
+    loganalyzer.expect_regex = [LOG_EXPECT_ACL_RULE_CREATE_RE]
+    with loganalyzer as analyzer:
+        duthost.command("config acl update full {}".format(dut_conf_file_path))
+
+    try:
+        yield
+    finally:
+        loganalyzer.expect_regex = [LOG_EXPECT_ACL_RULE_REMOVE_RE]
+        with loganalyzer as analyzer:
+            logger.info("Applying {}".format(dut_clear_conf_file_path))
+            duthost.command("config acl update full {}".format(dut_clear_conf_file_path))
+            logger.info("Removing {}".format(dut_tmp_dir))
+            duthost.command("rm -rf {}".format(dut_tmp_dir))
 
 
 @pytest.fixture
-def rif_port_down(duthost, setup):
+def rif_port_down(duthost, setup, loganalyzer):
     """ Disable RIF interface and return neighbor IP address attached to this interface """
     wait_after_ports_up = 30
 
@@ -184,13 +198,10 @@ def rif_port_down(duthost, setup):
         pytest.skip("RIF interface is absent")
     rif_member_iface = setup["rif_members"].keys()[0]
 
-    vm_name = None
-    for iface, neighbor in setup["mg_facts"]["minigraph_neighbors"].items():
-        if iface == rif_member_iface:
-            vm_name = neighbor["name"]
-            break
-    else:
-        pytest.fail("Didn't found RIF interface in 'minigraph_neighbors'")
+    try:
+        vm_name = setup["mg_facts"]["minigraph_neighbors"][rif_member_iface]["name"]
+    except KeyError as err:
+        pytest.fail("Didn't found RIF interface in 'minigraph_neighbors'. {}".format(str(err)))
 
     ip_dst = None
     for item in setup["mg_facts"]["minigraph_bgp"]:
@@ -200,13 +211,19 @@ def rif_port_down(duthost, setup):
                 break
     else:
         pytest.fail("Unable to find neighbor in 'minigraph_bgp' list")
-    duthost.command('config interface shutdown {}'.format(iface))
+
+    loganalyzer.expect_regex = [LOG_EXPECT_PORT_ADMIN_DOWN_RE.format(rif_member_iface)]
+    with loganalyzer as analyzer:
+        duthost.command("config interface shutdown {}".format(rif_member_iface))
+
     time.sleep(1)
-
-    yield ip_dst
-
-    duthost.command("config interface startup {}".format(iface))
-    time.sleep(wait_after_ports_up)
+    try:
+        yield ip_dst
+    finally:
+        loganalyzer.expect_regex = [LOG_EXPECT_PORT_ADMIN_UP_RE.format(rif_member_iface)]
+        with loganalyzer as analyzer:
+            duthost.command("config interface startup {}".format(rif_member_iface))
+            time.sleep(wait_after_ports_up)
 
 
 def get_pkt_drops(duthost, cli_cmd):
@@ -825,8 +842,9 @@ def test_acl_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, acl_setu
     @summary: Verify that DUT drops packet with SRC IP 20.0.0.0/24 matched by ingress ACL and ACL drop counter incremented
     """
     dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
-    if  "vlan" in tx_dut_ports[dut_iface].lower():
-        pytest.skip("Test case is not supported on VLAN interface")
+
+    if tx_dut_ports[dut_iface] not in duthost.acl_facts()["ansible_facts"]["ansible_acl_facts"]["DATAACL"]["ports"]:
+        pytest.skip("RX DUT port absent in 'DATAACL' table")
 
     ip_src = "20.0.0.5"
 
