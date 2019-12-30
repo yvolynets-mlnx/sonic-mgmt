@@ -24,6 +24,7 @@ L3_DISCARD_KEY = "RX_ERR"
 # CLI commands to obtain drop counters
 GET_L2_COUNTERS = "portstat -j"
 GET_L3_COUNTERS = "intfstat -j"
+ACL_COUNTERS_UPDATE_INTERVAL = 10
 
 
 @pytest.fixture(scope="module")
@@ -147,6 +148,67 @@ def enable_counters(duthost):
             logger.info("Restoring counter '{}' state to disable".format(port))
             duthost.command("counterpoll {} disable".format(port))
 
+@pytest.fixture
+def acl_setup(duthost):
+    """ Create acl rule defined in config file. Delete rule after test case finished """
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    template_dir = os.path.join(base_dir, 'acl_templates')
+    acl_rules_template = "acltb_test_rule.json"
+    del_acl_rules_template = "acl_rule_del.json"
+    dut_tmp_dir = os.path.join("tmp", os.path.basename(base_dir))
+
+    duthost.command("mkdir -p {}".format(dut_tmp_dir))
+    dut_conf_file_path = os.path.join(dut_tmp_dir, acl_rules_template)
+    dut_clear_conf_file_path = os.path.join(dut_tmp_dir, del_acl_rules_template)
+
+    logger.info("Generating config for ACL rule, ACL table - DATAACL")
+    duthost.template(src=os.path.join(template_dir, acl_rules_template), dest=dut_conf_file_path)
+    logger.info("Generating clear config for ACL rule, ACL table - DATAACL")
+    duthost.template(src=os.path.join(template_dir, del_acl_rules_template), dest=dut_clear_conf_file_path)
+
+    logger.info("Applying {}".format(dut_conf_file_path))
+    duthost.command("config acl update full {}".format(dut_conf_file_path))
+    yield
+    logger.info("Applying {}".format(dut_clear_conf_file_path))
+    duthost.command("config acl update full {}".format(dut_clear_conf_file_path))
+    logger.info("Removing {}".format(dut_tmp_dir))
+    duthost.command("rm -rf {}".format(dut_tmp_dir))
+
+
+@pytest.fixture
+def rif_port_down(duthost, setup):
+    """ Disable RIF interface and return neighbor IP address attached to this interface """
+    wait_after_ports_up = 30
+
+    if not setup["rif_members"]:
+        pytest.skip("RIF interface is absent")
+    rif_member_iface = setup["rif_members"].keys()[0]
+
+    vm_name = None
+    for iface, neighbor in setup["mg_facts"]["minigraph_neighbors"].items():
+        if iface == rif_member_iface:
+            vm_name = neighbor["name"]
+            break
+    else:
+        pytest.fail("Didn't found RIF interface in 'minigraph_neighbors'")
+
+    ip_dst = None
+    for item in setup["mg_facts"]["minigraph_bgp"]:
+        if item["name"] == vm_name:
+            if netaddr.valid_ipv4(item["addr"]):
+                ip_dst = item["addr"]
+                break
+    else:
+        pytest.fail("Unable to find neighbor in 'minigraph_bgp' list")
+    duthost.command('config interface shutdown {}'.format(iface))
+    time.sleep(1)
+
+    yield ip_dst
+
+    duthost.command("config interface startup {}".format(iface))
+    time.sleep(wait_after_ports_up)
+
+
 def get_pkt_drops(duthost, cli_cmd):
     """
     @summary: Parse output of "portstat" or "intfstat" commands and convert it to the dictionary.
@@ -212,10 +274,32 @@ def log_pkt_params(dut_iface, mac_dst, mac_src, ip_dst, ip_src):
     logger.info("Packet IP SRC - {}".format(ip_src))
 
 
+def ensure_no_l3_drops(duthost):
+    """ Verify L3 drop counters were not incremented """
+    intf_l3_counters = get_pkt_drops(duthost, GET_L3_COUNTERS)
+    unexpected_drops = {}
+    for iface, value in intf_l3_counters.items():
+        if int(value[L3_DISCARD_KEY]) >= PKT_NUMBER:
+            unexpected_drops[iface] = int(value[L3_DISCARD_KEY])
+    if unexpected_drops:
+        pytest.fail("L3 'RX_ERR' was incremented for the following interfaces:\n{}".format(unexpected_drops))
+
+
+def ensure_no_l2_drops(duthost):
+    """ Verify L2 drop counters were not incremented """
+    intf_l2_counters = get_pkt_drops(duthost, GET_L2_COUNTERS)
+    unexpected_drops = {}
+    for iface, value in intf_l2_counters.items():
+        if int(value[L2_DISCARD_KEY]) >= PKT_NUMBER:
+            unexpected_drops[iface] = int(value[L2_DISCARD_KEY])
+    if unexpected_drops:
+        pytest.fail("L2 'RX_DRP' was incremented for the following interfaces:\n{}".format(unexpected_drops))
+
+
 def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter, ptf_tx_port_id, dut_iface):
     """
     Base test function for verification of L2 or L3 packet drops. Verification type depends on 'discard_group' value.
-    Supported 'discard_group' values: 'L2', 'L3'
+    Supported 'discard_group' values: 'L2', 'L3', 'ACL'
     """
     # Clear SONiC counters
     duthost.command("sonic-clear counters")
@@ -241,14 +325,7 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter,
 
         # Skip L3 discards verification for platform with linked L2 and L3 drop counters
         if not combined_counter:
-            # Verify other drop counters were not incremented
-            intf_l3_counters = get_pkt_drops(duthost, GET_L3_COUNTERS)
-            unexpected_drops = {}
-            for iface, value in intf_l3_counters.items():
-                if int(value[L3_DISCARD_KEY]) != 0:
-                    unexpected_drops[iface] = int(value[L3_DISCARD_KEY])
-            if unexpected_drops:
-                pytest.fail("L3 'RX_ERR' was incremented for the following interfaces:\n{}".format(unexpected_drops))
+            ensure_no_l3_drops(duthost)
     elif discard_group == "L3":
         # Verify L3 drop counter incremented on specific interface
         l3_drops = get_pkt_drops(duthost, GET_L3_COUNTERS)[dut_iface][L3_DISCARD_KEY]
@@ -262,14 +339,18 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter,
 
         # Skip L2 discards verification for platform with linked L2 and L3 drop counters
         if not combined_counter:
-            # Verify L2 drop counters were not incremented
-            intf_l2_counters = get_pkt_drops(duthost, GET_L2_COUNTERS)
-            unexpected_drops = {}
-            for iface, value in intf_l2_counters.items():
-                if int(value[L2_DISCARD_KEY]) != 0:
-                    unexpected_drops[iface] = int(value[L2_DISCARD_KEY])
-            if unexpected_drops:
-                pytest.fail("L2 'RX_DRP' was incremented for the following interfaces:\n{}".format(unexpected_drops))
+            ensure_no_l2_drops(duthost)
+    elif discard_group == "ACL":
+        time.sleep(ACL_COUNTERS_UPDATE_INTERVAL)
+        acl_drops = duthost.acl_facts()["ansible_facts"]["ansible_acl_facts"]["DATAACL"]["rules"]["RULE_1"]["packets_count"]
+        if acl_drops != PKT_NUMBER:
+            fail_msg = "ACL drop counter was not incremented on iface {}. DUT ACL counter == {}; Sent pkts == {}".format(
+                dut_iface, acl_drops, PKT_NUMBER
+            )
+            pytest.fail(fail_msg)
+
+        ensure_no_l3_drops(duthost)
+        ensure_no_l2_drops(duthost)
     else:
         pytest.fail("Incorrect 'discard_group' specified. Supported values: 'L2' or 'L3'")
 
@@ -719,7 +800,6 @@ def test_unicast_ip_incorrect_eth_dst(ptfadapter, duthost, setup, tx_dut_ports, 
     """
     dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
 
-
     if  "vlan" in tx_dut_ports[dut_iface].lower():
         pytest.skip("Test case is not supported on VLAN interface")
 
@@ -730,6 +810,57 @@ def test_unicast_ip_incorrect_eth_dst(ptfadapter, duthost, setup, tx_dut_ports, 
         eth_src=src_mac, # PTF port
         ip_src=pkt_fields["ipv4_src"], # PTF source
         ip_dst=pkt_fields["ipv4_dst"],
+        tcp_sport=pkt_fields["tcp_sport"],
+        tcp_dport=pkt_fields["tcp_dport"]
+        )
+    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+
+    # Verify packets were not egresed the DUT
+    exp_pkt = expected_packet_mask(pkt)
+    testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["neighbor_sniff_ports"])
+
+
+def test_acl_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, acl_setup):
+    """
+    @summary: Verify that DUT drops packet with SRC IP 20.0.0.0/24 matched by ingress ACL and ACL drop counter incremented
+    """
+    dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
+    if  "vlan" in tx_dut_ports[dut_iface].lower():
+        pytest.skip("Test case is not supported on VLAN interface")
+
+    ip_src = "20.0.0.5"
+
+    log_pkt_params(dut_iface, dst_mac, src_mac, pkt_fields["ipv4_dst"], ip_src)
+
+    pkt = testutils.simple_tcp_packet(
+        eth_dst=dst_mac, # DUT port
+        eth_src=src_mac, # PTF port
+        ip_src=ip_src,
+        ip_dst=pkt_fields["ipv4_dst"],
+        tcp_sport=pkt_fields["tcp_sport"],
+        tcp_dport=pkt_fields["tcp_dport"]
+        )
+    base_verification("ACL", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+
+    # Verify packets were not egresed the DUT
+    exp_pkt = expected_packet_mask(pkt)
+    exp_pkt.set_do_not_care_scapy(packet.IP, 'ip_src')
+    testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["neighbor_sniff_ports"])
+
+
+def test_egress_drop_on_down_link(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, rif_port_down):
+    """
+    @summary: Verify that packets on ingress port are dropped when egress RIF link is down and check that L3 drop counter incremented
+    """
+    dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
+    ip_dst = rif_port_down
+    log_pkt_params(dut_iface, dst_mac, src_mac, ip_dst, pkt_fields["ipv4_src"])
+
+    pkt = testutils.simple_tcp_packet(
+        eth_dst=dst_mac, # DUT port
+        eth_src=src_mac, # PTF port
+        ip_src=pkt_fields["ipv4_src"], # PTF source
+        ip_dst=ip_dst,
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"]
         )
