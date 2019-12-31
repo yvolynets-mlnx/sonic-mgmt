@@ -30,6 +30,28 @@ LOG_EXPECT_ACL_RULE_REMOVE_RE = ".*Successfully deleted ACL rule.*"
 LOG_EXPECT_PORT_ADMIN_DOWN_RE = ".*Configure {} admin status to down.*"
 LOG_EXPECT_PORT_ADMIN_UP_RE = ".*Port {} oper state set from down to up.*"
 
+COMBINED_L2L3_DROP_COUNTER = False
+COMBINED_ACL_DROP_COUNTER = False
+
+
+def parse_combined_counters(duthost):
+    # Get info whether L2 and L3 drop counters are linked
+    # Or ACL and L2 drop counters are linked
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(base_dir, "combined_drop_counters.yml")) as stream:
+        regexps = yaml.safe_load(stream)
+        if regexps["l2_l3"]:
+            for item in regexps["l2_l3"]:
+                if re.match(item, duthost.facts["platform"]):
+                    COMBINED_L2L3_DROP_COUNTER = True
+                    break
+        if regexps["acl"]:
+            for item in regexps["acl"]:
+                if re.match(item, duthost.facts["platform"]):
+                    COMBINED_ACL_DROP_COUNTER = True
+                    break
+
+
 @pytest.fixture(scope="module")
 def pkt_fields(duthost):
     # Gather ansible facts
@@ -69,16 +91,12 @@ def setup(duthost, testbed):
     """
     Setup fixture for collecting PortChannel, VLAN and RIF port members.
     @return: Dictionary with keys:
-        port_channel_members, vlan_members, rif_members, dut_to_ptf_port_map, combined_drop_counter
-        Note: if 'combined_drop_counter' is True, platform has common counter for L2 and L3 discards.
-              To get this counter - call 'show interfaces counters' CLI comamnd and check 'RX_DRP' column for
-              specified port.
+        port_channel_members, vlan_members, rif_members, dut_to_ptf_port_map, neighbor_sniff_ports, vlans, mg_facts
     """
     port_channel_members = {}
     vlan_members = {}
     configured_vlans = []
     rif_members = []
-    combined_drop_counter = False
 
     if testbed["topo"] == "ptf32":
         pytest.skip("Unsupported topology {}".format(testbed["topo"]))
@@ -96,16 +114,6 @@ def setup(duthost, testbed):
 
     rif_members = {item["attachto"]: item["attachto"] for item in mg_facts["minigraph_interfaces"]}
 
-    # Get info whether L2 and L3 drop counters are linked
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(base_dir, "combined_drop_counters.yml")) as stream:
-        regexps = yaml.safe_load(stream)
-        if regexps:
-            for item in regexps:
-                if re.match(item, duthost.facts["platform"]):
-                    combined_drop_counter = True
-                    break
-
     # Compose list of sniff ports
     neighbor_sniff_ports = []
     for dut_port, neigh in mg_facts['minigraph_neighbors'].items():
@@ -119,12 +127,11 @@ def setup(duthost, testbed):
         "vlan_members": vlan_members,
         "rif_members": rif_members,
         "dut_to_ptf_port_map": mg_facts["minigraph_port_indices"],
-        "combined_drop_counter": combined_drop_counter,
         "neighbor_sniff_ports": neighbor_sniff_ports,
         "vlans": configured_vlans,
         "mg_facts": mg_facts
     }
-
+    parse_combined_counters(duthost)
     return setup_information
 
 
@@ -313,7 +320,7 @@ def ensure_no_l2_drops(duthost):
         pytest.fail("L2 'RX_DRP' was incremented for the following interfaces:\n{}".format(unexpected_drops))
 
 
-def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter, ptf_tx_port_id, dut_iface):
+def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface):
     """
     Base test function for verification of L2 or L3 packet drops. Verification type depends on 'discard_group' value.
     Supported 'discard_group' values: 'L2', 'L3', 'ACL'
@@ -341,7 +348,7 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter,
             pytest.fail(fail_msg)
 
         # Skip L3 discards verification for platform with linked L2 and L3 drop counters
-        if not combined_counter:
+        if not COMBINED_L2L3_DROP_COUNTER:
             ensure_no_l3_drops(duthost)
     elif discard_group == "L3":
         # Verify L3 drop counter incremented on specific interface
@@ -355,7 +362,7 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter,
             pytest.fail(fail_msg)
 
         # Skip L2 discards verification for platform with linked L2 and L3 drop counters
-        if not combined_counter:
+        if not COMBINED_L2L3_DROP_COUNTER:
             ensure_no_l2_drops(duthost)
     elif discard_group == "ACL":
         time.sleep(ACL_COUNTERS_UPDATE_INTERVAL)
@@ -365,9 +372,9 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter,
                 dut_iface, acl_drops, PKT_NUMBER
             )
             pytest.fail(fail_msg)
-
-        ensure_no_l3_drops(duthost)
-        ensure_no_l2_drops(duthost)
+        if not COMBINED_ACL_DROP_COUNTER:
+            ensure_no_l3_drops(duthost)
+            ensure_no_l2_drops(duthost)
     else:
         pytest.fail("Incorrect 'discard_group' specified. Supported values: 'L2' or 'L3'")
 
@@ -388,7 +395,7 @@ def test_equal_smac_dmac_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fiel
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
-    base_verification("L2", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, dut_iface)
+    base_verification("L2", pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface)
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -412,7 +419,7 @@ def test_multicast_smac_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_field
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
-    base_verification("L2", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, dut_iface)
+    base_verification("L2", pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface)
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -439,7 +446,7 @@ def test_reserved_dmac_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields
             tcp_sport=pkt_fields["tcp_sport"],
             tcp_dport=pkt_fields["tcp_dport"])
 
-        base_verification("L2", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, dut_iface)
+        base_verification("L2", pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface)
 
         # Verify packets were not egresed the DUT
         exp_pkt = expected_packet_mask(pkt)
@@ -473,7 +480,7 @@ def test_not_expected_vlan_tag_drop(ptfadapter, duthost, setup, tx_dut_ports, pk
         vlan_vid=vlan_id,
         )
 
-    base_verification("L2", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, dut_iface)
+    base_verification("L2", pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface)
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -497,7 +504,7 @@ def test_dst_ip_is_loopback_addr(ptfadapter, duthost, setup, tx_dut_ports, pkt_f
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -521,7 +528,7 @@ def test_src_ip_is_loopback_addr(ptfadapter, duthost, setup, tx_dut_ports, pkt_f
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -544,7 +551,7 @@ def test_dst_ip_absent(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -583,7 +590,7 @@ def test_src_ip_is_multicast_addr(ptfadapter, duthost, setup, tx_dut_ports, pkt_
         pytest.fail("Incorrect value specified for 'ip_addr' test parameter. Supported parameters: 'ipv4' and 'ipv6'")
 
     log_pkt_params(dut_iface, dst_mac, src_mac, pkt_fields["ipv4_dst"], ip_src)
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -608,7 +615,7 @@ def test_src_ip_is_class_e(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields)
             tcp_sport=pkt_fields["tcp_sport"],
             tcp_dport=pkt_fields["tcp_dport"])
 
-        base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+        base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
         # Verify packets were not egresed the DUT
         exp_pkt = expected_packet_mask(pkt)
@@ -658,8 +665,7 @@ def test_ip_is_zero_addr(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, a
         pytest.fail("Incorrect value specified for 'addr_type' test parameter. Supported parameters: 'ipv4' or 'ipv6'")
 
     logger.info(pkt_params)
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id,
-                        tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -692,8 +698,7 @@ def test_ip_link_local(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, add
     pkt = testutils.simple_tcp_packet(**pkt_params)
 
     logger.info(pkt_params)
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id,
-                        tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -726,7 +731,7 @@ def test_loopback_filter(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"])
 
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -750,7 +755,7 @@ def test_ip_pkt_with_expired_ttl(ptfadapter, duthost, setup, tx_dut_ports, pkt_f
         tcp_dport=pkt_fields["tcp_dport"],
         ip_ttl=0)
 
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -778,7 +783,7 @@ def test_absent_ip_header(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
     pkt.type = 0x800
     pkt = pkt/tcp
 
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -803,7 +808,7 @@ def test_broken_ip_header(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, 
         tcp_dport=pkt_fields["tcp_dport"]
         )
     setattr(pkt[testutils.scapy.scapy.all.IP], pkt_field, value)
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -830,7 +835,7 @@ def test_unicast_ip_incorrect_eth_dst(ptfadapter, duthost, setup, tx_dut_ports, 
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"]
         )
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -858,7 +863,7 @@ def test_acl_drop(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, acl_setu
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"]
         )
-    base_verification("ACL", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("ACL", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
@@ -882,7 +887,7 @@ def test_egress_drop_on_down_link(ptfadapter, duthost, setup, tx_dut_ports, pkt_
         tcp_sport=pkt_fields["tcp_sport"],
         tcp_dport=pkt_fields["tcp_dport"]
         )
-    base_verification("L3", pkt, ptfadapter, duthost, setup["combined_drop_counter"], ptf_tx_port_id, tx_dut_ports[dut_iface])
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
 
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
