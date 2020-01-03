@@ -77,6 +77,12 @@
       copy: src={{ ptf_portmap }} dest=/root
       delegate_to: "{{ ptf_host }}"
 
+    - name: Copy qos_wred_lossy.json to DUT
+      copy: src=roles/test/files/mlnx/qos_wred_lossy.json dest=/tmp
+
+    - name: Apply qos_wred_lossy
+      shell: sonic-cfggen -j /tmp/qos_wred_lossy.json --write-to-db
+
     - name: Init PTF base test parameters
       set_fact: 
         ptf_base_params:

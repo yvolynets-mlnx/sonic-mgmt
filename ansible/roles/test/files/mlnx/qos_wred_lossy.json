@@ -1,0 +1,26 @@
+{
+    "QUEUE": {
+        "Ethernet0|0": {
+            "scheduler": "[SCHEDULER|scheduler.0]",
+            "wred_profile": "[WRED_PROFILE|AZURE_LOSSY]"
+        },
+        "Ethernet0|1": {
+            "scheduler": "[SCHEDULER|scheduler.0]",
+            "wred_profile": "[WRED_PROFILE|AZURE_LOSSY]"
+        }
+    },
+    "WRED_PROFILE": {
+        "AZURE_LOSSY": {
+            "red_max_threshold": "312000",
+            "wred_green_enable": "true",
+            "ecn": "ecn_all",
+            "green_min_threshold": "104000",
+            "red_min_threshold": "104000",
+            "yellow_min_threshold": "104000",
+            "green_max_threshold": "312000",
+            "wred_yellow_enable": "true",
+            "yellow_max_threshold": "312000",
+            "wred_red_enable": "true"
+        }
+    }
+}
