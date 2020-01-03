@@ -279,22 +279,22 @@
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
 
-#    - name: Test ECN with different thresholds
-#      include: qos_ecn_range.yml
-#      vars:
-#        test_name: ECN threshold. dscp = {{ qp.ecn_range.dscp }}, ecn = {{ qp.ecn_range.ecn }}
-#        test_path: sai_qos_tests_mlnx.DscpEcnSend
-#        cell_size: '{{ qp.cell_size }}'
-#        test_params_part:
-#        - dscp='{{ qp.ecn_range.dscp }}'
-#        - ecn='{{  qp.ecn_range.ecn }}'
-#        - num_of_pkts='{{ qp.ecn_range.num_of_pkts }}'
-#        - cell_size='{{ qp.cell_size }}'
-#        - dst_port_id='{{ dst_port_id }}'
-#        - dst_port_ip='{{ dst_port_ip }}'
-#        - src_port_id='{{ src_port_id }}'
-#        - src_port_ip='{{ src_port_ip }}'
-#      with_items: "{{qp.ecn_range_threshold}}"
+    - name: Test ECN with different thresholds
+      include: qos_ecn_range.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_range.dscp }}, ecn = {{ qp.ecn_range.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        cell_size: '{{ qp.cell_size }}'
+        test_params_part:
+        - dscp='{{ qp.ecn_range.dscp }}'
+        - ecn='{{ qp.ecn_range.ecn }}'
+        - num_of_pkts='{{ qp.ecn_range.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+      with_items: "{{qp.ecn_range_threshold}}"
 
     - name: Set testing buffer profile for lossy test
       shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db

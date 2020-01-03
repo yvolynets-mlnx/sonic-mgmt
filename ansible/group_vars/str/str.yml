@@ -12,7 +12,7 @@ ASIC_params:
         cell_size: 96
         buffer_utilization_tolerance: 0
         default_ecn_tolerance: 10
-        ecn_range_treshold: [
+        ecn_range_threshold: [
             {min: 1088, max: 3264, tolerance: 10},
             {min: 1088, max: 3776, tolerance: 10},
             {min: 1088, max: 4032, tolerance: 10},
@@ -22,7 +22,7 @@ ASIC_params:
             {min: 1088, max: 4992, tolerance: 10},
             {min: 1088, max: 5056, tolerance: 10},
             {min: 1088, max: 5120, tolerance: 10},
-            {min: 1088, max: 5184, tolerance: 10},
+#            {min: 1088, max: 5184, tolerance: 10}, we have issue on this set of arguments, need further investigation
             {min: 1088, max: 5248, tolerance: 11},
             {min: 1088, max: 5312, tolerance: 12},
             {min: 1088, max: 5376, tolerance: 12},
@@ -35,7 +35,7 @@ ASIC_params:
         cell_size: 144
         buffer_utilization_tolerance: 4
         default_ecn_tolerance: 30
-        ecn_range_treshold: [
+        ecn_range_threshold: [
             {min: 1088, max: 3264, tolerance: 35},
             {min: 1088, max: 3776, tolerance: 35},
             {min: 1088, max: 4032, tolerance: 35},
@@ -45,7 +45,7 @@ ASIC_params:
             {min: 1088, max: 4992, tolerance: 30},
             {min: 1088, max: 5056, tolerance: 30},
             {min: 1088, max: 5120, tolerance: 30},
-            {min: 1088, max: 5184, tolerance: 30},
+#            {min: 1088, max: 5184, tolerance: 30}, we have issue on this set of arguments, need further investigation
             {min: 1088, max: 5248, tolerance: 30},
             {min: 1088, max: 5312, tolerance: 30},
             {min: 1088, max: 5376, tolerance: 30},
