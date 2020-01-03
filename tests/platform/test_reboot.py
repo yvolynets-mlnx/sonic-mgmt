@@ -67,6 +67,7 @@ reboot_ctrl_dict = {
 
 
 sku_supporting_reboot_cause_test = ['ACS-MSN2410', 'ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8', 'ACS-MSN3700', 'ACS-MSN3700C', 'ACS-MSN3800']
+sku_supporting_fast_reboot = ['ACS-MSN2410', 'ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8', 'ACS-MSN2100', 'ACS-MSN2010', 'ACS-MSN2740']
 
 def check_reboot_cause(dut, reboot_cause_expected):
     """
@@ -186,6 +187,9 @@ def test_fast_reboot(testbed_devices, conn_graph_facts):
     """
     ans_host = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
+
+    if ans_host.facts["hwsku"] not in sku_supporting_fast_reboot:
+        pytest.skip("Fast reboot skipped because %s doesn't support it" % ans_host.facts["hwsku"])
 
     reboot_and_check(localhost, ans_host, conn_graph_facts["device_conn"], reboot_type=REBOOT_TYPE_FAST)
 
