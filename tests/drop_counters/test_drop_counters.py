@@ -162,6 +162,34 @@ def enable_counters(duthost):
 
 
 @pytest.fixture
+def mtu_setup(duthost):
+    """ Fixture which prepare port MTU configuration for 'test_ip_pkt_with_exceeded_mtu' test case """
+    class MTUConfig(object):
+        iface = None
+        @classmethod
+        def set_mtu(cls, mtu, iface):
+            if "PortChannel" in iface:
+                res = duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(iface, mtu))["stdout"]
+            elif "Ethernet" in iface:
+                res = duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(iface, mtu))["stdout"]
+            if res != "0":
+                pytest.fail("Unable to change MTU on interface {}".format(iface))
+            cls.iface = iface
+        @classmethod
+        def restore_mtu(cls, mtu=9100):
+            if "PortChannel" in cls.iface:
+                res = duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
+            elif "Ethernet" in cls.iface:
+                res = duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
+            if res != "0":
+                pytest.fail("Unable to change MTU on interface {}".format(cls.iface))
+    try:
+        yield MTUConfig
+    finally:
+        MTUConfig.restore_mtu()
+
+
+@pytest.fixture
 def acl_setup(duthost, loganalyzer):
     """ Create acl rule defined in config file. Delete rule after test case finished """
     base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -320,11 +348,7 @@ def ensure_no_l2_drops(duthost):
         pytest.fail("L2 'RX_DRP' was incremented for the following interfaces:\n{}".format(unexpected_drops))
 
 
-def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface):
-    """
-    Base test function for verification of L2 or L3 packet drops. Verification type depends on 'discard_group' value.
-    Supported 'discard_group' values: 'L2', 'L3', 'ACL'
-    """
+def send_packets(pkt, duthost, ptfadapter, ptf_tx_port_id):
     # Clear SONiC counters
     duthost.command("sonic-clear counters")
     duthost.command("sonic-clear rifcounters")
@@ -337,6 +361,13 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, d
     testutils.send(ptfadapter, ptf_tx_port_id, pkt, count=PKT_NUMBER)
     time.sleep(1)
 
+
+def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface):
+    """
+    Base test function for verification of L2 or L3 packet drops. Verification type depends on 'discard_group' value.
+    Supported 'discard_group' values: 'L2', 'L3', 'ACL'
+    """
+    send_packets(pkt, duthost, ptfadapter, ptf_tx_port_id)
     if discard_group == "L2":
         # Verify drop counter incremented on specific interface
         intf_l2_counters = get_pkt_drops(duthost, GET_L2_COUNTERS)
@@ -738,6 +769,48 @@ def test_loopback_filter(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
     testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["neighbor_sniff_ports"])
 
 
+def test_ip_pkt_with_exceeded_mtu(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, mtu_setup):
+    """
+    @summary: Verify that IP packet with exceeded MTU is dropped and L3 drop counter incremented
+    """
+    dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
+    tmp_port_mtu = 1500
+
+    log_pkt_params(dut_iface, dst_mac, src_mac, pkt_fields["ipv4_dst"], pkt_fields["ipv4_src"])
+    # Set temporal MTU. This will be restored by 'mtu_setup' fixture
+    mtu_setup.set_mtu(tmp_port_mtu, tx_dut_ports[dut_iface])
+
+    pkt = testutils.simple_tcp_packet(
+        pktlen=9100,
+        eth_dst=dst_mac, # DUT port
+        eth_src=src_mac, # PTF port
+        ip_src=pkt_fields["ipv4_src"], # PTF source
+        ip_dst=pkt_fields["ipv4_dst"], # VM IP address
+        tcp_sport=pkt_fields["tcp_sport"],
+        tcp_dport=pkt_fields["tcp_dport"]
+        )
+
+    send_packets(pkt, duthost, ptfadapter, ptf_tx_port_id)
+
+    # Verify L3 drop counter incremented on specific interface
+    l3_drops = get_pkt_drops(duthost, "portstat -j")[dut_iface][L3_DISCARD_KEY]
+    l3_drops = int("".join(l3_drops.split(",")))
+
+    if l3_drops != PKT_NUMBER:
+        fail_msg = "RX_ERR drop counter was not incremented on iface {}. DUT RX_ERR == {}; Sent pkts == {}".format(
+            dut_iface, l3_drops, PKT_NUMBER
+        )
+        pytest.fail(fail_msg)
+
+    # Skip L2 discards verification for platform with linked L2 and L3 drop counters
+    if not COMBINED_L2L3_DROP_COUNTER:
+        ensure_no_l2_drops(duthost)
+
+    # Verify packets were not egresed the DUT
+    exp_pkt = expected_packet_mask(pkt)
+    testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["neighbor_sniff_ports"])
+
+
 def test_ip_pkt_with_expired_ttl(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
     """
     @summary: Verify that IP packet with TTL=0 is dropped and L3 drop counter incremented
@@ -760,6 +833,71 @@ def test_ip_pkt_with_expired_ttl(ptfadapter, duthost, setup, tx_dut_ports, pkt_f
     # Verify packets were not egresed the DUT
     exp_pkt = expected_packet_mask(pkt)
     testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["neighbor_sniff_ports"])
+
+
+@pytest.mark.parametrize("igmp_version,msg_type", [("v1", "membership_query"), ("v3", "membership_query"), ("v1", "membership_report"),
+("v2", "membership_report"), ("v3", "membership_report"), ("v2", "leave_group")])
+def test_non_routable_igmp_pkts(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, igmp_version, msg_type):
+    """
+    @summary: Verify IGMP non-routable packets dropped by DUT and L3 drop counter incremented
+    """
+    # IGMP Types:
+    # 0x11 = Membership Query
+    # 0x12 = Version 1 Membership Report
+    # 0x16 = Version 2 Membership Report
+    # 0x17 = Leave Group
+
+    # IP destination address according to the RFC 2236:
+    # Message Type                  Destination Group
+    # ------------                  -----------------
+    # General Query                 ALL-SYSTEMS (224.0.0.1)
+    # Group-Specific Query          The group being queried
+    # Membership Report             The group being reported
+    # Leave Message                 ALL-ROUTERS (224.0.0.2)
+
+    # TODO: fix this workaround as of now current PTF and Scapy versions do not support creation of IGMP packets
+    # Temporaly created hex of IGMP packet layer
+    # Example how to get HEX of specific IGMP packets:
+    # v3_membership_query = IGMPv3(type=0x11, mrcode=0, chksum=None)/scapy.contrib.igmpv3.IGMPv3mq(gaddr="224.0.0.1",
+    # srcaddrs=["172.16.11.1", "10.0.0.59"], qrv=1, qqic=125, numsrc=2)
+    # gr_obj = scapy.contrib.igmpv3.IGMPv3gr(rtype=1, auxdlen=0, maddr="224.2.2.4", numsrc=2, srcaddrs=["172.16.11.1",
+    # "10.0.0.59"]).build()
+    # v3_membership_report = IGMPv3(type=0x22, mrcode=0, chksum=None)/scapy.contrib.igmpv3.IGMPv3mr(res2=0x00, numgrp=1,
+    # records=[gr_obj]).build()
+    # The rest packets are build like "simple_igmp_packet" function from PTF testutils.py
+    dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
+
+    ethernet_dst = {"membership_query": "01:00:5e:00:00:01",
+                    "membership_report": "01:00:5e:02:02:04",
+                    "leave_group": "01:00:5e:00:00:02"}
+    ip_dst = {"membership_query": "224.0.0.1",
+              "membership_report": "224.2.2.4",
+              "leave_group": "224.0.0.2"}
+    igmp_types = {"v1": {"membership_query": "\x11\x00\x0e\xfe\xe0\x00\x00\x01",
+                         "membership_report": "\x12\x00\x0b\xf9\xe0\x02\x02\x04"},
+                  "v2": {"membership_report": "\x16\x00\x07\xf9\xe0\x02\x02\x04",
+                         "leave_group": "\x17\x00\x08\xfd\xe0\x00\x00\x02"},
+                  "v3": {"membership_query": "\x11\x00L2\xe0\x00\x00\x01\x01}\x00\x02\xac\x10\x0b\x01\n\x00\x00;",
+                         "membership_report": "\"\x009\xa9\x00\x00\x00\x01\x01\x00\x00\x02\xe0\x02\x02\x04\xac\x10\x0b\x01\n\x00\x00;"}
+    }
+
+    log_pkt_params(dut_iface, ethernet_dst[msg_type], src_mac, ip_dst[msg_type], pkt_fields["ipv4_src"])
+
+    pkt = testutils.simple_ip_packet(
+        eth_dst=ethernet_dst[msg_type], # DUT port
+        eth_src=src_mac, # PTF port
+        ip_src=pkt_fields["ipv4_src"], # PTF source
+        ip_dst=ip_dst[msg_type],
+        ip_ttl=1,
+    )
+
+    del pkt[testutils.scapy.scapy.all.Raw]
+    pkt = pkt / igmp_types[igmp_version][msg_type]
+    base_verification("L3", pkt, ptfadapter, duthost, ptf_tx_port_id, tx_dut_ports[dut_iface])
+
+    # Verify packets were not egresed the DUT
+    exp_pkt = expected_packet_mask(pkt)
+    testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["dut_to_ptf_port_map"].values())
 
 
 def test_absent_ip_header(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
