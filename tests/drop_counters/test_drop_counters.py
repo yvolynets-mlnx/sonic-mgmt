@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 PKT_NUMBER = 1000
 
 # Discard key from 'portstat -j' CLI command output
-L2_DISCARD_KEY = "RX_DRP"
-L3_DISCARD_KEY = "RX_ERR"
+RX_DRP = "RX_DRP"
+RX_ERR = "RX_ERR"
 # CLI commands to obtain drop counters
 GET_L2_COUNTERS = "portstat -j"
 GET_L3_COUNTERS = "intfstat -j"
@@ -169,20 +169,20 @@ def mtu_setup(duthost):
         @classmethod
         def set_mtu(cls, mtu, iface):
             if "PortChannel" in iface:
-                res = duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(iface, mtu))["stdout"]
+                duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(iface, mtu))["stdout"]
             elif "Ethernet" in iface:
-                res = duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(iface, mtu))["stdout"]
-            if res != "0":
-                pytest.fail("Unable to change MTU on interface {}".format(iface))
+                duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(iface, mtu))["stdout"]
+            else:
+                raise Exception("Unsupported interface parameter - {}".format(iface))
             cls.iface = iface
         @classmethod
         def restore_mtu(cls, mtu=9100):
             if "PortChannel" in cls.iface:
-                res = duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
+                duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
             elif "Ethernet" in cls.iface:
-                res = duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
-            if res != "0":
-                pytest.fail("Unable to change MTU on interface {}".format(cls.iface))
+                duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
+            else:
+                raise Exception("Trying to restore MTU on unsupported interface - {}".format(cls.iface))
     try:
         yield MTUConfig
     finally:
@@ -331,8 +331,8 @@ def ensure_no_l3_drops(duthost):
     intf_l3_counters = get_pkt_drops(duthost, GET_L3_COUNTERS)
     unexpected_drops = {}
     for iface, value in intf_l3_counters.items():
-        if int(value[L3_DISCARD_KEY]) >= PKT_NUMBER:
-            unexpected_drops[iface] = int(value[L3_DISCARD_KEY])
+        if int(value[RX_ERR]) >= PKT_NUMBER:
+            unexpected_drops[iface] = int(value[RX_ERR])
     if unexpected_drops:
         pytest.fail("L3 'RX_ERR' was incremented for the following interfaces:\n{}".format(unexpected_drops))
 
@@ -342,8 +342,8 @@ def ensure_no_l2_drops(duthost):
     intf_l2_counters = get_pkt_drops(duthost, GET_L2_COUNTERS)
     unexpected_drops = {}
     for iface, value in intf_l2_counters.items():
-        if int(value[L2_DISCARD_KEY]) >= PKT_NUMBER:
-            unexpected_drops[iface] = int(value[L2_DISCARD_KEY])
+        if int(value[RX_DRP]) >= PKT_NUMBER:
+            unexpected_drops[iface] = int(value[RX_DRP])
     if unexpected_drops:
         pytest.fail("L2 'RX_DRP' was incremented for the following interfaces:\n{}".format(unexpected_drops))
 
@@ -362,6 +362,11 @@ def send_packets(pkt, duthost, ptfadapter, ptf_tx_port_id):
     time.sleep(1)
 
 
+def str_to_int(value):
+    """ Convert string value which can contain ',' symbols to integer value """
+    return int("".join(value.split(",")))
+
+
 def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, dut_iface):
     """
     Base test function for verification of L2 or L3 packet drops. Verification type depends on 'discard_group' value.
@@ -371,10 +376,10 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, d
     if discard_group == "L2":
         # Verify drop counter incremented on specific interface
         intf_l2_counters = get_pkt_drops(duthost, GET_L2_COUNTERS)
-        if int(intf_l2_counters[dut_iface][L2_DISCARD_KEY]) != PKT_NUMBER:
+        if int(intf_l2_counters[dut_iface][RX_DRP]) != PKT_NUMBER:
             fail_msg = "'{}' drop counter was not incremented on iface {}. DUT {} == {}; Sent == {}".format(
-                L2_DISCARD_KEY, dut_iface, L2_DISCARD_KEY,
-                int(intf_l2_counters[dut_iface][L2_DISCARD_KEY]), PKT_NUMBER
+                RX_DRP, dut_iface, RX_DRP,
+                int(intf_l2_counters[dut_iface][RX_DRP]), PKT_NUMBER
             )
             pytest.fail(fail_msg)
 
@@ -383,8 +388,8 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, ptf_tx_port_id, d
             ensure_no_l3_drops(duthost)
     elif discard_group == "L3":
         # Verify L3 drop counter incremented on specific interface
-        l3_drops = get_pkt_drops(duthost, GET_L3_COUNTERS)[dut_iface][L3_DISCARD_KEY]
-        l3_drops = int("".join(l3_drops.split(",")))
+        l3_drops = get_pkt_drops(duthost, GET_L3_COUNTERS)[dut_iface][RX_ERR]
+        l3_drops = str_to_int(l3_drops)
 
         if l3_drops != PKT_NUMBER:
             fail_msg = "RX_ERR drop counter was not incremented on iface {}. DUT RX_ERR == {}; Sent pkts == {}".format(
@@ -792,17 +797,17 @@ def test_ip_pkt_with_exceeded_mtu(ptfadapter, duthost, setup, tx_dut_ports, pkt_
 
     send_packets(pkt, duthost, ptfadapter, ptf_tx_port_id)
 
-    # Verify L3 drop counter incremented on specific interface
-    l3_drops = get_pkt_drops(duthost, "portstat -j")[dut_iface][L3_DISCARD_KEY]
-    l3_drops = int("".join(l3_drops.split(",")))
+    # Verify L2 drop counter incremented on specific interface
+    l2_drops = get_pkt_drops(duthost, "portstat -j")[dut_iface][RX_ERR]
+    l2_drops = str_to_int(l2_drops)
 
-    if l3_drops != PKT_NUMBER:
+    if l2_drops != PKT_NUMBER:
         fail_msg = "RX_ERR drop counter was not incremented on iface {}. DUT RX_ERR == {}; Sent pkts == {}".format(
-            dut_iface, l3_drops, PKT_NUMBER
+            dut_iface, l2_drops, PKT_NUMBER
         )
         pytest.fail(fail_msg)
 
-    # Skip L2 discards verification for platform with linked L2 and L3 drop counters
+    # Skip L3 discards verification for platform with linked L2 and L3 drop counters
     if not COMBINED_L2L3_DROP_COUNTER:
         ensure_no_l2_drops(duthost)
 
