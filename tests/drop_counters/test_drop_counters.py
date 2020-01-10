@@ -162,12 +162,17 @@ def enable_counters(duthost):
 
 
 @pytest.fixture
-def mtu_setup(duthost):
+def mtu_config(duthost):
     """ Fixture which prepare port MTU configuration for 'test_ip_pkt_with_exceeded_mtu' test case """
     class MTUConfig(object):
         iface = None
+        mtu = None
+        default_mtu = 9100
         @classmethod
         def set_mtu(cls, mtu, iface):
+            cls.mtu = duthost.command("redis-cli -n 4 hget \"PORTCHANNEL|{}\" mtu".format(iface))["stdout"]
+            if not cls.mtu:
+                cls.mtu = cls.default_mtu
             if "PortChannel" in iface:
                 duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(iface, mtu))["stdout"]
             elif "Ethernet" in iface:
@@ -176,11 +181,11 @@ def mtu_setup(duthost):
                 raise Exception("Unsupported interface parameter - {}".format(iface))
             cls.iface = iface
         @classmethod
-        def restore_mtu(cls, mtu=9100):
+        def restore_mtu(cls):
             if "PortChannel" in cls.iface:
-                duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
+                duthost.command("redis-cli -n 4 hset \"PORTCHANNEL|{}\" mtu {}".format(cls.iface, cls.mtu))["stdout"]
             elif "Ethernet" in cls.iface:
-                duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(cls.iface, mtu))["stdout"]
+                duthost.command("redis-cli -n 4 hset \"PORT|{}\" mtu {}".format(cls.iface, cls.mtu))["stdout"]
             else:
                 raise Exception("Trying to restore MTU on unsupported interface - {}".format(cls.iface))
     try:
@@ -774,7 +779,7 @@ def test_loopback_filter(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields):
     testutils.verify_no_packet_any(ptfadapter, exp_pkt, ports=setup["neighbor_sniff_ports"])
 
 
-def test_ip_pkt_with_exceeded_mtu(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, mtu_setup):
+def test_ip_pkt_with_exceeded_mtu(ptfadapter, duthost, setup, tx_dut_ports, pkt_fields, mtu_config):
     """
     @summary: Verify that IP packet with exceeded MTU is dropped and L3 drop counter incremented
     """
@@ -782,8 +787,8 @@ def test_ip_pkt_with_exceeded_mtu(ptfadapter, duthost, setup, tx_dut_ports, pkt_
     tmp_port_mtu = 1500
 
     log_pkt_params(dut_iface, dst_mac, src_mac, pkt_fields["ipv4_dst"], pkt_fields["ipv4_src"])
-    # Set temporal MTU. This will be restored by 'mtu_setup' fixture
-    mtu_setup.set_mtu(tmp_port_mtu, tx_dut_ports[dut_iface])
+    # Set temporal MTU. This will be restored by 'mtu' fixture
+    mtu_config.set_mtu(tmp_port_mtu, tx_dut_ports[dut_iface])
 
     pkt = testutils.simple_tcp_packet(
         pktlen=9100,
