@@ -1,2 +1,4 @@
 r, ".* ERR ntpd.*routing socket reports: No buffer space available.*"
 r, ".* ERR snmp#snmp-subagent \[ax_interface\] ERROR: Socket bind failed.*"
+r, ".* ERR monit.*process is not running.*"
+r, ".* ERR systemd.*Failed to start Telemetry.*"
