@@ -130,6 +130,14 @@
   minigraph_facts: host={{ inventory_hostname }}
   tags: always
 
+- name: Remove old ssh keys by address
+  shell: ssh-keygen -R {{ minigraph_mgmt_interface.addr }}
+  delegate_to: localhost
+
+- name: Remove old ssh keys by hostname
+  shell: ssh-keygen -R {{ inventory_hostname }}
+  delegate_to: localhost
+
 - block:
 
     - set_fact:
