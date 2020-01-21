@@ -30,6 +30,10 @@
         port_config:
            src: "roles/sonicv2/files/mlnx/hwsku/r-tigris-13/port_config.ini"
            dest: "/usr/share/sonic/device/x86_64-mlnx_msn3800-r0/ACS-MSN3800/port_config.ini"
+      r-tigris-04:
+        port_config:
+           src: "roles/sonicv2/files/mlnx/hwsku/r-tigris-04/port_config.ini"
+           dest: "/usr/share/sonic/device/x86_64-mlnx_msn3800-r0/Mellanox-SN3800-D112C8/port_config.ini"
 
 - name: Find specific configs if defined for this dut
   set_fact:
