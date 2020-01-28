@@ -3,6 +3,7 @@ import ptf.testutils as testutils
 import ptf.mask as mask
 import ptf.packet as packet
 import logging
+import importlib
 import pprint
 import random
 import time
@@ -121,79 +122,24 @@ def enable_counters(duthost):
             duthost.command("counterpoll {} disable".format(port))
 
 
-class FanoutConfig(object):
-    def __init__(self, fanout_host, ansible_root, trunk_port, ansible_localhost):
-        self.rule_id = None
-        self.playbook = os.path.join(os.path.dirname(__file__), "exec_template.yml")
-        self.del_rule_template = os.path.join(os.path.dirname(__file__), "mlnx_fanout_del_rule.j2")
-        self.cmd = "cd {ansible_path}; ansible-playbook {playbook} -i lab -l {fanout_host} --extra-vars \"{extra_vars}\" -vvvvv"
-        self.fanout_host = fanout_host
-        self.ansible_root = ansible_root
-        self.trunk_port = trunk_port
-        self.ansible_localhost = ansible_localhost
-
-    def exec_template(self, **kwargs):
-        """
-        Execute Jinja template on fanout switch which creates openflow rule.
-        @kwargs: Contain parameters to pass into 'ansible-playbook' CLI utility.
-        """
-        attempt = 100
-        while attempt > 0:
-            self.rule_id = random.randint(300, 1000)
-            kwargs["rule_id"] = self.rule_id
-            kwargs["trunk_port"] = "eth{}".format(self.trunk_port)
-            extra_vars = ""
-            for key, value in kwargs.items():
-                extra_vars += "{}={} ".format(key, value)
-
-            add_flow = self.cmd.format(ansible_path=self.ansible_root, playbook=self.playbook, fanout_host=self.fanout_host,
-                                        extra_vars=extra_vars)
-            res = self.ansible_localhost.shell(add_flow)
-            if res["rc"] != 0:
-                raise Exception("Unable to add openflow rule\n{}".format(res["stdout"]))
-
-            if "already exist" in res["stdout"]:
-                attempt -= 1
-                continue
-            break
-        else:
-            raise Exception("Unable to add openflow rule. To many rules already exist.\n{}".format(res["stdout"]))
-
-    def restore_config(self):
-        """ Delete openflow rule to clear previous configuration """
-        if self.rule_id is not None:
-            del_flow = self.cmd.format(ansible_path=self.ansible_root, playbook=self.playbook, fanout_host=self.fanout_host,
-                                        extra_vars="rule_id={} template_path={}".format(self.rule_id, self.del_rule_template))
-            res = self.ansible_localhost.shell(del_flow)
-            if res["rc"] != 0:
-                raise Exception("Unable to delete openflow rule\n{}".format(res["stdout"]))
-
-
 @pytest.fixture
-def fanout(testbed_devices):
+def fanouthost(request, testbed_devices):
     """ Fixture for add/remove openflow rules on fanout using Jinja template """
     dut = testbed_devices["dut"]
-    localhost = testbed_devices["localhost"]
-    base_path = os.path.dirname(os.path.realpath(__file__))
-    lab_conn_graph_file = os.path.normpath((os.path.join(base_path, "../../ansible/files/lab_connection_graph.xml")))
-    ansible_base_path = os.path.normpath((os.path.join(base_path, "../../ansible")))
-
-    dut_facts = localhost.conn_graph_facts(host=dut.hostname, filename=lab_conn_graph_file)["ansible_facts"]
-    fanout_host= dut_facts["device_conn"]["Ethernet0"]["peerdevice"]
-    fanout_facts = localhost.conn_graph_facts(host=fanout_host, filename=lab_conn_graph_file)["ansible_facts"]
-
-    trunk_port = None
-    out_port = None
-    for iface, iface_info in fanout_facts["device_port_vlans"].items():
-        if iface_info["mode"] == "Trunk":
-            trunk_port = iface[iface.find("/") + 1:]
-            break
-
-    fanout_item = FanoutConfig(fanout_host, ansible_base_path, trunk_port, localhost)
+    # Check that class to handle fanout config is implemented
+    if "mellanox" == dut.facts["asic_type"]:
+        for file_name in os.listdir(os.path.join(os.path.dirname(__file__), "fanout")):
+            # Import fanout configuration handler based on vendor name
+            if "mellanox" in file_name:
+                module = importlib.import_module("fanout.{0}.{0}_fanout".format(file_name.strip(".py")))
+                fanout = module.FanoutHandler(testbed_devices)
+                break
+        else:
+            pytest.skip("Fanout handler for '{}' vendor is not specifified".format(dut.facts["asic_type"]))
     try:
-        yield fanout_item
+        yield fanout
     finally:
-        fanout_item.restore_config()
+        fanout.restore_config()
 
 
 def get_pkt_drops(duthost, cli_cmd):
@@ -323,7 +269,7 @@ def base_verification(discard_group, pkt, ptfadapter, duthost, combined_counter,
         pytest.fail("Incorrect 'discard_group' specified. Supported values: 'L2' or 'L3'")
 
 
-def test_equal_smac_dmac_drop(ptfadapter, fanout, duthost, setup, tx_dut_ports, pkt_fields):
+def test_equal_smac_dmac_drop(ptfadapter, fanouthost, duthost, setup, tx_dut_ports, pkt_fields):
     """
     @summary: Verify that packet with equal SMAC and DMAC is dropped and L2 drop cunter incremented
     """
@@ -331,9 +277,11 @@ def test_equal_smac_dmac_drop(ptfadapter, fanout, duthost, setup, tx_dut_ports, 
     src_mac = "00:00:00:00:00:11"
 
     log_pkt_params(dut_iface, dst_mac, dst_mac, pkt_fields["ip_dst"], pkt_fields["ip_src"])
-
-    # Prepare openflow rule
-    fanout.exec_template(template_path=os.path.join(os.path.dirname(__file__), "mlnx_fanout_add_rule_eq_mac.j2"), match_mac=src_mac, set_mac=dst_mac)
+    
+    if "mellanox" == duthost.facts["asic_type"]:
+        # Prepare openflow rule
+        fanouthost.update_config(template_path=os.path.join(os.path.dirname(__file__),
+                                    "fanout/mellanox/mlnx_update_smac.j2"), match_mac=src_mac, set_mac=dst_mac)
 
     pkt = testutils.simple_tcp_packet(
         eth_dst=dst_mac, # DUT port
