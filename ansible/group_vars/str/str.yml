@@ -34,7 +34,7 @@ ASIC_params:
     SPC2:
         cell_size: 144
         buffer_utilization_tolerance: 4
-        default_ecn_tolerance: 30
+        default_ecn_tolerance: 10
         ecn_range_threshold: [
             {min: 1088, max: 3264, tolerance: 35},
             {min: 1088, max: 3776, tolerance: 35},
@@ -79,7 +79,7 @@ qos_params:
         ecn_2:
             dscp: 8
             ecn: 1
-            num_of_pkts: 1023
+            num_of_pkts: 2000
         ecn_3:
             dscp: 0
             ecn: 0
@@ -87,11 +87,19 @@ qos_params:
         ecn_4:
             dscp: 0
             ecn: 1
-            num_of_pkts: 1023
+            num_of_pkts: 2000
         ecn_range:
             dscp: 0
             ecn: 0
             num_of_pkts: 10000
+        ecn_lossless_1:
+            dscp: 3
+            ecn: 1
+            num_of_pkts: 20000
+        ecn_lossless_2:
+            dscp: 3
+            ecn: 0
+            num_of_pkts: 20000
         lossy_queue:
             dscp: 8
             ecn: 1

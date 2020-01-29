@@ -173,7 +173,6 @@
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
 
-
     - include: qos_sai_ptf_mlnx.yml
       vars:
         test_name: xoff limit ptf test dscp = {{ qp.xoff_2.dscp }}, ecn = {{ qp.xoff_2.ecn }}
@@ -295,6 +294,60 @@
         - src_port_id='{{ src_port_id }}'
         - src_port_ip='{{ src_port_ip }}'
       with_items: "{{qp.ecn_range_threshold}}"
+
+    # It doesn't support modifying an in-use buffer profile. We have to remove it and re-add
+    - name: Remove the previously loaded test profile
+      shell: redis-cli -n 4 del "BUFFER_PROFILE|pg_lossless_PFC_TEST_profile"
+
+    - name: Set testing buffer profile for PFC tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_test_ecn_profile.json --write-to-db
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_lossless_1.dscp }}, ecn = {{ qp.ecn_lossless_1.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_lossless_1.dscp }}'
+        - ecn='{{  qp.ecn_lossless_1.ecn }}'
+        - green_min_limit='{{ green_min_threshold_lossless }}'
+        - green_max_limit='{{ green_max_threshold_lossless }}'
+        - num_of_pkts='{{ qp.ecn_lossless_1.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        - src_port_2_id='{{ src_port_2_id }}'
+        - src_port_2_ip='{{ src_port_2_ip }}'
+        - max_drop_probability='{{ green_drop_probability_lossless }}'
+
+    - include: qos_sai_ptf_mlnx.yml
+      vars:
+        test_name: ECN threshold. dscp = {{ qp.ecn_lossless_2.dscp }}, ecn = {{ qp.ecn_lossless_2.ecn }}
+        test_path: sai_qos_tests_mlnx.DscpEcnSend
+        test_params:
+        - dscp='{{ qp.ecn_lossless_2.dscp }}'
+        - ecn='{{  qp.ecn_lossless_2.ecn }}'
+        - green_min_limit='{{ green_min_threshold_lossless }}'
+        - green_max_limit='{{ green_max_threshold_lossless }}'
+        - num_of_pkts='{{ qp.ecn_lossless_2.num_of_pkts }}'
+        - cell_size='{{ qp.cell_size }}'
+        - ecn_tolerance='{{ qp.default_ecn_tolerance }}'
+        - dst_port_id='{{ dst_port_id }}'
+        - dst_port_ip='{{ dst_port_ip }}'
+        - src_port_id='{{ src_port_id }}'
+        - src_port_ip='{{ src_port_ip }}'
+        - src_port_2_id='{{ src_port_2_id }}'
+        - src_port_2_ip='{{ src_port_2_ip }}'
+        - max_drop_probability='{{ green_drop_probability_lossless }}'
+
+    - name: Restore origin buffer profile after ecn tests
+      shell: sonic-cfggen -j /tmp/pfc_lossless_base_profile.json --write-to-db
+
+    # It doesn't support modifying an in-use buffer profile. We have to remove it and re-add
+    - name: Remove the previously loaded test profile
+      shell: redis-cli -n 4 del "BUFFER_PROFILE|pg_lossless_PFC_TEST_profile"
 
     - name: Set testing buffer profile for lossy test
       shell: sonic-cfggen -j /tmp/pfc_lossy_test_profile.json --write-to-db
