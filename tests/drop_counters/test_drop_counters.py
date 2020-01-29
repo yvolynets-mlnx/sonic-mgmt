@@ -124,8 +124,16 @@ def enable_counters(duthost):
 
 @pytest.fixture
 def fanouthost(request, testbed_devices):
-    """ Fixture for add/remove openflow rules on fanout using Jinja template """
+    """
+    Fixture that allows to update Fanout configuration if there is a need to send incorrect packets.
+    Added possibility to create vendor specific logic to handle fanout configuration.
+    If vendor need to update Fanout configuration, 'fanouthost' fixture should load and return appropriate instance.
+    This instance can be used inside test case to handle fanout configuration in vendor specific section.
+    By default 'fanouthost' fixture will not instantiate any instance so it will return None, and in such case
+    'fanouthost' instance should not be used in test case logic.
+    """
     dut = testbed_devices["dut"]
+    fanout = None
     # Check that class to handle fanout config is implemented
     if "mellanox" == dut.facts["asic_type"]:
         for file_name in os.listdir(os.path.join(os.path.dirname(__file__), "fanout")):
@@ -134,12 +142,11 @@ def fanouthost(request, testbed_devices):
                 module = importlib.import_module("fanout.{0}.{0}_fanout".format(file_name.strip(".py")))
                 fanout = module.FanoutHandler(testbed_devices)
                 break
-        else:
-            pytest.skip("Fanout handler for '{}' vendor is not specifified".format(dut.facts["asic_type"]))
     try:
         yield fanout
     finally:
-        fanout.restore_config()
+        if fanout is not None:
+            fanout.restore_config()
 
 
 def get_pkt_drops(duthost, cli_cmd):
@@ -274,11 +281,12 @@ def test_equal_smac_dmac_drop(ptfadapter, fanouthost, duthost, setup, tx_dut_por
     @summary: Verify that packet with equal SMAC and DMAC is dropped and L2 drop cunter incremented
     """
     dut_iface, ptf_tx_port_id, dst_mac, src_mac = get_test_ports_info(ptfadapter, duthost, setup, tx_dut_ports)
-    src_mac = "00:00:00:00:00:11"
+    src_mac = dst_mac
 
     log_pkt_params(dut_iface, dst_mac, dst_mac, pkt_fields["ip_dst"], pkt_fields["ip_src"])
-    
+
     if "mellanox" == duthost.facts["asic_type"]:
+        src_mac = "00:00:00:00:00:11"
         # Prepare openflow rule
         fanouthost.update_config(template_path=os.path.join(os.path.dirname(__file__),
                                     "fanout/mellanox/mlnx_update_smac.j2"), match_mac=src_mac, set_mac=dst_mac)
