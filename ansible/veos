@@ -40,6 +40,9 @@ R-SONIC-07 ansible_host=r-sonic-07 ansible_python_interpreter=/images/pyenv/soni
 [vm_host_14]
 MTBC-R730-04 ansible_host=mtbc-r730-04
 
+[vm_host_15]
+ARC-HOST70 ansible_host=arc-host70 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -61,6 +64,7 @@ vm_host_11
 vm_host_12
 vm_host_13
 vm_host_14
+vm_host_15
 vm_host_50
 vm_host_52
 
@@ -512,6 +516,40 @@ VM1402 ansible_host=10.112.205.203
 VM1403 ansible_host=10.112.205.204
 VM1404 ansible_host=10.112.205.205
 
+[vms_15]
+VM1501 ansible_host=10.215.22.62
+VM1502 ansible_host=10.215.22.63
+VM1503 ansible_host=10.215.22.64
+VM1504 ansible_host=10.215.22.65
+VM1505 ansible_host=10.215.22.66
+VM1506 ansible_host=10.215.22.67
+VM1507 ansible_host=10.215.22.68
+VM1508 ansible_host=10.215.22.69
+VM1509 ansible_host=10.215.22.70
+VM1510 ansible_host=10.215.22.71
+VM1511 ansible_host=10.215.22.72
+VM1512 ansible_host=10.215.22.73
+VM1513 ansible_host=10.215.22.74
+VM1514 ansible_host=10.215.22.75
+VM1515 ansible_host=10.215.22.76
+VM1516 ansible_host=10.215.22.77
+VM1517 ansible_host=10.215.22.78
+VM1518 ansible_host=10.215.22.79
+VM1519 ansible_host=10.215.22.80
+VM1520 ansible_host=10.215.22.81
+VM1521 ansible_host=10.215.22.82
+VM1522 ansible_host=10.215.22.83
+VM1523 ansible_host=10.215.22.84
+VM1524 ansible_host=10.215.22.85
+VM1525 ansible_host=10.215.22.86
+VM1526 ansible_host=10.215.22.87
+VM1527 ansible_host=10.215.22.88
+VM1528 ansible_host=10.215.22.89
+VM1529 ansible_host=10.215.22.90
+VM1530 ansible_host=10.215.22.91
+VM1531 ansible_host=10.215.22.92
+VM1532 ansible_host=10.215.22.93
+
 [vms_50]
 VM5001 ansible_host=10.212.232.5
 VM5002 ansible_host=10.212.232.6
@@ -539,6 +577,7 @@ vms_11
 vms_12
 vms_13
 vms_14
+vms_15
 vms_50
 vms_52
 
@@ -592,19 +631,19 @@ vms_7
 [server_7:vars]
 host_var_file=host_vars/ARC-HOST26.yml
 
-[server_8:vars]
-host_var_file=host_vars/DEV-R730-02.yml
-
 [server_8:children]
 vm_host_8
 vms_8
 
-[server_9:vars]
-host_var_file=host_vars/R-SONIC-02.yml
+[server_8:vars]
+host_var_file=host_vars/DEV-R730-02.yml
 
 [server_9:children]
 vm_host_9
 vms_9
+
+[server_9:vars]
+host_var_file=host_vars/R-SONIC-02.yml
 
 [server_10:children]
 vm_host_10
@@ -640,6 +679,13 @@ vms_14
 
 [server_14:vars]
 host_var_file=host_vars/MTBC-R730-04.yml
+
+[server_15:children]
+vm_host_15
+vms_15
+
+[server_15:vars]
+host_var_file=host_vars/ARC-HOST70.yml
 
 [server_50:children]
 vm_host_50
@@ -678,6 +724,7 @@ server_11
 server_12
 server_13
 server_14
+server_15
 server_50
 server_52
 
