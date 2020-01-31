@@ -89,6 +89,11 @@
                                  20849, 20850, 20865, 20866, 20881, 20882, 20897, 20898,
                                  20913, 20914, 20929, 20930, 20945, 20946, 20960, 20976,
                                  20992] %}
+{% set r_anaconda_51_of_ports = [-1, 20496, 20512, 20528, 20544, 20560, 20576, 20592, 20608,
+                                 20624, 20640, 20656, 20672, 20688, 20704, 20720, 20736,
+                                 20752, 20768, 20784, 20800, 20816, 20832, 20848, 20864,
+                                 20880, 20896, 20912, 20928, 20944, 20960, 20977, 20978,
+                                 20992] %}
 {% set r_tigris_17_eth_ports = [-1, '1/1/1', '1/1/2', '1/2/1', '1/2/2', '1/3/1', '1/3/2', '1/4', '1/5/1',
                                 '1/5/2', '1/6/1', '1/6/2', '1/7/1', '1/7/2', '1/8', '1/9/1', '1/9/2',
                                 '1/10/1', '1/10/2', '1/11/1', '1/11/2', '1/12', '1/13/1', '1/13/2', '1/14/1',
@@ -202,6 +207,11 @@
                                    50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000,
                                    50000, 50000, 50000, 50000, 50000, 50000, 100000, 100000,
                                    100000] %}
+{% set r_anaconda_51_port_speed = [-1, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000,
+                                   1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000,
+                                   1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000,
+                                   1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000,
+                                   'auto'] %}
 {% set r_tigris_17_port_speed = [-1, 50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000,
                                  50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000,
                                  50000, 50000, 50000, 50000, 50000, 50000, 50000, 50000,
@@ -240,6 +250,7 @@
                                              '1/11', '1/12', '1/13', '1/14', '1/15', '1/16', '1/17', '1/18',
                                              '1/19', '1/20', '1/21', '1/22', '1/23', '1/24', '1/25', '1/26',
                                              '1/27', '1/28', '1/29'],
+                            'r-anaconda-51':['1/31'],
                             'r-tigris-17':['1/1', '1/2', '1/3', '1/5', '1/6', '1/7', '1/9', '1/10',
                                            '1/11', '1/13', '1/14', '1/15', '1/17', '1/18', '1/19', '1/21',
                                            '1/22', '1/23', '1/27', '1/31', '1/35', '1/39', '1/41', '1/42',
@@ -259,6 +270,7 @@
                             'arc-switch1039':[],
                             'r-panther-03':['1/29'],
                             'r-anaconda-43':['1/1', '1/2'],
+                            'r-anaconda-51':[],
                             'r-tigris-17':[],
                             'mts-sonic-fanout':[]} %}
 
@@ -274,6 +286,7 @@
                          'arc-switch1039':default_eth_ports,
                          'r-panther-03':r_panther_03_eth_ports,
                          'r-anaconda-43':r_anaconda_43_eth_ports,
+                         'r-anaconda-51':default_eth_ports,
                          'r-tigris-17':r_tigris_17_eth_ports,
                          'mts-sonic-fanout':default_eth_ports} %}
 
@@ -289,6 +302,7 @@
                         'arc-switch1039':default_of_ports,
                         'r-panther-03':r_panther_03_of_ports,
                         'r-anaconda-43':r_anaconda_43_of_ports,
+                        'r-anaconda-51':r_anaconda_51_of_ports,
                         'r-tigris-17':r_tigris_17_of_ports,
                         'mts-sonic-fanout':default_of_ports} %}
 
@@ -304,6 +318,7 @@
                           'arc-switch1039':default_vlan_range,
                           'r-panther-03':default_vlan_range,
                           'r-anaconda-43':[(vlanid_offset + 1)|string, (vlanid_offset + 64)|string],
+                          'r-anaconda-51':default_vlan_range,
                           'r-tigris-17':[(vlanid_offset + 1)|string, (vlanid_offset + 96)|string],
                           'mts-sonic-fanout':default_vlan_range} %}
 
@@ -319,6 +334,7 @@
                         'arc-switch1039':default_port_fec,
                         'r-panther-03':default_port_fec,
                         'r-anaconda-43':default_port_fec,
+                        'r-anaconda-51':default_port_fec,
                         'r-tigris-17':r_tigris_17_port_fec,
                         'mts-sonic-fanout':default_port_fec} %}
 
@@ -334,6 +350,7 @@
                           'arc-switch1039':arc_switch1039_port_speed,
                           'r-panther-03':r_panther_03_port_speed,
                           'r-anaconda-43':r_anaconda_43_port_speed,
+                          'r-anaconda-51':r_anaconda_51_port_speed,
                           'r-tigris-17':r_tigris_17_port_speed,
                           'mts-sonic-fanout':mts_sonic_fanout_port_speed} %}
 
@@ -349,6 +366,7 @@
                        'arc-switch1039':'LK2-RESTRICTED_CMDS_GEN2-43A1-4H83-KY0T-C88A-5CEP-8QUJ-PB',
                        'r-panther-03':'LK2-RESTRICTED_CMDS_GEN2-43A7-43LN-YFM9-T88A-171M-EFFE-CA',
                        'r-anaconda-43':'LK2-RESTRICTED_CMDS_GEN2-43A5-QB6F-L0JP-E88A-30JK-4234-LD',
+                       'r-anaconda-51':'LK2-RESTRICTED_CMDS_GEN2-439V-6KD5-QGE0-88A4-F8PR-DKEW-6',
                        'r-tigris-17':'LK2-RESTRICTED_CMDS_GEN2-43A5-QB6F-U732-888A-0G6U-WJU1-LN',
                        'mts-sonic-fanout':'LK2-RESTRICTED_CMDS_GEN2-43A7-C1ND-30WG-T88A-1H4M-NBU2-MY'} %}
 
