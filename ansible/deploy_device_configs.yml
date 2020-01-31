@@ -12,13 +12,10 @@
         sai_xml:
           src: "roles/sonicv2/files/ssw/ACS-MSN2010/sai_config_boxer01.xml"
           dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/sai_2010.xml"
-      arc-switch1004:
+      Mellanox-SN2700-D48C8:
         port_config:
-          src: "roles/sonicv2/files/ssw/ACS-MSN2700/port_config1004.ini"
-          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/port_config.ini"
-        sai_xml:
-          src: "roles/sonicv2/files/ssw/ACS-MSN2700/sai_2700_1004.xml"
-          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/ACS-MSN2700/sai_2700.xml"
+          src: "roles/sonicv2/files/ssw/Mellanox-SN2700-D48C8/port_config.ini"
+          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2700-r0/Mellanox-SN2700-D48C8/port_config.ini"
       arc-switch1038:
         port_config:
            src: "roles/sonicv2/files/ssw/ACS-MSN3700/port_config1038.ini"
