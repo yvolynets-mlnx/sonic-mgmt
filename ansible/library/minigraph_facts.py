@@ -502,17 +502,6 @@ def parse_xml(filename, hostname):
 
             for i in range(23, 33):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
-        elif hostname == "arc-switch1004":
-            for i in range(1, 17):
-                port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
-
-            port_alias_to_name_map["etp17a"] = "Ethernet64"
-            port_alias_to_name_map["etp17b"] = "Ethernet65"
-            port_alias_to_name_map["etp17c"] = "Ethernet66"
-            port_alias_to_name_map["etp17d"] = "Ethernet67"
-
-            for i in range(21, 33):
-                port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
         elif hostname == "r-tigris-04":
             port_alias_to_name_map["etp1a"] = "Ethernet0"
             port_alias_to_name_map["etp1b"] = "Ethernet2"

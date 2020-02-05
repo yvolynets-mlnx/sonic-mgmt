@@ -5,7 +5,7 @@ arc-switch1041     ansible_host=10.210.25.48 sonic_version=v2 hwsku="ACS-MSN2740
 arc-switch1029     ansible_host=10.210.25.44 sonic_version=v2 hwsku="ACS-MSN2100" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0401
 arc-mtbc-1001      ansible_host=10.112.206.180 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0501
 arc-switch1025     ansible_host=10.210.25.45 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0601
-arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701
+arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="Mellanox-SN2700-D48C8" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701
 r-anaconda-10      ansible_host=10.210.25.3 sonic_version=v2 hwsku="ACS-MSN3700C" iface_speed=100000  mgmt_subnet_mask_length=22 vm_base=VM1101
 r-tigris-04        ansible_host=10.210.25.93 sonic_version=v2 hwsku="Mellanox-SN3800-D112C8" iface_speed=50000 mgmt_subnet_mask_length=22 vm_base=VM1201
 r-tigris-13        ansible_host=10.210.24.22 sonic_version=v2 hwsku="ACS-MSN3800" iface_speed=50000 mgmt_subnet_mask_length=22 vm_base=VM1301

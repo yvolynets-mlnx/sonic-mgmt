@@ -31,10 +31,8 @@
     {%- if port_alias[index] in port_speed and port_speed[port_alias[index]] != ""  %}
           <Speed>{{ port_speed[port_alias[index]] }}</Speed>
     {%- else %}
-        {%- if (inventory_hostname == "arc-switch1041" or inventory_hostname == "arc-switch1025" or inventory_hostname == "arc-switch1004" or inventory_hostname == "mts-sonic-dut" or inventory_hostname == "mtbc-sonic-03-2700") and index >= 30 %}
+        {%- if (inventory_hostname == "arc-switch1041" or inventory_hostname == "arc-switch1025" or inventory_hostname == "mts-sonic-dut" or inventory_hostname == "mtbc-sonic-03-2700") and index >= 30 %}
           <Speed>50000</Speed>
-        {%- elif inventory_hostname == "arc-switch1004" and (index >= 16 and index <= 19) %}
-          <Speed>10000</Speed>
         {%- elif inventory_hostname == "arc-switch1038" %}
             {%- if index >= 16 and index <= 19 %}
           <Speed>25000</Speed>
