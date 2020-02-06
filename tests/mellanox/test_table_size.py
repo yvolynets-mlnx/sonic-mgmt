@@ -17,70 +17,45 @@ from common.errors import RunAnsibleModuleFail
 pytestmark = [pytest.mark.disable_loganalyzer]
 
 
-@pytest.fixture(scope="module")
-def common_setup_teardown(testbed_devices):
+def reboot_dut(dut, localhost):
+    logging.info("Reboot the dut")
+    reboot_task, reboot_res = dut.command("reboot", module_async=True)
+
+    logging.info("Wait for DUT to go down")
+    try:
+        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
+    except RunAnsibleModuleFail as e:
+        logging.error("DUT did not go down, exception: " + repr(e))
+        if reboot_task.is_alive():
+            logging.error("Rebooting is not completed")
+            reboot_task.terminate()
+        logging.error("reboot result %s" % str(reboot_res.get()))
+        assert False, "Failed to reboot the DUT"
+
+    localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
+
+    logging.info("Wait until system is stable")
+    wait_until(300, 30, dut.critical_services_fully_started)
+
+    logging.info("Wait some extra time")
+    time.sleep(120)
+
+
+def set_issu(dut, issu_enabled=False):
     """
-    @summary: Fixture for setup and teardown for all the test cases in this script
-
-    When table size is changed in sai.profile, a reboot is required for the new settings to take effect. To recover
-    the testbed after testing, reboot is also required. It takes too much time to use reboot to recover SONiC DUT
-    after each test case is executed. Purpose of this fixture is to reboot to recover testbed after all the test cases
-    in this script have been executed.
+    @summary: Just set issu on DUT to specified status. Do not reboot.
     """
-    logging.info("Start common setup, initialize instances for various devices")
-
-    yield testbed_devices  # Test cases can call this function to pass in the (dut, localhost) objects for later cleanup
-
-    logging.info("Start common teardown")
-
-    dut = testbed_devices["dut"]
+    logging.info("Set issu to %s on dut" % ("enabled" if issu_enabled else "disabled"))
     dut_platform = dut.facts["platform"]
     dut_hwsku = dut.facts["hwsku"]
-    localhost = testbed_devices["localhost"]
 
-    reboot_required = False
-
-    # Recover sai.profile settings
     sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
-    backup_sai_profile = sai_profile + ".backup"
-    logging.info("sai.profile: %s" % sai_profile)
-    if dut.stat(path=backup_sai_profile)["stat"]["exists"]:
-        logging.info("Restore %s to %s" % (backup_sai_profile, sai_profile))
-        dut.command("cp %s %s" % (backup_sai_profile, sai_profile))
-        dut.file(path=backup_sai_profile, state="absent")
-        reboot_required = True
-
-    # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
     sai_xml_filename = dut.shell("basename $(cat {} | cut -d'=' -f2)".format(sai_profile))["stdout"]
     sai_xml_path = "/usr/share/sonic/device/{}/{}/{}".format(dut_platform, dut_hwsku, sai_xml_filename)
 
-    if models[dut_hwsku]["reboot"]["warm_reboot"]:
-        if dut.shell("grep '<issu-enabled>0</issu-enabled>' %s | wc -l" % sai_xml_path)["stdout"] == "1":
-            line = "<issu-enabled>1</issu-enabled>"
-            pattern = r"<issu-enabled>\d</issu-enabled>"
-            dut.lineinfile(dest=sai_xml_path, regexp=pattern, line=line)
-            reboot_required = True
-
-    if reboot_required:
-        logging.info("Reboot the DUT to restore")
-        reboot_task, reboot_res = dut.command("reboot", module_async=True)
-        logging.info("Wait for DUT to go down")
-        try:
-            localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
-        except RunAnsibleModuleFail as e:
-            logging.error("DUT did not go down, exception: " + repr(e))
-            if reboot_task.is_alive():
-                logging.error("Rebooting is not completed")
-                reboot_task.terminate()
-            logging.error("reboot result %s" % str(reboot_res.get()))
-
-        logging.info("Wait for DUT to come back")
-        localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
-
-        logging.info("Wait until system is stable")
-        wait_until(300, 30, dut.critical_services_fully_started)
-
-    logging.info("Done common teardown")
+    value = "1" if issu_enabled else "0"
+    dut.command("sed -i 's/<issu-enabled> *[0-9]* *<\/issu-enabled>/<issu-enabled>%s<\/issu-enabled>/g' %s" %
+                (value, sai_xml_path))
 
 
 def set_table_size(dut, table_size):
@@ -113,46 +88,48 @@ def set_table_size(dut, table_size):
     dut.copy(content=content, dest=sai_profile)
 
 
-def configure_issu(dut, localhost, issu_status="disabled"):
+@pytest.fixture(scope="module")
+def common_setup_teardown(testbed_devices):
     """
-    @summary: Configure issu on DUT to specified status
+    @summary: Fixture for setup and teardown for all the test cases in this script
+
+    When table size is changed in sai.profile, a reboot is required for the new settings to take effect. To recover
+    the testbed after testing, reboot is also required. It takes too much time to use reboot to recover SONiC DUT
+    after each test case is executed. Purpose of this fixture is to reboot to recover testbed after all the test cases
+    in this script have been executed.
     """
+    logging.info("Start common setup")
+
+    yield
+
+    logging.info("Start common teardown")
+
+    dut = testbed_devices["dut"]
     dut_platform = dut.facts["platform"]
     dut_hwsku = dut.facts["hwsku"]
+    localhost = testbed_devices["localhost"]
+
+    reboot_required = False
+
+    # Recover sai.profile settings
     sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
-    sai_xml_filename = dut.shell("basename $(cat {} | cut -d'=' -f2)".format(sai_profile))["stdout"]
-    sai_xml_path = "/usr/share/sonic/device/{}/{}/{}".format(dut_platform, dut_hwsku, sai_xml_filename)
+    backup_sai_profile = sai_profile + ".backup"
+    logging.info("sai.profile: %s" % sai_profile)
+    if dut.stat(path=backup_sai_profile)["stat"]["exists"]:
+        logging.info("Restore %s to %s" % (backup_sai_profile, sai_profile))
+        dut.command("cp %s %s" % (backup_sai_profile, sai_profile))
+        dut.file(path=backup_sai_profile, state="absent")
+        reboot_required = True
 
-    pattern = r"<issu-enabled>\d</issu-enabled>"
+    # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
+    if models[dut_hwsku]["reboot"]["warm_reboot"]:
+        set_issu(dut, issu_enabled=True)
+        reboot_required = True
 
-    if issu_status == "disabled":
-        line = "<issu-enabled>0</issu-enabled>"
-        dut.lineinfile(dest=sai_xml_path, regexp=pattern, line=line)
-    elif issu_status == "enabled":
-        line = "<issu-enabled>1</issu-enabled>"
-        dut.lineinfile(dest=sai_xml_path, regexp=pattern, line=line)
+    if reboot_required:
+        reboot_dut(dut, localhost)
 
-    logging.info("Reboot the dut")
-    reboot_task, reboot_res = dut.command("reboot", module_async=True)
-
-    logging.info("Wait for DUT to go down")
-    try:
-        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
-    except RunAnsibleModuleFail as e:
-        logging.error("DUT did not go down, exception: " + repr(e))
-        if reboot_task.is_alive():
-            logging.error("Rebooting is not completed")
-            reboot_task.terminate()
-        logging.error("reboot result %s" % str(reboot_res.get()))
-        assert False, "Failed to reboot the DUT"
-
-    localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
-
-    logging.info("Wait until system is stable")
-    wait_until(300, 30, dut.critical_services_fully_started)
-
-    logging.info("Wait some extra time")
-    time.sleep(180)
+    logging.info("Done common teardown")
 
 
 def crm_stats_found(dut):
@@ -166,8 +143,8 @@ def compare_table_size(sai_settings, crm_stats):
     """
     @summary: Compare the CRM stats with the customized table size settings. Case failed if they do not match.
     """
-    logging.info("SAI settings: %s" % json.dumps(sai_settings))
-    logging.info("CRM stats: %s" % json.dumps(crm_stats))
+    logging.info("SAI settings: %s" % json.dumps(sai_settings, indent=4))
+    logging.info("CRM stats: %s" % json.dumps(crm_stats, indent=4))
 
     # TODO: FDB checking is skipped because of below bugs:
     # Bug SW #1829399: SAI profile: single hash table size calculation need to take IPv6 route and VID
@@ -177,7 +154,7 @@ def compare_table_size(sai_settings, crm_stats):
     tables = ["ipv4_route", "ipv6_route", "ipv4_neighbor", "ipv6_neighbor"]
     for table in tables:
         sai_setting = "SAI_%s_TABLE_SIZE" % table.upper()
-        logging.info("*************ASSERT HERE***************")
+        logging.info("*************ASSERT HERE: %s***************" % table)
         assert table in crm_stats.keys(), \
             "No CRM stats for %s, probably the table size settings are not accepted by SONiC." % table
         expected = sai_settings[sai_setting]
@@ -185,39 +162,26 @@ def compare_table_size(sai_settings, crm_stats):
         # TODO: Used pytest.approx because of below bug:
         # Bug SW #1840858: IP neighbor used+available count is less than allocated number
         # Need to use exact compare after the bug is fixed
+        # assert expected == actual, \
         assert expected == pytest.approx(actual, rel=0.001), \
             "Expected %s table size: %d, actual: %d" % (table, expected, actual)
 
 
-def configure_table_size_and_check(table_size, dut, localhost, request):
+def configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False):
     """
-    @summary: Set table size and check CRM stats. Re-used by test cases.
+    @summary: Set table size and issu status. Check CRM stats. Re-used by test cases.
     """
     logging.info("Set target table size in sai.profile")
     set_table_size(dut, table_size)
 
+    logging.info("Set issu")
+    set_issu(dut, issu_enabled)
+
     logging.info("Reboot the dut")
-    reboot_task, reboot_res = dut.command("reboot", module_async=True)
-
-    logging.info("Wait for DUT to go down")
-    try:
-        localhost.wait_for(host=dut.hostname, port=22, state="stopped", delay=10, timeout=300)
-    except RunAnsibleModuleFail as e:
-        logging.error("DUT did not go down, exception: " + repr(e))
-        if reboot_task.is_alive():
-            logging.error("Rebooting is not completed")
-            reboot_task.terminate()
-        logging.error("reboot result %s" % str(reboot_res.get()))
-        assert False, "Failed to reboot the DUT"
-
-    logging.info("Wait for DUT to come back")
-    localhost.wait_for(host=dut.hostname, port=22, state="started", delay=10, timeout=300)
-
-    logging.info("Wait until system is stable")
-    wait_until(300, 20, dut.critical_services_fully_started)
+    reboot_dut(dut, localhost)
 
     logging.info("Set CRM polling interval to a short time")
-    dut.command("crm config polling interval 3")
+    dut.command("crm config polling interval 5")
 
     logging.info("Add finalizer to ensure that CRM config interval is always restored")
     def restore_crm_interval():
@@ -226,29 +190,25 @@ def configure_table_size_and_check(table_size, dut, localhost, request):
     request.addfinalizer(restore_crm_interval)
 
     logging.info("Wait some time for CRM stats to be available")
-    time.sleep(60)
+    time.sleep(30)
 
     logging.info("Read CRM stats")
     crm_stats = dut.get_crm_resources()["main_resources"]
+
+    # For debugging, log status of docker containers
+    logging.info(json.dumps(dut.command("docker ps -a")["stdout_lines"], indent=2))
 
     logging.info("Compare CRM stats with the configuration data")
     compare_table_size(table_size, crm_stats)
 
 
-def test_typical_table_size(request, common_setup_teardown):
+def test_typical_table_size(testbed_devices, request, common_setup_teardown):
     """
     @summary: Test setting typical table size values and check the result.
     """
-    testbed_devices = common_setup_teardown
 
     dut = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
-
-    logging.info("Find out whether warm-reboot is supported on this platform")
-    try:
-        issu_enabled = "enabled" in dut.command("show platform mlnx issu")["stdout"]
-    except:
-        pytest.fail("Unable to get ISSU status, DUT is not in good state.")
 
     table_size = {
         "SAI_FDB_TABLE_SIZE": 32768,
@@ -268,57 +228,24 @@ def test_typical_table_size(request, common_setup_teardown):
         "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 8192
     }
 
-    logging.info("Configure table size and check")
+    logging.info("Test typical table size configuration with warm-reboot disabled")
+    configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
+
+    # TODO: Temporarily commented out because of Bug #1800191
     # Know issue: https://redmine.mellanox.com/issues/1800191
     # Bug SW #1800191: SAI key/value table size configuration failed if warm-reboot enabled
-
-    if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
-        logging.info("DUT supports warm reboot")
-        if issu_enabled:
-
-            logging.info("Disable warm-reboot")
-            configure_issu(dut, localhost, issu_status="disabled")
-
-            logging.info("Test table size configuration with warm-reboot disabled")
-            configure_table_size_and_check(table_size, dut, localhost, request)
-
-            # logging.info("Enable warm-reboot")
-            # configure_issu(dut, localhost, issu_status="enabled")
-
-            # TODO: Temporarily commented out because of Bug #1800191
-            # logging.info("Test table size configuration with warm-reboot enabled")
-            # configure_table_size_and_check(table_size_issu, dut, localhost, request)
-        else:
-            logging.info("Test table size configuration with warm-reboot disabled")
-            configure_table_size_and_check(table_size, dut, localhost, request)
-
-            # logging.info("Enable warm-reboot")
-            # configure_issu(dut, localhost, issu_status="enabled")
-
-            # TODO: Temporarily commented out because of Bug #1800191
-            # logging.info("Test table size configuration with warm-reboot enabled")
-            # configure_table_size_and_check(table_size_issu, dut, localhost, request)
-    else:
-        logging.info("DUT does not support warm reboot")
-
-        logging.info("Test table size configuration with warm-reboot disabled")
-        configure_table_size_and_check(table_size, dut, localhost, request)
+    # if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
+    #     logging.info("DUT supports warm reboot")
+    #     logging.info("Test typical table size configuration with warm-reboot enabled")
+    #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
 
 
-def test_more_resources_for_ipv6(request, common_setup_teardown):
+def test_more_resources_for_ipv6(testbed_devices, request, common_setup_teardown):
     """
-    @summary: Configure more resources for IPv6 check the result.
+    @summary: Configure more resources for IPv6 and check the result.
     """
-    testbed_devices = common_setup_teardown
-
     dut = testbed_devices["dut"]
     localhost = testbed_devices["localhost"]
-
-    logging.info("Find out whether warm-reboot is supported on this platform")
-    try:
-        issu_enabled = "enabled" in dut.command("show platform mlnx issu")["stdout"]
-    except:
-        pytest.fail("Unable to get ISSU status, DUT is not in good state.")
 
     table_size = {
         "SAI_FDB_TABLE_SIZE": 32768,
@@ -336,37 +263,54 @@ def test_more_resources_for_ipv6(request, common_setup_teardown):
         "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 8192
     }
 
-    logging.info("Configure table size and check")
+    logging.info("Test more resources for ipv6 table size configuration with warm-reboot disabled")
+    configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
+
+    # TODO: Temporarily commented out because of Bug #1800191
     # Know issue: https://redmine.mellanox.com/issues/1800191
     # Bug SW #1800191: SAI key/value table size configuration failed if warm-reboot enabled
+    # if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
+    #     logging.info("DUT supports warm reboot")
+    #     logging.info("Test more resources for ipv6 table size configuration with warm-reboot enabled")
+    #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
 
-    if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
-        logging.info("DUT supports warm reboot")
-        if issu_enabled:
-            logging.info("Disable warm-reboot")
-            configure_issu(dut, localhost, issu_status="disabled")
 
-            logging.info("Test table size configuration with warm-reboot disabled")
-            configure_table_size_and_check(table_size, dut, localhost, request)
+def test_less_fdb_resources(testbed_devices, request, common_setup_teardown):
+    """
+    @summary: Configure less resources for FDB and check the result.
+    """
 
-            # logging.info("Enable warm-reboot")
-            # configure_issu(dut, localhost, issu_status="enabled")
+    # Related bugs:
+    # * Bug SW #1978577: SONiC failed to init switch with a combination table size set
+    # * Bug SW #1829399: SAI profile: single hash table size calculation need to take IPv6 route and VID
+    #                    into consideration.
 
-            # TODO: Temporarily commented out because of Bug #1800191
-            # logging.info("Test table size configuration with warm-reboot enabled")
-            # configure_table_size_and_check(table_size_issu, dut, localhost, request)
-        else:
-            logging.info("Test table size configuration with warm-reboot disabled")
-            configure_table_size_and_check(table_size, dut, localhost, request)
+    dut = testbed_devices["dut"]
+    localhost = testbed_devices["localhost"]
 
-            # logging.info("Enable warm-reboot")
-            # configure_issu(dut, localhost, issu_status="enabled")
+    table_size = {
+        "SAI_FDB_TABLE_SIZE": 10240,
+        "SAI_IPV4_ROUTE_TABLE_SIZE": 32768,
+        "SAI_IPV6_ROUTE_TABLE_SIZE": 25600,
+        "SAI_IPV4_NEIGHBOR_TABLE_SIZE": 8192,
+        "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 16384
+    }
 
-            # TODO: Temporarily commented out because of Bug #1800191
-            # logging.info("Test table size configuration with warm-reboot enabled")
-            # configure_table_size_and_check(table_size_issu, dut, localhost, request)
-    else:
-        logging.info("DUT does not support warm reboot")
+    table_size_issu = {
+        "SAI_FDB_TABLE_SIZE": 5120,
+        "SAI_IPV4_ROUTE_TABLE_SIZE": 24576,
+        "SAI_IPV6_ROUTE_TABLE_SIZE": 16384,
+        "SAI_IPV4_NEIGHBOR_TABLE_SIZE": 8192,
+        "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 8192
+    }
 
-        logging.info("Test table size configuration with warm-reboot disabled")
-        configure_table_size_and_check(table_size, dut, localhost, request)
+    logging.info("Test less fdb table size configuration with warm-reboot disabled")
+    configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
+
+    # TODO: Temporarily disabled because of Bug #1800191
+    # Know issue: https://redmine.mellanox.com/issues/1800191
+    # Bug SW #1800191: SAI key/value table size configuration failed if warm-reboot enabled
+    # if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
+    #     logging.info("DUT supports warm reboot")
+    #     logging.info("Test less fdb table size configuration with warm-reboot enabled")
+    #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
