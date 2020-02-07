@@ -62,16 +62,18 @@ ptf-1041    ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=roo
 ptf-1038    ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1025    ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1004    ansible_host=10.213.80.153 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-r-anaconda-10    ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-boxer-sw01     ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-r-anaconda-10  ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-tigris-04    ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-tigris-13    ansible_host=10.215.0.61 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-leopard-01   ansible_host=10.215.22.61 ansible_ssh_user=root ansible_ssh_pass=root
+mts-ptf     ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-mtbc01  ansible_host=10.112.206.220 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-mtbc02  ansible_host=10.112.207.41 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc03  ansible_host=10.112.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc04  ansible_host=10.112.205.201 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-232-005 ansible_host=10.212.232.6 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-232-007 ansible_host=10.212.232.8 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-233-005 ansible_host=10.212.233.6 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-233-007 ansible_host=10.212.233.8 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-232-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-233-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf_vms6-1  ansible_host=10.250.0.100 ansible_ssh_user=root ansible_ssh_pass=root
 
 [lab:children]
@@ -100,7 +102,3 @@ r-anaconda-43     ansible_host=10.210.25.21 os=mellanox
 r-anaconda-51     ansible_host=10.210.26.51 os=mellanox
 mtbc-sonic-02-2700  ansible_host=10.112.67.45 os=mellanox
 mtbc-3700c-02     ansible_host=10.112.67.51 os=mellanox
-arc-switch232-005 ansible_host=0.0.0.0
-arc-switch232-007 ansible_host=0.0.0.0
-arc-switch233-005 ansible_host=0.0.0.0
-arc-switch233-007 ansible_host=0.0.0.0
