@@ -99,7 +99,7 @@ qos_params:
         ecn_lossless_2:
             dscp: 3
             ecn: 0
-            num_of_pkts: 20000
+            num_of_pkts: 18000
         lossy_queue:
             dscp: 8
             ecn: 1

@@ -320,6 +320,11 @@
         - src_port_ip='{{ src_port_ip }}'
         - src_port_2_id='{{ src_port_2_id }}'
         - src_port_2_ip='{{ src_port_2_ip }}'
+        - src_port_3_id='{{ src_port_3_id }}'
+        - src_port_3_ip='{{ src_port_3_ip }}'
+        - src_port_4_id='{{ src_port_4_id }}'
+        - src_port_4_ip='{{ src_port_4_ip }}'
+        - more_src_ports='3'
         - max_drop_probability='{{ green_drop_probability_lossless }}'
 
     - include: qos_sai_ptf_mlnx.yml
@@ -340,6 +345,11 @@
         - src_port_ip='{{ src_port_ip }}'
         - src_port_2_id='{{ src_port_2_id }}'
         - src_port_2_ip='{{ src_port_2_ip }}'
+        - src_port_3_id='{{ src_port_3_id }}'
+        - src_port_3_ip='{{ src_port_3_ip }}'
+        - src_port_4_id='{{ src_port_4_id }}'
+        - src_port_4_ip='{{ src_port_4_ip }}'
+        - more_src_ports='3'
         - max_drop_probability='{{ green_drop_probability_lossless }}'
 
     - name: Restore origin buffer profile after ecn tests

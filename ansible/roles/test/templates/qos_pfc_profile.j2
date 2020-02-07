@@ -24,6 +24,20 @@
             {% else %}
             "profile": "[{{ buffer_profile }}]"
             {% endif %}
+        },
+        "{{ dut_switch_ports[src_port_3_id|int] }}|3-4": {
+            {% if pfc_generate_buffer_profile == 'True' %}
+            "profile": "[BUFFER_PROFILE|pg_lossless_PFC_TEST_profile]"
+            {% else %}
+            "profile": "[{{ buffer_profile }}]"
+            {% endif %}
+        },
+        "{{ dut_switch_ports[src_port_4_id|int] }}|3-4": {
+            {% if pfc_generate_buffer_profile == 'True' %}
+            "profile": "[BUFFER_PROFILE|pg_lossless_PFC_TEST_profile]"
+            {% else %}
+            "profile": "[{{ buffer_profile }}]"
+            {% endif %}
         }
     }
 }
