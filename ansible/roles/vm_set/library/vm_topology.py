@@ -52,8 +52,6 @@ Parameters:
     - vm_base: which VM consider the first VM in the current vm set
     - ptf_mgmt_ip_addr: ip address with prefixlen for the injected docker container
     - ptf_mgmt_ip_gw: default gateway for the injected docker container
-    - ptf_bp_ip_addr: ipv6 address with prefixlen for the injected docker container
-    - ptf_bp_ipv6_addr: ipv6 address with prefixlen for the injected docker container
     - mgmt_bridge: a bridge which is used as mgmt bridge on the host
     - dut_fp_ports: dut ports
     - dut_mgmt_port: dut mgmt port
@@ -76,8 +74,6 @@ EXAMPLES = '''
     vm_base: "{{ VM_base }}"
     ptf_mgmt_ip_addr: "{{ ptf_ip }}"
     ptf_mgmt_ip_gw: "{{ mgmt_gw }}"
-    ptf_bp_ip_addr: "{{ ptf_ip }}"
-    ptf_bp_ipv6_addr: "{{ ptf_ip }}"
     mgmt_bridge: "{{ mgmt_bridge }}"
     dut_mgmt_port: "{{ dut_mgmt_port }}"
     dut_fp_ports: "{{ dut_fp_ports }}"
@@ -89,21 +85,21 @@ EXAMPLES = '''
 DEFAULT_MTU = 0
 NUM_FP_VLANS_PER_FP = 4
 VM_SET_NAME_MAX_LEN = 8  # used in interface names. So restricted
-MGMT_PORT_NAME = 'mgmt'
-BP_PORT_NAME = 'backplane'
+MGMT_BR_NAME = 'mgmt'
 CMD_DEBUG_FNAME = "/tmp/vmtopology.cmds.%s.txt"
 EXCEPTION_DEBUG_FNAME = "/tmp/vmtopology.exception.%s.txt"
 
 OVS_FP_BRIDGE_REGEX = 'br-%s-\d+'
 OVS_FP_BRIDGE_TEMPLATE = 'br-%s-%d'
 OVS_FP_TAP_TEMPLATE = '%s-t%d'
-OVS_BP_TAP_TEMPLATE = '%s-back'
+OVS_BRIDGE_BACK_TEMPLATE = 'br-%s-back'
 INJECTED_INTERFACES_TEMPLATE = 'inje-%s-%d'
 PTF_NAME_TEMPLATE = 'ptf_%s'
 PTF_MGMT_IF_TEMPLATE = 'ptf-%s-m'
-PTF_BP_IF_TEMPLATE = 'ptf-%s-b'
 ROOT_BACK_BR_TEMPLATE = 'br-b-%s'
 PTF_FP_IFACE_TEMPLATE = 'eth%d'
+BACK_ROOT_END_IF_TEMPLATE = 'veth-bb-%s'
+BACK_VM_END_IF_TEMPLATE = 'veth-bv-%s'
 RETRIES = 3
 
 cmd_debug_fname = None
@@ -149,8 +145,6 @@ class VMTopology(object):
         else:
             self.pid = None
 
-        self.bp_bridge = ROOT_BACK_BR_TEMPLATE % self.vm_set_name
-
         self.update()
 
         return
@@ -160,7 +154,7 @@ class VMTopology(object):
         i = 0
         while i < 3:
             try:
-                self.host_br_to_ifs, self.host_if_to_br = VMTopology.brctl_show()
+                self.host_br_to_ifs, self.host_if_to_br = VMTopology.brctl('brctl show')
                 self.host_ifaces = VMTopology.ifconfig('ifconfig -a')
                 if self.pid is not None:
                     self.cntr_ifaces = VMTopology.ifconfig('nsenter -t %s -n ifconfig -a' % self.pid)
@@ -187,11 +181,13 @@ class VMTopology(object):
         for vm in self.vm_names:
             for fp_num in xrange(self.max_fp_num):
                 fp_br_name = OVS_FP_BRIDGE_TEMPLATE % (vm, fp_num)
-                self.create_ovs_bridge(fp_br_name, self.fp_mtu)
+                self.create_bridge(fp_br_name, self.fp_mtu)
+            bport_br_name = OVS_BRIDGE_BACK_TEMPLATE = 'br-%s-back' % vm
+            self.create_bridge(bport_br_name, self.fp_mtu)
 
         return
 
-    def create_ovs_bridge(self, bridge_name, mtu):
+    def create_bridge(self, bridge_name, mtu):
         if bridge_name not in self.host_ifaces:
             VMTopology.cmd('ovs-vsctl add-br %s' % bridge_name)
 
@@ -206,11 +202,13 @@ class VMTopology(object):
         for vm in self.vm_names:
             for ifname in self.host_ifaces:
                 if re.compile(OVS_FP_BRIDGE_REGEX % vm).match(ifname):
-                    self.destroy_ovs_bridge(ifname)
+                    self.destroy_bridge(ifname)
+            bport_br_name = OVS_BRIDGE_BACK_TEMPLATE = 'br-%s-back' % vm
+            self.destroy_bridge(bport_br_name)
 
         return
 
-    def destroy_ovs_bridge(self, bridge_name):
+    def destroy_bridge(self, bridge_name):
         if bridge_name in self.host_ifaces:
             VMTopology.cmd('ifconfig %s down' % bridge_name)
             VMTopology.cmd('ovs-vsctl del-br %s' % bridge_name)
@@ -234,15 +232,8 @@ class VMTopology(object):
         return
 
     def add_mgmt_port_to_docker(self, mgmt_bridge, mgmt_ip, mgmt_gw):
-        self.add_br_if_to_docker(mgmt_bridge, PTF_MGMT_IF_TEMPLATE % self.vm_set_name, MGMT_PORT_NAME)
-        self.add_ip_to_docker_if(MGMT_PORT_NAME, mgmt_ip, mgmt_gw=mgmt_gw)
-
-        return
-
-    def add_bp_port_to_docker(self, mgmt_ip, mgmt_ipv6):
-        self.add_br_if_to_docker(self.bp_bridge, PTF_BP_IF_TEMPLATE % self.vm_set_name, BP_PORT_NAME)
-        self.add_ip_to_docker_if(BP_PORT_NAME, mgmt_ip, mgmt_ipv6)
-        VMTopology.iface_disable_txoff(BP_PORT_NAME, self.pid)
+        self.add_br_if_to_docker(mgmt_bridge, PTF_MGMT_IF_TEMPLATE % self.vm_set_name, MGMT_BR_NAME)
+        self.add_ip_to_docker_if(MGMT_BR_NAME, mgmt_ip, mgmt_gw)
 
         return
 
@@ -265,15 +256,12 @@ class VMTopology(object):
 
         return
 
-    def add_ip_to_docker_if(self, int_if, mgmt_ip_addr, mgmt_ipv6_addr=None, mgmt_gw=None):
+    def add_ip_to_docker_if(self, int_if, mgmt_ip_addr, mgmt_gw):
         self.update()
         if int_if in self.cntr_ifaces:
             VMTopology.cmd("nsenter -t %s -n ip addr flush dev %s" % (self.pid, int_if))
             VMTopology.cmd("nsenter -t %s -n ip addr add %s dev %s" % (self.pid, mgmt_ip_addr, int_if))
-            if mgmt_ipv6_addr:
-                VMTopology.cmd("nsenter -t %s -n ip -6 addr add %s dev %s" % (self.pid, mgmt_ipv6_addr, int_if))
-            if mgmt_gw:
-                VMTopology.cmd("nsenter -t %s -n ip route add default via %s dev %s" % (self.pid, mgmt_gw, int_if))
+            VMTopology.cmd("nsenter -t %s -n ip route add default via %s dev %s" % (self.pid, mgmt_gw, int_if))
 
         return
 
@@ -375,30 +363,53 @@ class VMTopology(object):
         return
 
     def bind_vm_backplane(self):
+        root_back_bridge = ROOT_BACK_BR_TEMPLATE % self.vm_set_name
 
-        if self.bp_bridge not in self.host_ifaces:
-            VMTopology.cmd('brctl addbr %s' % self.bp_bridge)
+        if root_back_bridge not in self.host_ifaces:
+            VMTopology.cmd('ovs-vsctl add-br %s' % root_back_bridge)
 
-        VMTopology.iface_up(self.bp_bridge)
-
-        self.update()
+        VMTopology.iface_up(root_back_bridge)
 
         for attr in self.VMs.itervalues():
             vm_name = self.vm_names[self.vm_base_index + attr['vm_offset']]
-            bp_port_name = OVS_BP_TAP_TEMPLATE % vm_name
+            br_name = OVS_BRIDGE_BACK_TEMPLATE % vm_name
 
-            if bp_port_name not in self.host_br_to_ifs[self.bp_bridge]:
-                VMTopology.cmd("brctl addif %s %s" % (self.bp_bridge, bp_port_name))
+            back_int_name = BACK_ROOT_END_IF_TEMPLATE % vm_name
+            vm_int_name = BACK_VM_END_IF_TEMPLATE % vm_name
 
-            VMTopology.iface_up(bp_port_name)
+            if back_int_name not in self.host_ifaces:
+                VMTopology.cmd("ip link add %s type veth peer name %s" % (back_int_name, vm_int_name))
+
+            if vm_int_name not in VMTopology.get_ovs_br_ports(br_name):
+                VMTopology.cmd("ovs-vsctl add-port %s %s" % (br_name, vm_int_name))
+
+            if back_int_name not in VMTopology.get_ovs_br_ports(root_back_bridge):
+                VMTopology.cmd("ovs-vsctl add-port %s %s" % (root_back_bridge, back_int_name))
+
+            VMTopology.iface_up(vm_int_name)
+            VMTopology.iface_up(back_int_name)
 
         return
 
     def unbind_vm_backplane(self):
+        root_back_bridge = ROOT_BACK_BR_TEMPLATE % self.vm_set_name
 
-        if self.bp_bridge in self.host_ifaces:
-            VMTopology.iface_down(self.bp_bridge)
-            VMTopology.cmd('brctl delbr %s' % self.bp_bridge)
+        if root_back_bridge in self.host_ifaces:
+            VMTopology.iface_down(root_back_bridge)
+            VMTopology.cmd('ovs-vsctl del-br %s' % root_back_bridge)
+
+        for attr in self.VMs.itervalues():
+            vm_name = self.vm_names[self.vm_base_index + attr['vm_offset']]
+            br_name = OVS_BRIDGE_BACK_TEMPLATE % vm_name
+
+            back_int_name = BACK_ROOT_END_IF_TEMPLATE % vm_name
+            vm_int_name = BACK_VM_END_IF_TEMPLATE % vm_name
+
+            self.unbind_ovs_port(br_name, vm_int_name)
+
+            if back_int_name in self.host_ifaces:
+                VMTopology.iface_down(back_int_name)
+                VMTopology.cmd("ip link delete dev %s" % back_int_name)
 
         return
 
@@ -488,13 +499,6 @@ class VMTopology(object):
             return VMTopology.cmd('nsenter -t %s -n ip link set %s %s' % (pid, iface_name, state))
 
     @staticmethod
-    def iface_disable_txoff(iface_name, pid=None):
-        if pid is None:
-            return VMTopology.cmd('ethtool -K %s tx off' % (iface_name))
-        else:
-            return VMTopology.cmd('nsenter -t %s -n ethtool -K %s tx off' % (pid, iface_name))
-
-    @staticmethod
     def cmd(cmdline):
         with open(cmd_debug_fname, 'a') as fp:
             pprint("CMD: %s" % cmdline, fp)
@@ -567,8 +571,8 @@ class VMTopology(object):
         return ctn.attrs['State']['Pid']
 
     @staticmethod
-    def brctl_show():
-        out = VMTopology.cmd("brctl show")
+    def brctl(cmdline):
+        out = VMTopology.cmd(cmdline)
 
         br_to_ifs = {}
         if_to_br = {}
@@ -654,8 +658,6 @@ def main():
             vm_base=dict(required=False, type='str'),
             ptf_mgmt_ip_addr=dict(required=False, type='str'),
             ptf_mgmt_ip_gw=dict(required=False, type='str'),
-            ptf_bp_ip_addr=dict(required=False, type='str'),
-            ptf_bp_ipv6_addr=dict(required=False, type='str'),
             mgmt_bridge=dict(required=False, type='str'),
             dut_fp_ports=dict(required=False, type='list'),
             dut_mgmt_port=dict(required=False, type='str'),
@@ -691,8 +693,6 @@ def main():
                                   'topo',
                                   'ptf_mgmt_ip_addr',
                                   'ptf_mgmt_ip_gw',
-                                  'ptf_bp_ip_addr',
-                                  'ptf_bp_ipv6_addr',
                                   'mgmt_bridge',
                                   'dut_fp_ports'], cmd)
 
@@ -719,16 +719,12 @@ def main():
 
             net.add_mgmt_port_to_docker(mgmt_bridge, ptf_mgmt_ip_addr, ptf_mgmt_ip_gw)
 
-            ptf_bp_ip_addr = module.params['ptf_bp_ip_addr']
-            ptf_bp_ipv6_addr = module.params['ptf_bp_ipv6_addr']
-
             if vms_exists:
                 net.add_veth_ports_to_docker()
                 if module.params['dut_mgmt_port']:
                     net.bind_mgmt_port(mgmt_bridge, module.params['dut_mgmt_port'])
                 net.bind_fp_ports()
                 net.bind_vm_backplane()
-                net.add_bp_port_to_docker(ptf_bp_ip_addr, ptf_bp_ipv6_addr)
 
             if hostif_exists:
                 net.inject_host_ports()
@@ -767,8 +763,6 @@ def main():
                                   'topo',
                                   'ptf_mgmt_ip_addr',
                                   'ptf_mgmt_ip_gw',
-                                  'ptf_bp_ip_addr',
-                                  'ptf_bp_ipv6_addr',
                                   'mgmt_bridge',
                                   'dut_fp_ports'], cmd)
 
@@ -794,9 +788,6 @@ def main():
             mgmt_bridge = module.params['mgmt_bridge']
 
             net.add_mgmt_port_to_docker(mgmt_bridge, ptf_mgmt_ip_addr, ptf_mgmt_ip_gw)
-
-            ptf_bp_ip_addr = module.params['ptf_bp_ip_addr']
-            ptf_bp_ipv6_addr = module.params['ptf_bp_ipv6_addr']
 
             if vms_exists:
                 net.unbind_fp_ports()
