@@ -51,13 +51,14 @@ def common_setup_teardown(testbed_devices):
         reboot_required = True
 
     # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
-    hwsku_digits = re.findall(r"\d+", dut_hwsku)[0]
-    sai_xml = "/usr/share/sonic/device/{}/{}/sai_{}.xml".format(dut_platform, dut_hwsku, hwsku_digits)
+    sai_xml_filename = dut.shell("basename $(cat {} | cut -d'=' -f2)".format(sai_profile))["stdout"]
+    sai_xml_path = "/usr/share/sonic/device/{}/{}/{}".format(dut_platform, dut_hwsku, sai_xml_filename)
+
     if models[dut_hwsku]["reboot"]["warm_reboot"]:
-        if dut.shell("grep '<issu-enabled>0</issu-enabled>' %s | wc -l" % sai_xml)["stdout"] == "1":
+        if dut.shell("grep '<issu-enabled>0</issu-enabled>' %s | wc -l" % sai_xml_path)["stdout"] == "1":
             line = "<issu-enabled>1</issu-enabled>"
             pattern = r"<issu-enabled>\d</issu-enabled>"
-            dut.lineinfile(dest=sai_xml, regexp=pattern, line=line)
+            dut.lineinfile(dest=sai_xml_path, regexp=pattern, line=line)
             reboot_required = True
 
     if reboot_required:
@@ -117,17 +118,19 @@ def configure_issu(dut, localhost, issu_status="disabled"):
     @summary: Configure issu on DUT to specified status
     """
     dut_platform = dut.facts["platform"]
-    hwsku = dut.facts["hwsku"]
-    hwsku_digits = re.findall(r"\d+", hwsku)[0]
-    sai_xml = "/usr/share/sonic/device/{}/{}/sai_{}.xml".format(dut_platform, hwsku, hwsku_digits)
+    dut_hwsku = dut.facts["hwsku"]
+    sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
+    sai_xml_filename = dut.shell("basename $(cat {} | cut -d'=' -f2)".format(sai_profile))["stdout"]
+    sai_xml_path = "/usr/share/sonic/device/{}/{}/{}".format(dut_platform, dut_hwsku, sai_xml_filename)
+
     pattern = r"<issu-enabled>\d</issu-enabled>"
 
     if issu_status == "disabled":
         line = "<issu-enabled>0</issu-enabled>"
-        dut.lineinfile(dest=sai_xml, regexp=pattern, line=line)
+        dut.lineinfile(dest=sai_xml_path, regexp=pattern, line=line)
     elif issu_status == "enabled":
         line = "<issu-enabled>1</issu-enabled>"
-        dut.lineinfile(dest=sai_xml, regexp=pattern, line=line)
+        dut.lineinfile(dest=sai_xml_path, regexp=pattern, line=line)
 
     logging.info("Reboot the dut")
     reboot_task, reboot_res = dut.command("reboot", module_async=True)
