@@ -66,7 +66,7 @@ reboot_ctrl_dict = {
 }
 
 
-sku_supporting_reboot_cause_test = ['ACS-MSN2410', 'ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8', 'ACS-MSN3700', 'ACS-MSN3700C', 'ACS-MSN3800']
+sku_supporting_reboot_cause_test = ['ACS-MSN2410', 'ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8', 'ACS-MSN3700', 'ACS-MSN3700C', 'ACS-MSN3800', 'Mellanox-SN3800-D112C8']
 sku_supporting_fast_reboot = ['ACS-MSN2410', 'ACS-MSN2700', "LS-SN2700", 'Mellanox-SN2700', 'Mellanox-SN2700-D48C8', 'ACS-MSN2100', 'ACS-MSN2010', 'ACS-MSN2740']
 
 def check_reboot_cause(dut, reboot_cause_expected):
@@ -77,7 +77,7 @@ def check_reboot_cause(dut, reboot_cause_expected):
     """
     if dut.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         logging.info("Reboot-cause check skipped because %s doesn't support it" % dut.facts["hwsku"])
-        return
+        return True
 
     logging.info("Check the reboot cause")
     output = dut.shell("show reboot-cause")
