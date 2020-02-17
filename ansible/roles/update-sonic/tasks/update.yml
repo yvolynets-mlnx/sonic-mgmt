@@ -46,6 +46,17 @@
   - name: Show update result
     debug: msg="{{ update_output.stdout_lines }}"
 
+  # https://github.com/Azure/sonic-buildimage/issues/3881 db migration failed if switch image from master to 201811
+  # https://github.com/Azure/sonic-buildimage/issues/3986 snmp AgentX socket bind failed
+  - name: WR for the db migration issue and the snmp AgentX socket bind error in log
+    file:
+      path: "/host/old_config/{{ item }}"
+      state: absent
+    ignore_errors: true
+    with_items:
+      - "config_db.json"
+      - "snmp.yml"
+
   when: update_required
 
 - name: Ensure that target image is always default after reboot
