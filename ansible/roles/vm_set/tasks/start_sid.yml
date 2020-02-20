@@ -7,6 +7,9 @@
 - include_vars: group_vars/sonic/vars
 
 - set_fact:
+    ansible_ssh_user: root
+
+- set_fact:
     src_disk_image: "{{ home_path }}/sid/images/sonic.img"
     disk_image: "{{ home_path }}/sid/disks/{{ dut_name }}.img"
     simx_image: "{{ home_path }}/sid/images/simx:latest.tar"
@@ -16,7 +19,7 @@
   debug: msg="hostname = {{ dut_name }} ip = {{ mgmt_ip_address }}"
 
 - name: Check destination file existance
-  stat: path={{ disk_image }}
+  stat: path={{ disk_image }} checksum_algorithm=md5
   register: file_stat
 
 - name: Copy sonic disk image for {{ dut_name }}
@@ -30,10 +33,10 @@
   when: "sonic_hwsku is not defined"
 
 - fail: msg="{{ item }} is not defined"
-  when: "{{ item }} is not defined"
-  with_items:
-    - "{{ mellanox_spc1_hwskus }}"
-    - "{{ mellanox_spc2_hwskus }}"
+  when: "mellanox_spc1_hwskus is not defined"
+
+- fail: msg="{{ item }} is not defined"
+  when: "mellanox_spc2_hwskus is not defined"
 
 - set_fact:
     chip: "spectrum"
