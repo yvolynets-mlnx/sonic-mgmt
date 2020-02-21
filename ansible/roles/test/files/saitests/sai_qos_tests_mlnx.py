@@ -352,12 +352,14 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
         src_port_info_list = [(src_port_id, src_port_ip, src_port_mac)]
         logging.info('source port info: %d %s %s' % (src_port_id, src_port_ip, src_port_mac))
 
-        if 'src_port_2_id' in self.test_params.keys():
-            src_port_id = int(self.test_params['src_port_2_id'])
-            src_port_ip = self.test_params['src_port_2_ip']
-            src_port_mac = self.dataplane.get_mac(0, src_port_id)
-            src_port_info_list.append((src_port_id, src_port_ip, src_port_mac))
-            logging.info('second source port info: %d %s %s' % (src_port_id, src_port_ip, src_port_mac))
+        if 'more_src_ports' in self.test_params.keys():
+            more_src_ports = int((self.test_params['more_src_ports']))
+            for i in range(more_src_ports):
+                src_port_id = int(self.test_params['src_port_{}_id'.format(i + 2)])
+                src_port_ip = self.test_params['src_port_{}_ip'.format(i + 2)]
+                src_port_mac = self.dataplane.get_mac(0, src_port_id)
+                src_port_info_list.append((src_port_id, src_port_ip, src_port_mac))
+                logging.info('%d-th source port info: %d %s %s' % (i+2, src_port_id, src_port_ip, src_port_mac))
 
         if 'max_drop_probability' in self.test_params.keys():
             max_drop_probability = int(self.test_params['max_drop_probability'])
@@ -366,13 +368,15 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
         logging.info('max drop probability is %d' % max_drop_probability)
 
         num_of_src_ports = len(src_port_info_list)
-        num_of_pkts = int(self.test_params['num_of_pkts']) / num_of_src_ports
+        num_of_pkts = int(self.test_params['num_of_pkts'])
+        num_of_pkts_perport = num_of_pkts / num_of_src_ports
         packet_length = cell_size - 20 # to be within one cell
         logging.info('original num_of_pkts: %d' % num_of_pkts)
         if ecn == 1:
             # scapy(ptf?) cannot capture more than 1023 packets.
-            packet_length = min(packet_length * (num_of_pkts / 125), 9000)
-            num_of_pkts = 125
+            packet_length = min(cell_size * (num_of_pkts_perport / 125), 9000)
+            num_of_pkts_perport = 125
+            num_of_pkts = num_of_pkts_perport * num_of_src_ports
 
         green_min_limit = int(self.test_params['green_min_limit'])
         green_max_limit = int(self.test_params['green_max_limit'])
@@ -406,12 +410,15 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
                                     ip_dst=dst_port_ip,
                                     ip_tos=tos,
                                     ip_ttl=ttl)
-                send_packet(self, src_port_id, pkt, num_of_pkts)
+                send_packet(self, src_port_id, pkt, num_of_pkts_perport)
                 time.sleep(1)
 
             # Set receiving socket buffers to some big value
             for p in self.dataplane.ports.values():
                 p.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 41943040)
+            # Set the dataplane qlen
+            self.dataplane.set_qlen(num_of_pkts)
+            logging.info("Setting dataplane qlen to {}".format(num_of_pkts))
 
             # RELEASE PORT
             sai_thrift_set_port_shaper(self.client, port_list[dst_port_id], RELEASE_PORT_MAX_RATE)
@@ -421,7 +428,7 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
             not_marked_cnt = 0
             if (ecn == 1):
                 cnt = 0
-                for i in xrange(num_of_pkts*num_of_src_ports):
+                for i in xrange(num_of_pkts):
                     (rcv_device, rcv_port, rcv_pkt, pkt_time) = dp_poll(self, device_number=0, port_number=dst_port_id, timeout=0.2)
                     if rcv_pkt is not None:
                         cnt += 1
@@ -448,7 +455,7 @@ class DscpEcnSend(sai_base_test.ThriftInterfaceDataPlane):
             logging.info(queue_counters)
 
             expected_tx_cells = self.predictTx(green_min_limit_cells, green_max_limit_cells,
-                                               num_of_src_ports*num_of_pkts*cells_per_packet,
+                                               num_of_pkts*cells_per_packet,
                                                max_drop_probability)
             tolerance = float(expected_tx_cells) * ecn_tolerance_prc / 100
             limit_max = expected_tx_cells + tolerance
