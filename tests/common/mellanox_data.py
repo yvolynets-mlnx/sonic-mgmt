@@ -27,6 +27,32 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 32
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 2
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "Mellanox-SN2700": {
@@ -51,6 +77,32 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 32
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 2
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "Mellanox-SN2700-D48C8": {
@@ -75,6 +127,32 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 32
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 2
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN2740": {
@@ -99,6 +177,29 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 32
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN2410": {
@@ -123,6 +224,32 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 56
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 2
+            },
+            "module": {
+                "start": 1,
+                "number": 56
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN2010": {
@@ -147,6 +274,25 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 22
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 22
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN2100": {
@@ -171,6 +317,25 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 16
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 16
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN3800": {
@@ -195,6 +360,39 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 64
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 64
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "gearbox": {
+                "start": 1,
+                "number": 32
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            },
+            "comex_ambient": {
+                "number": 1
+            }
         }
     },
     "Mellanox-SN3800-D112C8": {
@@ -243,6 +441,35 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 32
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            },
+            "comex_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN3700C": {
@@ -264,6 +491,59 @@ SWITCH_MODELS = {
         },
         "cpu_cores": {
             "number": 2
+        },
+        "ports": {
+            "number": 32
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 2
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            },
+            "comex_ambient": {
+                "number": 1
+            }
+        }
+    },
+    "ACS-MSN4700": {
+        "reboot": {
+            "cold_reboot": True,
+            "fast_reboot": False,
+            "warm_reboot": False
+        },
+        "fans": {
+            "number": 6,
+            "hot_swappable": True
+        },
+        "psus": {
+            "number": 2,
+            "hot_swappable": True
+        },
+        "cpu_pack": {
+            "number": 1
+        },
+        "cpu_cores": {
+            "number": 4
         },
         "ports": {
             "number": 32
