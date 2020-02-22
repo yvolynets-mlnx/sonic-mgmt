@@ -41,6 +41,11 @@
         ap={{ ASIC_params['SPC2'] }}
       when: sonic_hwsku in mellanox_spc2_hwskus
 
+    - name: set ASIC parameters for SPC3
+      set_fact:
+        ap={{ ASIC_params['SPC3'] }}
+      when: sonic_hwsku in mellanox_spc3_hwskus
+
     - name: Update ASIC dependant values
       set_fact:
         qp: "{{ qp | combine(ap) }}"
