@@ -2,7 +2,7 @@
     msg="Get the {{ target_port_name }} port MAX buffer size"
     
 - name: Get buffer profile table for {{ target_port_name }} port
-  shell: docker exec database redis-cli -n 4 KEYS "{{ target_table }}|{{ target_port_name }}|{{ target_pg }}"
+  shell: docker exec database redis-cli -n 4 KEYS "{{ target_table }}|*{{ target_port_name }}[^0-9]*{{ target_pg }}"
   register: buffer_profile_table
         
 - name: Get buffer profile for {{ target_port_name }} port
