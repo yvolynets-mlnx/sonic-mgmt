@@ -15,6 +15,12 @@ from multiprocessing.pool import ThreadPool
 from errors import RunAnsibleModuleFail
 from errors import UnsupportedAnsibleModule
 
+
+ANSIBLE_ROOT = os.path.normpath((os.path.join(__file__, "../../../ansible")))
+LAB_CONNECTION_GRAPH = os.path.normpath((os.path.join(os.path.dirname(__file__),
+                                        "../../ansible/files/lab_connection_graph.xml")))
+
+
 class AnsibleHostBase(object):
     """
     @summary: The base class for various objects.
@@ -159,7 +165,7 @@ class SonicHost(AnsibleHostBase):
         for service in self.CRITICAL_SERVICES:
             result[service] = self.is_service_fully_started(service)
 
-        logging.info("Status of critical services: %s" % str(result))
+        logging.debug("Status of critical services: %s" % str(result))
         return all(result.values())
 
 
@@ -223,3 +229,27 @@ class SonicHost(AnsibleHostBase):
 
         logging.info("Pmon daemon list for this platform is %s" % str(daemon_list))
         return daemon_list
+
+class FanoutHost(Localhost):
+    def __init__(self, ansible_adhoc, localhost, duthost):
+        Localhost.__init__(self, ansible_adhoc)
+        self.ansible_playbook = os.path.realpath(os.path.join(os.path.dirname(__file__), "../scripts/exec_template.yml"))
+        self.playbook_template = 'cd {ansible_path}; ansible-playbook {playbook} -i lab -l {fanout_host} --extra-vars \'{extra_vars}\' -vvvvv'
+        self.localhost = localhost
+        self.duthost = duthost
+        self.fanout_host = None
+        self.facts = {}
+        self.gather_facts()
+
+    def exec_template(self, **kwargs):
+        cli_cmd = self.playbook_template.format(ansible_path=ANSIBLE_ROOT, playbook=self.ansible_playbook,
+                                                    fanout_host=self.fanout_host, extra_vars=json.dumps(kwargs))
+        res = self.localhost.shell(cli_cmd)
+
+        if res["rc"] != 0:
+            raise Exception("Unable to execute template\n{}".format(res["stdout"]))
+
+    def gather_facts(self):
+        dut_facts = self.localhost.conn_graph_facts(host=self.duthost.hostname, filename=LAB_CONNECTION_GRAPH)["ansible_facts"]
+        self.fanout_host = dut_facts["device_conn"]["Ethernet0"]["peerdevice"]
+        self.facts = self.localhost.conn_graph_facts(host=self.fanout_host, filename=LAB_CONNECTION_GRAPH)["ansible_facts"]

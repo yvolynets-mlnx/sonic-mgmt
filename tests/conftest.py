@@ -10,11 +10,13 @@ import csv
 import yaml
 import ipaddr as ipaddress
 
+from ansible.parsing.dataloader import DataLoader
+from ansible.inventory.manager import InventoryManager
 from ansible_host import AnsibleHost
 from loganalyzer import LogAnalyzer
 from common.sanity_check import check_critical_services, check_links_up
 
-from common.devices import SonicHost, Localhost, PTFHost
+from common.devices import SonicHost, Localhost, PTFHost, FanoutHost
 
 logger = logging.getLogger(__name__)
 pytest_plugins = ('ptf_fixtures',
@@ -99,7 +101,10 @@ def testbed_devices(ansible_adhoc, testbed):
 
     devices = {
         "localhost": Localhost(ansible_adhoc),
-        "dut": SonicHost(ansible_adhoc, testbed["dut"], gather_facts=True)}
+        "dut": SonicHost(ansible_adhoc, testbed["dut"], gather_facts=True)
+    }
+
+    devices["fanout"] = FanoutHost(ansible_adhoc, devices["localhost"], devices["dut"])
 
     if "ptf" in testbed:
         devices["ptf"] = PTFHost(ansible_adhoc, testbed["ptf"])
@@ -171,12 +176,31 @@ def ptfhost(testbed_devices):
     return testbed_devices["ptf"]
 
 
+@pytest.fixture(scope="module")
+def localhost(testbed_devices):
+    """
+    Shortcut fixture for getting Localhost host
+    """
+
+    return testbed_devices["localhost"]
+
+
 @pytest.fixture(scope='session')
 def eos():
     """ read and yield eos configuration """
     with open('eos/eos.yml') as stream:
         eos = yaml.safe_load(stream)
         return eos
+
+
+@pytest.fixture(scope='session')
+def ansible_inventory():
+    ansible_root = os.path.realpath(os.path.join(os.path.dirname(__file__), "../ansible"))
+    inventory_file_name = os.path.join(ansible_root, "inventory")
+
+    data_loader = DataLoader()
+    inventory = InventoryManager(loader = data_loader, sources=[inventory_file_name])
+    yield inventory
 
 
 @pytest.fixture(autouse=True)

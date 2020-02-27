@@ -14,7 +14,7 @@ import ptf
 from sai_base_test import *
 from collections import defaultdict
 from switch import *
-import threading
+import multiprocessing
 import subprocess
 import json
 import logging
@@ -52,9 +52,8 @@ class PfcAsymBaseTest(ThriftInterfaceDataPlane):
 
         for server_port in server_ports:
             d[server_port['ptf_name']].append(server_port['ptf_ip'].split('/')[0])
-
-            with open('/tmp/arp_responder_pfc_asym.json', 'w') as file:
-                json.dump(d, file)
+        with open('/tmp/arp_responder_pfc_asym.json', 'w') as file:
+            json.dump(d, file)
 
     def setUp(self):
         ThriftInterfaceDataPlane.setUp(self)
@@ -80,10 +79,10 @@ class PfcAsymBaseTest(ThriftInterfaceDataPlane):
         threads = []
 
         for pkt in packets:
-            thread = threading.Thread(target=send_packet, args=(self, int(pkt['port']), pkt['packet'], self.PACKET_NUM))
+            thread = multiprocessing.Process(target=send_packet, args=(self, int(pkt['port']), pkt['packet'], self.PACKET_NUM))
             thread.daemon = True
             threads.append(thread)
-    
+
         for thread in threads:
             thread.start()
 
@@ -142,10 +141,6 @@ class PfcAsymOffOnTxTest(PfcAsymBaseTest):
 
         # Send packets for lossless priorities from all server ports (src) to non-server port (dst)
         self.sendData(self.server_ports, self.non_server_port, self.router_mac, self.lossless_priorities)
-
-        # Verify that some packets are dropped on dst port, which means that Tx buffer is full
-        port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[int(self.non_server_port['index'])])
-        assert(port_counters[self.EGRESS_DROP] > 0)
 
         # 1. Verify that some packets are dropped on src ports, which means that Rx queue is full
         # 2. Verify that PFC frames are generated for lossless priorities
