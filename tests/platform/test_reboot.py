@@ -18,7 +18,6 @@ from datetime import datetime
 import pytest
 
 from platform_fixtures import conn_graph_facts
-from psu_controller import psu_controller
 from common.utilities import wait_until
 from check_critical_services import check_critical_services
 from check_transceiver_status import check_transceiver_basic
@@ -278,7 +277,7 @@ def test_power_off_reboot(testbed_devices, conn_graph_facts, psu_controller, pow
     if ans_host.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         pytest.skip("Reboot-cause check skipped because %s doesn't support it" % ans_host.facts["hwsku"])
 
-    psu_ctrl = psu_controller(ans_host.hostname, ans_host.facts["asic_type"])
+    psu_ctrl = psu_controller
     if psu_ctrl is None:
         pytest.skip("No PSU controller for %s, skip rest of the testing in this case" % ans_host.hostname)
 
