@@ -827,16 +827,16 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.43/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switchmtbc01">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.112.67.34/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.75.67.34/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switchmtbc02">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.112.67.41/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.75.67.41/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="mtbc-sonic-02-2700">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.112.67.45/25"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.75.67.45/25"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="mtbc-3700c-02">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.112.67.51/24"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.75.67.51/24"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="r-panther-03">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.83/22"/>
