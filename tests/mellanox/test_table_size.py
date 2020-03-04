@@ -50,7 +50,8 @@ def set_issu(dut, issu_enabled=False):
     dut_hwsku = dut.facts["hwsku"]
 
     sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
-    sai_xml_filename = dut.shell("basename $(cat {} | cut -d'=' -f2)".format(sai_profile))["stdout"]
+    cmd = "basename $(cat {} | grep SAI_INIT_CONFIG_FILE | cut -d'=' -f2)".format(sai_profile)
+    sai_xml_filename = dut.shell(cmd)["stdout"].strip()
     sai_xml_path = "/usr/share/sonic/device/{}/{}/{}".format(dut_platform, dut_hwsku, sai_xml_filename)
 
     value = "1" if issu_enabled else "0"
