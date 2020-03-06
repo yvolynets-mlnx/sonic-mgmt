@@ -108,6 +108,12 @@ class ARPResponder(object):
         request_ip_str = socket.inet_ntoa(request_ip)
         if request_ip_str not in self.ip_sets[interface.name()]:
             return
+
+        if 'vlan' in self.ip_sets[interface.name()]:
+            vlan_id = self.ip_sets[interface.name()]['vlan']
+        else:
+            vlan_id = None
+
         arp_reply = self.generate_arp_reply(self.ip_sets[interface.name()][request_ip_str], remote_mac, request_ip, remote_ip, vlan_id)
         interface.send(arp_reply)
 
