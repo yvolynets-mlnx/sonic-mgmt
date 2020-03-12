@@ -180,7 +180,8 @@ def enable_pfc_asym(setup, duthost):
     try:
         # Enable asymmetric PFC on all server interfaces
         duthost.shell("for item in {}; do config interface pfc asymmetric $item on; done".format(srv_ports))
-        for p_oid in setup["server_ports_oids"]:
+        for port in setup["ptf_test_params"]["server_ports"]:
+            p_oid = hex(port["oid"])
             # Verify asymmetric PFC enabled
             assert pfc_asym_enabled == duthost.command(get_pfc_mode.format(p_oid))["stdout"]
             # Verify asymmetric PFC Rx and Tx values
@@ -191,7 +192,8 @@ def enable_pfc_asym(setup, duthost):
     finally:
         # Disable asymmetric PFC on all server interfaces
         duthost.shell("for item in {}; do config interface pfc asymmetric $item off; done".format(srv_ports))
-        for p_oid in setup["server_ports_oids"]:
+        for port in setup["ptf_test_params"]["server_ports"]:
+            p_oid = hex(port["oid"])
             # Verify asymmetric PFC disabled
             assert pfc_asym_restored == duthost.command(get_pfc_mode.format(p_oid))["stdout"]
             # Verify PFC value is restored to default

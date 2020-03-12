@@ -50,18 +50,33 @@ class Setup(object):
         generated_ips = generate_ips(len(self.vlan_members), "{}/{}".format(self.mg_facts['minigraph_vlan_interfaces'][0]['addr'],
                                             self.mg_facts['minigraph_vlan_interfaces'][0]['prefixlen']),
                                             [IPAddress(self.mg_facts['minigraph_vlan_interfaces'][0]['addr'])])
-        self.vars["ptf_test_params"]["server_ports"] = [{"dut_name": item,
-                                                "ptf_name": "eth{}".format(self.mg_facts["minigraph_port_indices"][item]),
-                                                "index": self.mg_facts["minigraph_port_indices"][item],
-                                                "ptf_ip": generated_ips[index]} for index, item in enumerate(self.vlan_members)]
+
+        self.vars["ptf_test_params"]["server_ports"] = []
+        for index, item in enumerate(self.vlan_members):
+            port_info = {"dut_name": item,
+                            "ptf_name": "eth{}".format(self.mg_facts["minigraph_port_indices"][item]),
+                            "index": self.mg_facts["minigraph_port_indices"][item],
+                            "ptf_ip": generated_ips[index],
+                            "oid": None}
+
+            redis_oid = self.duthost.command("docker exec -i database redis-cli --raw -n 2 HMGET \
+                        COUNTERS_PORT_NAME_MAP {}".format(item))["stdout"]
+            sai_redis_oid = int(self.duthost.command("docker exec -i database redis-cli -n 1 hget VIDTORID {}".format(redis_oid))["stdout"].replace("oid:", ""), 16)
+            port_info["oid"] = sai_redis_oid
+            self.vars["ptf_test_params"]["server_ports"].append(port_info)
+
         self.vars["ptf_test_params"]["server"] = self.ansible_facts["ansible_hostname"]
 
     def generate_non_server_ports(self):
         """ Generate list of port parameters which are connected to VMs """
+        redis_oid = self.duthost.command("docker exec -i database redis-cli --raw -n 2 HMGET \
+                                            COUNTERS_PORT_NAME_MAP {}".format(self.portchannel_member))["stdout"]
+        sai_redis_oid = int(self.duthost.command("docker exec -i database redis-cli -n 1 hget VIDTORID {}".format(redis_oid))["stdout"].replace("oid:", ""), 16)
         self.vars["ptf_test_params"]["non_server_port"] = {"ptf_name": "eth{}".format(self.mg_facts["minigraph_port_indices"][self.portchannel_member]),
                                                     "index": self.mg_facts["minigraph_port_indices"][self.portchannel_member],
                                                     "ip": self.mg_facts["minigraph_portchannel_interfaces"][0]["peer_addr"],
-                                                    "dut_name": self.portchannel_member}
+                                                    "dut_name": self.portchannel_member,
+                                                    "oid": sai_redis_oid}
 
     def generate_router_mac(self):
         """ Get DUT MAC address which will be used by PTF as Ethernet destination MAC address during sending traffic """

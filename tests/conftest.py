@@ -13,16 +13,16 @@ import ipaddr as ipaddress
 from ansible.parsing.dataloader import DataLoader
 from ansible.inventory.manager import InventoryManager
 from ansible_host import AnsibleHost
-from loganalyzer import LogAnalyzer
-from common.sanity_check import check_critical_services, check_links_up
-
+from collections import defaultdict
 from common.devices import SonicHost, Localhost, PTFHost, FanoutHost
 
 logger = logging.getLogger(__name__)
-pytest_plugins = ('ptf_fixtures',
-                  'ansible_fixtures',
-                  'plugins.dut_monitor.pytest_dut_monitor',
-                  'fib',
+
+pytest_plugins = ('common.plugins.ptfadapter',
+                  'common.plugins.ansible_fixtures',
+                  'common.plugins.dut_monitor',
+                  'common.plugins.fib',
+                  'common.plugins.loganalyzer',
                   'common.plugins.psu_controller')
 
 
@@ -31,44 +31,44 @@ class TestbedInfo(object):
     Parse the CSV file used to describe whole testbed info
     Please refer to the example of the CSV file format
     CSV file first line is title
-    The topology name in title is using uniq-name | conf-name
+    The topology name in title is using conf-name
     """
 
     def __init__(self, testbed_file):
         self.testbed_filename = testbed_file
-        self.testbed_topo = {}
+        self.testbed_topo = defaultdict()
+        CSV_FIELDS = ('conf-name', 'group-name', 'topo', 'ptf_image_name', 'ptf', 'ptf_ip', 'server', 'vm_base', 'dut', 'comment')
 
         with open(self.testbed_filename) as f:
-            topo = csv.DictReader(f)
-            for line in topo:
-                tb_prop = {}
-                name = ''
-                for key in line:
-                    if ('uniq-name' in key or 'conf-name' in key) and '#' in line[key]:
-                        continue
-                    elif 'uniq-name' in key or 'conf-name' in key:
-                        name = line[key]
-                    elif 'ptf_ip' in key and line[key]:
-                        ptfaddress = ipaddress.IPNetwork(line[key])
-                        tb_prop['ptf_ip'] = str(ptfaddress.ip)
-                        tb_prop['ptf_netmask'] = str(ptfaddress.netmask)
-                    elif key == 'topo':
-                        tb_prop['topo'] = {}
-                        tb_prop['topo']['name'] = line[key]
-                        with open("../ansible/vars/topo_{}.yml".format(tb_prop['topo']['name']), 'r') as fh:
-                            tb_prop['topo']['properties'] = yaml.safe_load(fh)
-                    else:
-                        tb_prop[key] = line[key]
+            topo = csv.DictReader(f, fieldnames=CSV_FIELDS)
 
-                if name:
-                    self.testbed_topo[name] = tb_prop
+            # Validate all field are in the same order and are present
+            header = next(topo)
+            for field in CSV_FIELDS:
+                assert header[field].replace('#', '').strip() == field
+
+            for line in topo:
+                if line['conf-name'].lstrip().startswith('#'):
+                    ### skip comment line
+                    continue
+                if line['ptf_ip']:
+                    ptfaddress = ipaddress.IPNetwork(line['ptf_ip'])
+                    line['ptf_ip'] = str(ptfaddress.ip)
+                    line['ptf_netmask'] = str(ptfaddress.netmask)
+
+                topo = line['topo']
+                del line['topo']
+                line['topo'] = defaultdict()
+                line['topo']['name'] = topo
+                with open("../ansible/vars/topo_{}.yml".format(topo), 'r') as fh:
+                    line['topo']['properties'] = yaml.safe_load(fh)
+
+                self.testbed_topo[line['conf-name']] = line
 
 
 def pytest_addoption(parser):
     parser.addoption("--testbed", action="store", default=None, help="testbed name")
     parser.addoption("--testbed_file", action="store", default=None, help="testbed file name")
-    parser.addoption("--disable_loganalyzer", action="store_true", default=False,
-                     help="disable loganalyzer analysis for 'loganalyzer' fixture")
 
     # test_vrf options
     parser.addoption("--vrf_capacity", action="store", default=None, type=int, help="vrf capacity of dut (4-1000)")
@@ -78,6 +78,17 @@ def pytest_addoption(parser):
     # pfc_asym options         #
     ############################
     parser.addoption("--server_ports_num", action="store", default=20, type=int, help="Number of server ports to use")
+
+    ############################
+    # test_techsupport options #
+    ############################
+    
+    parser.addoption("--loop_num", action="store", default=10, type=int,
+                    help="Change default loop range for show techsupport command")
+    parser.addoption("--loop_delay", action="store", default=10, type=int,
+                    help="Change default loops delay")
+    parser.addoption("--logs_since", action="store", type=int, 
+                    help="number of minutes for show techsupport command")
 
 
 @pytest.fixture(scope="session")
@@ -129,6 +140,7 @@ def testbed_devices(ansible_adhoc, testbed):
 
     return devices
 
+
 def disable_ssh_timout(dut):
     '''
     @summary disable ssh session on target dut
@@ -140,6 +152,7 @@ def disable_ssh_timout(dut):
 
     dut.command("sudo systemctl restart ssh")
     time.sleep(5)
+
 
 def enable_ssh_timout(dut):
     '''
@@ -172,6 +185,7 @@ def duthost(testbed_devices, request):
 
     if stop_ssh_timeout is not None:
         enable_ssh_timout(duthost)
+
 
 @pytest.fixture(scope="module")
 def ptfhost(testbed_devices):
@@ -209,22 +223,6 @@ def ansible_inventory():
     yield inventory
 
 
-@pytest.fixture(autouse=True)
-def loganalyzer(duthost, request):
-    loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix=request.node.name)
-    # Add start marker into DUT syslog
-    marker = loganalyzer.init()
-    yield loganalyzer
-    if not request.config.getoption("--disable_loganalyzer") and "disable_loganalyzer" not in request.keywords:
-        # Read existed common regular expressions located with legacy loganalyzer module
-        loganalyzer.load_common_config()
-        # Parse syslog and process result. Raise "LogAnalyzerError" exception if: total match or expected missing
-        # match is not equal to zero
-        loganalyzer.analyze(marker)
-    else:
-        # Add end marker into DUT syslog
-        loganalyzer._add_end_marker(marker)
-
 @pytest.fixture(scope="session")
 def creds():
     """ read and yield lab configuration """
@@ -235,17 +233,6 @@ def creds():
             creds.update(yaml.safe_load(stream))
     return creds
 
-@pytest.fixture(scope="module", autouse=True)
-def base_sanity(duthost):
-    """perform base sanity checks before and after each test"""
-
-    check_critical_services(duthost)
-    check_links_up(duthost)
-
-    yield base_sanity
-
-    check_critical_services(duthost)
-    check_links_up(duthost)
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
@@ -263,6 +250,7 @@ def fetch_dbs(duthost, testname):
     for db in dbs:
         duthost.shell("redis-dump -d {} --pretty -o {}.json".format(db[0], db[1]))
         duthost.fetch(src="{}.json".format(db[1]), dest="logs/{}".format(testname))
+
 
 @pytest.fixture
 def collect_techsupport(request, duthost):

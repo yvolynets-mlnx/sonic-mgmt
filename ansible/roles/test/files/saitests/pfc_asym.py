@@ -105,14 +105,14 @@ class PfcAsymOffOnTxTest(PfcAsymBaseTest):
         sched_prof_id = sai_thrift_create_scheduler_profile(self.client, self.STOP_PORT_MAX_RATE)
         attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
         attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-        self.client.sai_thrift_set_port_attribute(port_list[int(self.non_server_port['index'])], attr)
+        self.client.sai_thrift_set_port_attribute(self.non_server_port['oid'], attr)
 
     def tearDown(self):
         # Restore maximum bandwith rate on the destination port
         sched_prof_id = sai_thrift_create_scheduler_profile(self.client, self.RELEASE_PORT_MAX_RATE)
         attr_value = sai_thrift_attribute_value_t(oid=sched_prof_id)
         attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_QOS_SCHEDULER_PROFILE_ID, value=attr_value)
-        self.client.sai_thrift_set_port_attribute(port_list[int(self.non_server_port['index'])],attr)
+        self.client.sai_thrift_set_port_attribute(self.non_server_port['oid'], attr)
 
         PfcAsymBaseTest.tearDown(self)
 
@@ -145,8 +145,9 @@ class PfcAsymOffOnTxTest(PfcAsymBaseTest):
         # 1. Verify that some packets are dropped on src ports, which means that Rx queue is full
         # 2. Verify that PFC frames are generated for lossless priorities
         for sp in self.server_ports:
-            port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[int(sp['index'])])
-            self.log("\nLossless: port_counters = {}\n queue_counters = {}".format(port_counters, queue_counters))
+            port_counters, queue_counters = sai_thrift_read_port_counters(self.client, sp['oid'])
+            self.log("\nLossless: port_counters = {}\n queue_counters = {}\nserver port = {}".format(port_counters,
+                                                                                    queue_counters, sp))
             assert(port_counters[self.INGRESS_DROP] > 0)
             for p in self.lossless_priorities:
                 assert(port_counters[p + 2] > 0)
@@ -156,8 +157,9 @@ class PfcAsymOffOnTxTest(PfcAsymBaseTest):
 
         # Verify that PFC frames are not generated for lossy priorities
         for sp in self.server_ports:
-            port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[int(sp['index'])])
-            self.log("\Lossy: port_counters = {}\n queue_counters = {}".format(port_counters, queue_counters))
+            port_counters, queue_counters = sai_thrift_read_port_counters(self.client, sp['oid'])
+            self.log("\Lossy: port_counters = {}\n queue_counters = {}\nserver_ports = {}".format(port_counters,
+                                                                                                queue_counters, sp))
             for p in self.lossy_priorities:
                 assert(port_counters[p + 2] == 0)
 
@@ -210,7 +212,9 @@ class PfcAsymOffRxTest(PfcAsymBaseTest):
         # 2. Verify that packets are transmitted from dst ports
         for sp in self.server_ports:
             port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[int(sp['index'])])
-            self.log("\Lossy - EGRESS_DROP: port_counters = {}\n queue_counters = {}".format(port_counters, queue_counters))
+            self.log("\Lossy - EGRESS_DROP: port_counters = {}\n queue_counters = {}\nserver_port = {}".format(port_counters,
+                                                                                                            queue_counters,
+                                                                                                            sp))
             assert(port_counters[self.EGRESS_DROP] == 0)
             for p in self.lossy_priorities:
                 assert(port_counters[self.TRANSMITTED_PKTS] > 0)
@@ -226,7 +230,9 @@ class PfcAsymOffRxTest(PfcAsymBaseTest):
         # Verify that some packets are dropped on dst ports, which means that Tx buffer is full
         for sp in self.server_ports:
             port_counters, queue_counters = sai_thrift_read_port_counters(self.client, port_list[int(sp['index'])])
-            self.log("\nLossless - EGRESS_DROP: port_counters = {}\n queue_counters = {}".format(port_counters, queue_counters))
+            self.log("\nLossless - EGRESS_DROP: port_counters = {}\n queue_counters = {}\nserver_port = {}".format(port_counters,
+                                                                                                                    queue_counters,
+                                                                                                                    sp))
             assert(port_counters[self.EGRESS_DROP] > 0)
 
 
