@@ -37,7 +37,6 @@ class Setup(object):
         self.generate_server_ports()
         self.generate_non_server_ports()
         self.generate_router_mac()
-        self.generate_server_ports_oids()
         self.prepare_arp_responder()
         self.copy_ptf_sai_tests()
         self.prepare_ptf_port_map()
@@ -61,6 +60,8 @@ class Setup(object):
 
             redis_oid = self.duthost.command("docker exec -i database redis-cli --raw -n 2 HMGET \
                         COUNTERS_PORT_NAME_MAP {}".format(item))["stdout"]
+            self.vars["server_ports_oids"].append(redis_oid)
+
             sai_redis_oid = int(self.duthost.command("docker exec -i database redis-cli -n 1 hget VIDTORID {}".format(redis_oid))["stdout"].replace("oid:", ""), 16)
             port_info["oid"] = sai_redis_oid
             self.vars["ptf_test_params"]["server_ports"].append(port_info)
@@ -82,11 +83,6 @@ class Setup(object):
         """ Get DUT MAC address which will be used by PTF as Ethernet destination MAC address during sending traffic """
         self.vars["ptf_test_params"]["router_mac"] = self.ansible_facts["ansible_Ethernet0"]["macaddress"]
 
-    def generate_server_ports_oids(self):
-        """ Get DUT port OIDs connected to the servers """
-        server_ports_names = " ".join(self.vlan_members)
-        self.vars["server_ports_oids"] = self.duthost.command("docker exec -i database redis-cli --raw -n 2 HMGET \
-                                COUNTERS_PORT_NAME_MAP {}".format(server_ports_names))["stdout"].split()
 
     def prepare_arp_responder(self):
         """ Copy ARP responder to the PTF host """

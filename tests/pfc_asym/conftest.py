@@ -95,7 +95,7 @@ def setup(testbed, duthost, ptfhost, ansible_inventory, ansible_facts, minigraph
             "lossless_priorities": None,
             "lossy_priorities": None
             },
-        "server_ports_oids": None
+        "server_ports_oids": []
     }
 
     server_ports_num = request.config.getoption("--server_ports_num")
@@ -180,8 +180,7 @@ def enable_pfc_asym(setup, duthost):
     try:
         # Enable asymmetric PFC on all server interfaces
         duthost.shell("for item in {}; do config interface pfc asymmetric $item on; done".format(srv_ports))
-        for port in setup["ptf_test_params"]["server_ports"]:
-            p_oid = hex(port["oid"])
+        for p_oid in setup["server_ports_oids"]:
             # Verify asymmetric PFC enabled
             assert pfc_asym_enabled == duthost.command(get_pfc_mode.format(p_oid))["stdout"]
             # Verify asymmetric PFC Rx and Tx values
@@ -189,11 +188,11 @@ def enable_pfc_asym(setup, duthost):
             assert setup["pfc_bitmask"]["pfc_tx_mask"] == int(duthost.command(get_asym_pfc.format(port=p_oid, sai_attr=sai_asym_pfc_tx))["stdout"])
 
         yield
+
     finally:
         # Disable asymmetric PFC on all server interfaces
         duthost.shell("for item in {}; do config interface pfc asymmetric $item off; done".format(srv_ports))
-        for port in setup["ptf_test_params"]["server_ports"]:
-            p_oid = hex(port["oid"])
+        for p_oid in setup["server_ports_oids"]:
             # Verify asymmetric PFC disabled
             assert pfc_asym_restored == duthost.command(get_pfc_mode.format(p_oid))["stdout"]
             # Verify PFC value is restored to default
