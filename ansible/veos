@@ -49,6 +49,9 @@ DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 [vm_host_52]
 DEV-R-VRT-233 ansible_host=dev-r-vrt-233
 
+[vm_host_54]
+DEV-SIMX-HOST01 ansible_host=dev-simx-host01
+
 [vm_host:children]
 vm_host_1
 vm_host_2
@@ -67,6 +70,7 @@ vm_host_14
 vm_host_15
 vm_host_50
 vm_host_52
+vm_host_54
 
 [vms_1]
 VM0101 ansible_host=10.213.84.17
@@ -562,6 +566,12 @@ VM5202 ansible_host=10.212.233.6
 VM5203 ansible_host=10.212.233.7
 VM5204 ansible_host=10.212.233.8
 
+[vms_54]
+VM5401 ansible_host=10.75.206.215
+VM5402 ansible_host=10.75.206.216
+VM5403 ansible_host=10.75.206.217
+VM5404 ansible_host=10.75.206.218
+
 [eos:children]
 vms_1
 vms_2
@@ -580,6 +590,7 @@ vms_14
 vms_15
 vms_50
 vms_52
+vms_54
 
 ## The groups below are helper to limit running playbooks to server_1, server_2 or server_3 only
 [server_1:children]
@@ -709,6 +720,17 @@ host_var_file=host_vars/DEV-R-VRT-233.yml
 host_var_file=host_vars/DEV-R-VRT-233.yml
 mgmt_prefixlen=16
 
+[server_54:children]
+vm_host_54
+vms_54
+
+[server_54:vars]
+host_var_file=host_vars/DEV-SIMX-HOST01.yml
+
+[vms_54:vars]
+host_var_file=host_vars/DEV-SIMX-HOST01.yml
+mgmt_prefixlen=24
+
 [servers:children]
 server_1
 server_2
@@ -727,6 +749,7 @@ server_14
 server_15
 server_50
 server_52
+server_54
 
 [servers:vars]
 topologies=['t1', 't1-lag', 't1-64-lag', 't1-64-lag-clet', 't0', 't0-16', 't0-56', 't0-52', 'ptf32', 'ptf64', 't0-64', 't0-64-32', 't0-116']
@@ -734,3 +757,4 @@ topologies=['t1', 't1-lag', 't1-64-lag', 't1-64-lag-clet', 't0', 't0-16', 't0-56
 [sonic_latest]
 dev-r-vrt-233-010  ansible_host=10.212.233.10 type=simx sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
 dev-r-vrt-232-010  ansible_host=10.212.232.10 type=simx sonic_version=v2 hwsku="ACS-MSN3700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
+dev-simx-host01-vm01  ansible_host=10.75.206.118 type=simx sonic_version=v2 hwsku="ACS-MSN4700" iface_speed=40000 mgmt_subnet_mask_length=24 vm_base=VM5401

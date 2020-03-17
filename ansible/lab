@@ -16,6 +16,7 @@ mtbc-3700c-01      ansible_host=10.75.67.50 sonic_version=v2 hwsku="ACS-MSN3700C
 r-boxer-sw01       ansible_host=10.210.25.53 sonic_version=v2 hwsku="ACS-MSN2010" iface_speed=25000 mgmt_subnet_mask_length=22 vm_base=VM0901
 dev-r-vrt-232-010  ansible_host=10.212.232.10 type=simx sonic_version=v2 hwsku="ACS-MSN3700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
 dev-r-vrt-233-010  ansible_host=10.212.233.10 type=simx sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
+dev-simx-host01-vm01  ansible_host=10.75.206.118 type=simx sonic_version=v2 hwsku="ACS-MSN4700" iface_speed=40000 mgmt_subnet_mask_length=24 vm_base=VM5401
 
 [sonic_sn2700_40]
 str-msn2700-01    ansible_host=10.251.0.188
@@ -75,6 +76,7 @@ ptf-mtbc04  ansible_host=10.75.205.201 ansible_ssh_user=root ansible_ssh_pass=ro
 ptf-232-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-233-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf_vms6-1  ansible_host=10.250.0.100 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-vms6-3  ansible_host=10.75.206.214 ansible_ssh_pass=root ansible_ssh_pass=root
 
 [lab:children]
 sonic

@@ -133,6 +133,11 @@ dev-r-vrt-233-010  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx soni
 dev-r-vrt-233-010-ptf32  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
 dev-r-vrt-233-010-t0  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
 
+# MTBC vtestbed dev-simx-host01-vm01 topologies
+dev-simx-host01-vm01  ansible_host=dev-simx-host01-vm01 ptf_host=ptf-vms6-3 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN4700" iface_speed=40000 mgmt_subnet_mask_length=24 vm_base=VM5401
+dev-simx-host01-vm01-t0  ansible_host=dev-simx-host01-vm01 ptf_host=ptf-vms6-3 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN4700" iface_speed=40000 mgmt_subnet_mask_length=24 vm_base=VM5401
+dev-simx-host01-vm01-ptf32  ansible_host=dev-simx-host01-vm01 ptf_host=ptf-vms6-3 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN4700" iface_speed=40000 mgmt_subnet_mask_length=24 vm_base=VM5401
+
 # MTR Lab devices info
 arc-build-server ansible_host=arc-build-server ansible_user=root ansible_ssh_pass=3tango
 arc-switch1007 ansible_host=arc-switch1007 ansible_ssh_user=admin ansible_ssh_pass=admin
@@ -419,6 +424,11 @@ dev-r-vrt-233-010
 dev-r-vrt-233-010-ptf32
 dev-r-vrt-233-010-t0
 
+# MTBC SimX dev-simx-host01-vm01 topologies
+dev-simx-host01-vm01
+dev-simx-host01-vm01-t0
+dev-simx-host01-vm01-ptf32
+
 [leaf_topo_1:vars]
 podset_number=200
 
@@ -494,6 +504,9 @@ ptf-vms6-1 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-vms6-2 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 10.212.232.9 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1 ansible_host=10.0.0.200 ansible_ssh_user=root ansible_ssh_pass=password
+
+# MTBC Virtual testbed PTF host
+ptf-vms6-3 ansible_host=10.75.206.214 ansible_ssh_user=root ansible_ssh_pass=root
 
 [pdu]
 pdu-1 ansible_host=192.168.9.2 protocol=snmp
