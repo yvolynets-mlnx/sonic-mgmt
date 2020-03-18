@@ -124,14 +124,14 @@ r-boxer-sw01-t1-lag  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=AC
 r-boxer-sw01-ptf32   ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
 
 # MTR SimX testbed dev-r-vrt-232-010 topologies
-dev-r-vrt-232-010 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-vms6-2 sonic_version=v2 sonic_hwsku=ACS-MSN3700 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
-dev-r-vrt-232-010-ptf32 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-vms6-2 sonic_version=v2 sonic_hwsku=ACS-MSN3700 iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
-dev-r-vrt-232-010-t0 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-vms6-2 sonic_version=v2 sonic_hwsku=ACS-MSN3700 iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001
+dev-r-vrt-232-010 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-232-010 sonic_version=v2 sonic_hwsku=ACS-MSN3700 type=simx iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+dev-r-vrt-232-010-ptf32 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-232-010 sonic_version=v2 sonic_hwsku=ACS-MSN3700 iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+dev-r-vrt-232-010-t0 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-232-010 sonic_version=v2 sonic_hwsku=ACS-MSN3700 iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTR vtestbed dev-r-vrt-233-010 topologies
-dev-r-vrt-233-010  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
-dev-r-vrt-233-010-ptf32  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
-dev-r-vrt-233-010-t0  ptf_host=ptf-vms6-1 ansible_host=10.212.233.10 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201
+dev-r-vrt-233-010  ansible_host=10.212.233.10 ptf_host=ptf-233-010 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+dev-r-vrt-233-010-ptf32  ansible_host=10.212.233.10 ptf_host=ptf-233-010 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201  ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
+dev-r-vrt-233-010-t0  ansible_host=10.212.233.10 ptf_host=ptf-233-010 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN2700" iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5201 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTBC vtestbed dev-simx-host01-vm01 topologies
 dev-simx-host01-vm01  ansible_host=dev-simx-host01-vm01 ptf_host=ptf-vms6-3 type=simx sonic_version=v2 sonic_hwsku="ACS-MSN4700" iface_speed=40000 mgmt_subnet_mask_length=24 vm_base=VM5401
@@ -497,11 +497,11 @@ ptf-boxer-sw01 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=r
 10.213.88.5 ansible_host=10.213.88.5 ansible_ssh_user=root ansible_ssh_pass=root
 
 # MTR Virtual testbed PTF host
-ptf-vms6-1 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-233-010 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
 10.212.233.9 ansible_host=10.212.233.9 ansible_ssh_user=root ansible_ssh_pass=root
 
 # MTR Virtual testbed PTF host
-ptf-vms6-2 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-232-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 10.212.232.9 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1 ansible_host=10.0.0.200 ansible_ssh_user=root ansible_ssh_pass=password
 
