@@ -196,15 +196,6 @@ def ptfhost(testbed_devices):
     return testbed_devices["ptf"]
 
 
-@pytest.fixture(scope="module")
-def localhost(testbed_devices):
-    """
-    Shortcut fixture for getting Localhost host
-    """
-
-    return testbed_devices["localhost"]
-
-
 @pytest.fixture(scope='session')
 def eos():
     """ read and yield eos configuration """

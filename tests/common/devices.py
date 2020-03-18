@@ -266,7 +266,7 @@ class FanoutHost(Localhost):
 
     def exec_template(self, **kwargs):
         cli_cmd = self.playbook_template.format(ansible_path=ANSIBLE_ROOT, playbook=self.ansible_playbook,
-                                                    fanout_host=self.fanout_host, extra_vars=json.dumps(kwargs))
+                                                fanout_host=self.fanout_host, extra_vars=json.dumps(kwargs))
         res = self.localhost.shell(cli_cmd)
 
         if res["rc"] != 0:
