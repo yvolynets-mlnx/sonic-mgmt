@@ -11,7 +11,6 @@ import json
 import logging
 import os
 from multiprocessing.pool import ThreadPool
-from datetime import datetime
 
 from errors import RunAnsibleModuleFail
 from errors import UnsupportedAnsibleModule
@@ -232,26 +231,6 @@ class SonicHost(AnsibleHostBase):
 
         logging.info("Pmon daemon list for this platform is %s" % str(daemon_list))
         return daemon_list
-
-    def get_up_time(self):
-        up_time_text = self.command("uptime -s")["stdout"]
-        return datetime.strptime(up_time_text, "%Y-%m-%d %H:%M:%S")
-
-    def get_now_time(self):
-        now_time_text = self.command('date +"%Y-%m-%d %H:%M:%S"')["stdout"]
-        return datetime.strptime(now_time_text, "%Y-%m-%d %H:%M:%S")
-
-    def get_uptime(self):
-        return self.get_now_time() - self.get_up_time()
-
-    def get_networking_uptime(self):
-        start_time = self.get_service_props("networking", props=["ExecMainStartTimestamp",])
-        try:
-            return self.get_now_time() - datetime.strptime(start_time["ExecMainStartTimestamp"],
-                                                           "%a %Y-%m-%d %H:%M:%S UTC")
-        except Exception as e:
-            logging.error("Exception raised while getting networking restart time: %s" % repr(e))
-            return None
 
 class FanoutHost(Localhost):
     def __init__(self, ansible_adhoc, localhost, duthost):
