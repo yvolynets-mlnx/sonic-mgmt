@@ -4,12 +4,6 @@
 - fail: msg="config_source is provided with invalid value"
   when: "config_source not in [ 'minigraph', 'config_db' ]"
 
-- name: "SimX workaround: Restore original BGP template config"
-  include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
-  vars:
-    routes_action: "remove"
-  when: "simx is defined and simx == 'yes'"
-
 - name: "Reload SONiC configuration using minigraph"
   shell: "{{ item }}"
   become: "yes"
@@ -25,13 +19,3 @@
 
 - name: "Wait for 2 minutes for prcesses and interfaces to be stable"
   pause: minutes=2
-
-- name: "SimX workaround: Run links sanity check"
-  include: "roles/test/tasks/common_tasks/simx/links_sanity.yml"
-  when: "simx is defined and simx == 'yes'"
-
-- name: "SimX workaround: Apply SimX BGP template config"
-  include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
-  vars:
-    routes_action: "add"
-  when: "simx is defined and simx == 'yes'"

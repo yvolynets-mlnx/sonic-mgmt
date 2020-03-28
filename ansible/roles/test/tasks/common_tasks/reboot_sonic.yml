@@ -16,12 +16,6 @@
     msg: "Reboot type {{ reboot_type }} is invalid. Must be one of {{ reboot_types }}"
   when: reboot_type not in reboot_types
 
-- name: "SimX workaround: Restore original BGP template config"
-  include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
-  vars:
-    routes_action: "remove"
-  when: "simx is defined and simx == 'yes'"
-
 - name: "rebooting {{ inventory_hostname }} : {{ ansible_host }} with {{ reboot_type }}..."
   command: "{{ reboot_type }}"
   async: 300
@@ -70,16 +64,6 @@
 
 - name: wait for {{ ready_timeout }} seconds for prcesses and interfaces to be stable
   pause: seconds={{ ready_timeout }}
-
-- name: "SimX workaround: Run links sanity check"
-  include: "roles/test/tasks/common_tasks/simx/links_sanity.yml"
-  when: "simx is defined and simx == 'yes'"
-
-- name: "SimX workaround: Apply SimX BGP template config"
-  include: "roles/test/tasks/common_tasks/simx/configure_bgp.yml"
-  vars:
-    routes_action: "add"
-  when: "simx is defined and simx == 'yes'"
 
 - name: Wait for warmboot-finalizer service to finish
   become: true
