@@ -31,7 +31,6 @@ def get_mac(iff):
 
 class Interface(object):
     ETH_P_ALL = 0x03
-    ETH_P_ARP = 0x806
     RCV_TIMEOUT = 1000
     RCV_SIZE = 4096
 
@@ -95,7 +94,6 @@ class ARPResponder(object):
 
     def action(self, interface):
         data = interface.recv()
-
         if len(data) > self.ARP_PKT_LEN:
             return
 

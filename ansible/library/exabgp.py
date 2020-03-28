@@ -142,10 +142,10 @@ def start_exabgp(module, name):
 
     for count in range(0, 60):
         time.sleep(1)
-        ret = get_exabgp_status(module, name)
-        if u'RUNNING' == ret['status']:
+        status = get_exabgp_status(module, name)
+        if u'RUNNING' == status:
             break
-    assert u'RUNNING' == ret['status']
+    assert u'RUNNING' == status
 
 def restart_exabgp(module, name):
     refresh_supervisord(module)
@@ -156,7 +156,7 @@ def restart_exabgp(module, name):
         status = get_exabgp_status(module, name)
         if u'RUNNING' == status:
             break
-    assert u'RUNNING' == ret['status']
+    assert u'RUNNING' == status
 
 def stop_exabgp(module, name):
     exec_command(module, cmd="supervisorctl stop exabgp-%s" % name, ignore_error=True)
@@ -179,7 +179,7 @@ def setup_exabgp_conf(name, router_id, local_ip, peer_ip, local_asn, peer_asn, p
                     group_updates=group_updates)
     with open("/etc/exabgp/%s.conf" % name, 'w') as out_file:
         out_file.write(data)
-
+ 
 def remove_exabgp_conf(name):
     try:
         os.remove("/etc/exabgp/%s.conf" % name)
