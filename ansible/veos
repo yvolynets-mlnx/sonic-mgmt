@@ -14,7 +14,7 @@ ARC-HOST62 ansible_host=arc-host62 ansible_python_interpreter=/images/pyenv/soni
 DEV-R730-01 ansible_host=dev-r730-01 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
 
 [vm_host_6]
-ARC-HOST121 ansible_host=arc-host121 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+ARC-HOST121 ansible_host=arc-host121
 
 [vm_host_7]
 ARC-HOST26 ansible_host=arc-host26 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
