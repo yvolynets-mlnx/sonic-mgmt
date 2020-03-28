@@ -18,6 +18,8 @@ function usage
   echo "Options:"
   echo "    -t <tbfile> : testbed CSV file name (default: 'testbed.csv')"
   echo "    -m <vmfile> : virtual machine file name (default: 'veos')"
+  echo "    -k <vmtype> : vm type (veos|ceos) (default: 'veos')"
+  echo "    -n <vm_num> : vm num (default: 0)"
   echo
   echo "Positional Arguments:"
   echo "    <server-name>         : Hostname of server on which to start VMs"
@@ -100,7 +102,8 @@ function start_vms
   shift
   echo "Starting VMs on server '${server}'"
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_start_VMs.yml --vault-password-file="${passwd}" -l "${server}" $@
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile -e VM_num="$vm_num" testbed_start_VMs.yml \
+      --vault-password-file="${passwd}" -l "${server}" $@
 }
 
 function stop_vms
@@ -124,7 +127,7 @@ function add_topo
 
   read_file ${topology}
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_add_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_add_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" -e vm_type="$vm_type" $@ 
 
   # ansible-playbook fanout_connect.yml -i $vmfile --limit "$server" --vault-password-file="${passwd}" -e "dut=$dut" $@
 
@@ -145,7 +148,7 @@ function remove_topo
 
   read_file ${topology}
 
-  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_remove_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" $@
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_remove_vm_topology.yml --vault-password-file="${passwd}" -l "$server" -e topo_name="$topo_name" -e dut_name="$dut" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" -e topo="$topo" -e vm_set_name="$testbed_name" -e ptf_imagename="$ptf_imagename" -e vm_type="$vm_type" $@
 
   rm -f /tmp/topo-${dut}
   echo Done
@@ -219,7 +222,7 @@ function generate_minigraph
 
   read_file $topology
 
-  ansible-playbook -i "$inventory" config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e local_minigraph=true $@
+  ansible-playbook -i "$inventory" config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e vm_file=$vmfile -e local_minigraph=true $@
 
   echo Done
 }
@@ -237,7 +240,7 @@ function deploy_minigraph
 
   read_file $topology
 
-  ansible-playbook -i "$inventory" config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e deploy=true -e save=true $@
+  ansible-playbook -i "$inventory" config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e vm_file=$vmfile -e deploy=true -e save=true $@
 
   echo Done
 }
@@ -255,7 +258,7 @@ function test_minigraph
 
   read_file $topology
 
-  ansible-playbook -i "$inventory" --diff --connection=local --check config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e local_minigraph=true $@
+  ansible-playbook -i "$inventory" --diff --connection=local --check config_sonic_basedon_testbed.yml --vault-password-file="$passfile" -l "$dut" -e testbed_name="$topology" -e testbed_file=$tbfile -e vm_file=$vmfile -e local_minigraph=true $@
 
   echo Done
 }
@@ -321,14 +324,22 @@ function connect_topo
 
 vmfile=veos
 tbfile=testbed.csv
+vm_type=veos
+vm_num=0
 
-while getopts "t:m:" OPTION; do
+while getopts "t:m:k:n:" OPTION; do
     case $OPTION in
     t)
         tbfile=$OPTARG
         ;;
     m)
         vmfile=$OPTARG
+        ;;
+    k)
+        vm_type=$OPTARG
+        ;;
+    n)
+        vm_num=$OPTARG
         ;;
     *)
         usage
