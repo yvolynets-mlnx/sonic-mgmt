@@ -1,12 +1,48 @@
 import pytest
 import time
+import json
 
 from helpers import Setup, OS_ROOT_DIR, ANSIBLE_ROOT
+from common.devices import Localhost
 
 
 PFC_GEN_FILE = "pfc_gen.py"
 PFC_FRAMES_NUMBER = 50000000
 PFC_QUEUE_INDEX = 0xff
+ANSIBLE_ROOT = os.path.normpath((os.path.join(__file__, "../../../ansible")))
+LAB_CONNECTION_GRAPH = os.path.normpath((os.path.join(os.path.dirname(__file__),
+                                        "../../ansible/files/lab_connection_graph.xml")))
+
+
+class FanoutHost(Localhost):
+    def __init__(self, ansible_adhoc, localhost, duthost):
+        Localhost.__init__(self, ansible_adhoc)
+        self.ansible_playbook = os.path.realpath(os.path.join(os.path.dirname(__file__), "../scripts/exec_template.yml"))
+        self.playbook_template = 'cd {ansible_path}; ansible-playbook {playbook} -i lab -l {fanout_host} --extra-vars \'{extra_vars}\' -vvvvv'
+        self.localhost = localhost
+        self.duthost = duthost
+        self.fanout_host = None
+        self.facts = {}
+        self.gather_facts()
+
+    def exec_template(self, **kwargs):
+        cli_cmd = self.playbook_template.format(ansible_path=ANSIBLE_ROOT, playbook=self.ansible_playbook,
+                                                fanout_host=self.fanout_host, extra_vars=json.dumps(kwargs))
+        res = self.localhost.shell(cli_cmd)
+
+        if res["rc"] != 0:
+            raise Exception("Unable to execute template\n{}".format(res["stdout"]))
+
+    def gather_facts(self):
+        dut_facts = self.localhost.conn_graph_facts(host=self.duthost.hostname, filename=LAB_CONNECTION_GRAPH)["ansible_facts"]
+        self.fanout_host = dut_facts["device_conn"]["Ethernet0"]["peerdevice"]
+        self.facts = self.localhost.conn_graph_facts(host=self.fanout_host, filename=LAB_CONNECTION_GRAPH)["ansible_facts"]
+
+
+@pytest.fixture(scope="module")
+def fanout_host(ansible_adhoc, testbed_devices):
+    fanout = FanoutHost(ansible_adhoc, testbed_devices["localhost"], testbed_devices["dut"])
+    return fanout
 
 
 @pytest.fixture(scope="module")
@@ -28,19 +64,19 @@ def flush_neighbors(duthost):
 
 
 @pytest.fixture(autouse=True, scope="module")
-def deploy_pfc_gen(testbed_devices):
+def deploy_pfc_gen(fanout_host):
     """
     Fixture to deploy 'pfc_gen.py' file for specific platforms to the Fanout switch.
     """
-    if "arista" in testbed_devices["fanout"].facts["device_info"]["HwSku"].lower():
+    if "arista" in fanout_host.facts["device_info"]["HwSku"].lower():
         arista_pfc_gen_dir = "/mnt/flash/"
-        testbed_devices["fanout"].file(path=arista_pfc_gen_dir, state="directory")
-        testbed_devices["fanout"].file(path=os.path.join(arista_pfc_gen_dir, PFC_GEN_FILE), state="touch")
-        testbed_devices["fanout"].copy(src=os.path.join(ANSIBLE_ROOT, "roles/test/files/helpers/pfc_gen.py"), dest=arista_pfc_gen_dir)
+        fanout_host.file(path=arista_pfc_gen_dir, state="directory")
+        fanout_host.file(path=os.path.join(arista_pfc_gen_dir, PFC_GEN_FILE), state="touch")
+        fanout_host.copy(src=os.path.join(ANSIBLE_ROOT, "roles/test/files/helpers/pfc_gen.py"), dest=arista_pfc_gen_dir)
 
 
 @pytest.fixture(scope="module")
-def setup(testbed, duthost, ptfhost, ansible_inventory, ansible_facts, minigraph_facts, request):
+def setup(testbed, duthost, ptfhost, ansible_facts, minigraph_facts, request):
     """
     Fixture performs initial steps which is required for test case execution.
     Also it compose data which is used as input parameters for PTF test cases, and PFC - RX and TX masks which is used in test case logic.
@@ -99,7 +135,7 @@ def setup(testbed, duthost, ptfhost, ansible_inventory, ansible_facts, minigraph
     }
 
     server_ports_num = request.config.getoption("--server_ports_num")
-    setup = Setup(duthost, ptfhost, setup_params, ansible_inventory, ansible_facts, minigraph_facts, server_ports_num)
+    setup = Setup(duthost, ptfhost, setup_params, ansible_facts, minigraph_facts, server_ports_num)
     setup.generate_setup()
 
     yield setup_params
@@ -112,12 +148,12 @@ def setup(testbed, duthost, ptfhost, ansible_inventory, ansible_facts, minigraph
 
 
 @pytest.fixture(scope="module")
-def pfc_storm_template(testbed_devices, setup, ansible_facts):
+def pfc_storm_template(fanout_host, setup, ansible_facts):
     """
     Compose dictionary which items will be used to start/stop PFC generator on Fanout switch by 'pfc_storm_runner' fixture.
     Dictionary values depends on fanout HWSKU (MLNX-OS, Arista or others)
     """
-    fanout_facts = testbed_devices["fanout"].facts
+    fanout_facts = fanout_host.facts
     used_server_ports = [item["dut_name"] for item in setup["ptf_test_params"]["server_ports"]]
 
     res = {
@@ -148,18 +184,18 @@ def pfc_storm_template(testbed_devices, setup, ansible_facts):
 
 
 @pytest.fixture(scope="function")
-def pfc_storm_runner(testbed_devices, pfc_storm_template):
+def pfc_storm_runner(fanout_host, pfc_storm_template):
     """
     Start/stop PFC generator on Fanout switch
     """
     params = pfc_storm_template["template_params"].copy()
-    params["peer_hwsku"] = str(testbed_devices["fanout"].facts["device_info"]["HwSku"])
+    params["peer_hwsku"] = str(fanout_host.facts["device_info"]["HwSku"])
     params["template_path"] = pfc_storm_template["template"]["pfc_storm_start"]
-    testbed_devices["fanout"].exec_template(**params)
+    fanout_host.exec_template(**params)
     time.sleep(5)
     yield
     params["template_path"] = pfc_storm_template["template"]["pfc_storm_stop"]
-    testbed_devices["fanout"].exec_template(**params)
+    fanout_host.exec_template(**params)
 
 
 @pytest.fixture(scope="function")

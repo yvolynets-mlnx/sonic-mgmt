@@ -1,7 +1,6 @@
 import sys
 import os
 import glob
-import json
 import tarfile
 import logging
 import time
@@ -11,11 +10,9 @@ import csv
 import yaml
 import ipaddr as ipaddress
 
-from ansible.parsing.dataloader import DataLoader
-from ansible.inventory.manager import InventoryManager
 from ansible_host import AnsibleHost
 from collections import defaultdict
-from common.devices import SonicHost, Localhost, PTFHost, EosHost, FanoutHost
+from common.devices import SonicHost, Localhost, PTFHost, EosHost
 
 logger = logging.getLogger(__name__)
 
@@ -124,8 +121,6 @@ def testbed_devices(ansible_adhoc, testbed):
         "dut": SonicHost(ansible_adhoc, testbed["dut"], gather_facts=True)
     }
 
-    devices["fanout"] = FanoutHost(ansible_adhoc, devices["localhost"], devices["dut"])
-
     if "ptf" in testbed:
         devices["ptf"] = PTFHost(ansible_adhoc, testbed["ptf"])
     else:
@@ -204,22 +199,13 @@ def nbrhosts(ansible_adhoc, testbed, creds):
         devices[k] = EosHost(ansible_adhoc, "VM%04d" % (vm_base + v['vm_offset']), creds['eos_login'], creds['eos_password'])
     return devices
 
+
 @pytest.fixture(scope='session')
 def eos():
     """ read and yield eos configuration """
     with open('eos/eos.yml') as stream:
         eos = yaml.safe_load(stream)
         return eos
-
-
-@pytest.fixture(scope='session')
-def ansible_inventory():
-    ansible_root = os.path.realpath(os.path.join(os.path.dirname(__file__), "../ansible"))
-    inventory_file_name = os.path.join(ansible_root, "inventory")
-
-    data_loader = DataLoader()
-    inventory = InventoryManager(loader = data_loader, sources=[inventory_file_name])
-    yield inventory
 
 
 @pytest.fixture(scope="session")

@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from netaddr import IPAddress
@@ -18,12 +19,11 @@ class Setup(object):
     """
     Class defines functionality to fill in 'setup_params' variable defined in 'setup' fixture.
     """
-    def __init__(self, duthost, ptfhost, setup_params, inventory, ansible_facts, minigraph_facts, use_port_num):
+    def __init__(self, duthost, ptfhost, setup_params, ansible_facts, minigraph_facts, use_port_num):
         self.duthost = duthost
         self.ptfhost = ptfhost
         self.mg_facts = minigraph_facts
         self.ansible_facts = ansible_facts
-        self.inventory = inventory
         self.vars = setup_params
         if not 0 <= use_port_num <= len(self.mg_facts["minigraph_vlans"][self.mg_facts["minigraph_vlan_interfaces"][0]["attachto"]]["members"]):
             raise Exception("Incorrect number specificed for used server ports: {}".format(use_port_num))
@@ -102,7 +102,7 @@ class Setup(object):
     def prepare_ptf_port_map(self):
         """ Copy 'ptf_portmap' file which is defined in inventory to the PTF host """
         ptf_portmap = None
-        for item in self.inventory.groups["sonic_latest"].hosts:
+        for item in self.duthost.host.options["inventory_manager"].groups["sonic_latest"].hosts:
             if item.name == self.duthost.hostname:
                 ptf_portmap = os.path.join(ANSIBLE_ROOT, item.vars["ptf_portmap"])
                 self.ptfhost.copy(src=ptf_portmap, dest=OS_ROOT_DIR)
