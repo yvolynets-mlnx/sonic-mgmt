@@ -147,14 +147,13 @@ def setup(testbed, duthost, ptfhost, ansible_facts, minigraph_facts, request):
     ptfhost.file(path=os.path.join(OS_ROOT_DIR, "ptftests"), state="absent")
 
 
-@pytest.fixture(scope="module")
-def pfc_storm_template(fanout_host, setup, ansible_facts):
+@pytest.fixture(scope="function")
+def pfc_storm_template(ansible_facts, fanout_host):
     """
     Compose dictionary which items will be used to start/stop PFC generator on Fanout switch by 'pfc_storm_runner' fixture.
     Dictionary values depends on fanout HWSKU (MLNX-OS, Arista or others)
     """
     fanout_facts = fanout_host.facts
-    used_server_ports = [item["dut_name"] for item in setup["ptf_test_params"]["server_ports"]]
 
     res = {
         "template": {
@@ -165,7 +164,7 @@ def pfc_storm_template(fanout_host, setup, ansible_facts):
             "pfc_gen_file": PFC_GEN_FILE,
             "pfc_queue_index": PFC_QUEUE_INDEX,
             "pfc_frames_number": PFC_FRAMES_NUMBER,
-            "pfc_fanout_interface": ",".join([key for key, value in fanout_facts["device_conn"].items() if value["peerport"] in used_server_ports]),
+            "pfc_fanout_interface": "",
             "ansible_eth0_ipv4_addr": ansible_facts["ansible_eth0"]["ipv4"]["address"],
             "pfc_asym": True
             }
@@ -184,18 +183,35 @@ def pfc_storm_template(fanout_host, setup, ansible_facts):
 
 
 @pytest.fixture(scope="function")
-def pfc_storm_runner(fanout_host, pfc_storm_template):
+def pfc_storm_runner(fanout_host, pfc_storm_template, setup):
     """
     Start/stop PFC generator on Fanout switch
     """
+    class StormRunner(object):
+        def __init__(self):
+            self.server_ports = False
+            self.non_server_port = False
+            self.used_server_ports = [item["dut_name"] for item in setup["ptf_test_params"]["server_ports"]]
+            self.used_non_server_port = [setup["ptf_test_params"]["non_server_port"]["dut_name"]]
+
+        def run(self):
+            params["pfc_fanout_interface"] = ""
+            if self.server_ports:
+                params["pfc_fanout_interface"] += ",".join([key for key, value in fanout_host.facts["device_conn"].items() if value["peerport"] in self.used_server_ports])
+            if self.non_server_port:
+                if params["pfc_fanout_interface"]:
+                    params["pfc_fanout_interface"] += ","
+                params["pfc_fanout_interface"] += ",".join([key for key, value in fanout_host.facts["device_conn"].items() if value["peerport"] in self.used_non_server_port])
+            fanout_host.exec_template(**params)
+            time.sleep(5)
+
     params = pfc_storm_template["template_params"].copy()
     params["peer_hwsku"] = str(fanout_host.facts["device_info"]["HwSku"])
     params["template_path"] = pfc_storm_template["template"]["pfc_storm_start"]
-    fanout_host.exec_template(**params)
-    time.sleep(5)
-    yield
+    yield StormRunner()
     params["template_path"] = pfc_storm_template["template"]["pfc_storm_stop"]
     fanout_host.exec_template(**params)
+    time.sleep(5)
 
 
 @pytest.fixture(scope="function")
