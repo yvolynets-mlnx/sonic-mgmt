@@ -442,6 +442,10 @@ interface ethernet {{ qsfp_split_2[i] }} module-type qsfp-split-2 force
 interface ethernet {{ qsfp_split_4[i] }} module-type qsfp-split-4 force
 {% endfor %}
 
+{% for i in range(1, port_speed|length) %}
+interface ethernet {{ eth_ports[i] }} speed {{ port_speed[i] }} no-autoneg force
+{% endfor %}
+
 {% for i in range(1, eth_ports|length) %}
 {% if port_fec and port_fec[i] != -1 %}
 interface ethernet {{ eth_ports[i] }} fec-override {{ port_fec[i] }} force

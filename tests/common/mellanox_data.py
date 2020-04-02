@@ -574,3 +574,6 @@ SWITCH_MODELS = {
         }
     }
 }
+
+def is_mellanox_device(hwsku):
+    return hwsku in SWITCH_HWSKUS
