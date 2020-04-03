@@ -1,7 +1,6 @@
 import sys
 import os
 import glob
-import json
 import tarfile
 import logging
 import time
@@ -82,22 +81,22 @@ def pytest_addoption(parser):
     # test_vrf options
     parser.addoption("--vrf_capacity", action="store", default=None, type=int, help="vrf capacity of dut (4-1000)")
     parser.addoption("--vrf_test_count", action="store", default=None, type=int, help="number of vrf to be tested (1-997)")
+
+    ############################
+    # pfc_asym options         #
+    ############################
+    parser.addoption("--server_ports_num", action="store", default=20, type=int, help="Number of server ports to use")
+
     ############################
     # test_techsupport options #
     ############################
-
+    
     parser.addoption("--loop_num", action="store", default=10, type=int,
                     help="Change default loop range for show techsupport command")
     parser.addoption("--loop_delay", action="store", default=10, type=int,
                     help="Change default loops delay")
     parser.addoption("--logs_since", action="store", type=int,
                     help="number of minutes for show techsupport command")
-
-
-    # fw_utility options
-    parser.addoption("--config_file", action="store", default=None, help="name of configuration file (per each vendor)")
-    parser.addoption("--binaries_path", action="store", default=None, help="path to binaries files")
-    parser.addoption("--second_image_path", action="store", default=None, help="path to second image to be installed if there is no image available")
 
 
 @pytest.fixture(scope="session")
@@ -127,7 +126,8 @@ def testbed_devices(ansible_adhoc, testbed):
 
     devices = {
         "localhost": Localhost(ansible_adhoc),
-        "dut": SonicHost(ansible_adhoc, testbed["dut"], gather_facts=True)}
+        "dut": SonicHost(ansible_adhoc, testbed["dut"], gather_facts=True)
+    }
 
     if "ptf" in testbed:
         devices["ptf"] = PTFHost(ansible_adhoc, testbed["ptf"])
@@ -139,6 +139,7 @@ def testbed_devices(ansible_adhoc, testbed):
         devices["ptf"] = PTFHost(ansible_adhoc, ptf_host)
 
     return devices
+
 
 def disable_ssh_timout(dut):
     '''
