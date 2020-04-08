@@ -7,7 +7,7 @@ import json
 import time
 import pytest
 
-from platform_fixtures import conn_graph_facts
+from common.fixtures.conn_graph_facts import conn_graph_facts
 from check_interface_status import parse_intf_status
 
 ans_host = None
