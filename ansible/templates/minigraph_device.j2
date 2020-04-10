@@ -21,12 +21,6 @@
     {% else %}
           <Speed>25000</Speed>
     {% endif %}
-{% elif hwsku == 'ACS-MSN2010' %}
-    {% if index < 4 %}
-        <Speed>25000</Speed>
-    {% else %}
-        <Speed>10000</Speed>
-    {% endif %}
 {% else %}
     {%- if port_alias[index] in port_speed and port_speed[port_alias[index]] != ""  %}
           <Speed>{{ port_speed[port_alias[index]] }}</Speed>

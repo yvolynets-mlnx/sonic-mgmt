@@ -76,10 +76,7 @@ arc-switch1041-ptf32  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku
 
 # MTR testbed arc-switch1029 topologies
 arc-switch1029  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-arc-switch1029-t1  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-arc-switch1029-t0  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-arc-switch1029-t1-lag  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-arc-switch1029-ptf32  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
+arc-switch1029-ptf-any  ansible_host=arc-switch1029  sonic_version=v2  sonic_hwsku=ACS-MSN2100 serial_console="ssh -l rcon:7023 10.224.2.81" ptf_host=ptf-1029 ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
 
 # MTS testbed mts-sonic-dut topologies
 mts-sonic-dut ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-9-74-52
@@ -117,11 +114,8 @@ mtbc-3700c-01-t1-lag  ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=
 mtbc-3700c-01-ptf32   ansible_host=mtbc-3700c-01  sonic_version=v2  sonic_hwsku=ACS-MSN3700C serial_console="ssh -l rcon:2001 10.75.68.204" ptf_host=ptf-mtbc04 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
 
 # MTR testbed r-boxer-sw01 topologies
-r-boxer-sw01 ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-r-boxer-sw01-t0  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-r-boxer-sw01-t1  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-r-boxer-sw01-t1-lag  ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
-r-boxer-sw01-ptf32   ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
+r-boxer-sw01   ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/boxer_sw01_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
+r-boxer-sw01-ptf-any   ansible_host=r-boxer-sw01  sonic_version=v2  sonic_hwsku=ACS-MSN2010 serial_console="ssh -l rcon:7003 10.208.0.47" ptf_host=ptf-boxer-sw01 ptf_portmap="roles/test/files/mlnx/boxer_sw01_interface_to_front_map.ini" pdu_host=pdu-10-208-0-23
 
 # MTR SimX testbed dev-r-vrt-232-010 topologies
 dev-r-vrt-232-010 ansible_host=dev-r-vrt-232-010 ptf_host=ptf-232-010 sonic_version=v2 sonic_hwsku=ACS-MSN3700 type=simx iface_speed=40000 mgmt_subnet_mask_length=16 vm_base=VM5001 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini"
@@ -234,10 +228,7 @@ arc-switch1041-ptf32
 
 # MTR arc-switch1029 topologies
 arc-switch1029
-arc-switch1029-t0
-arc-switch1029-t1
-arc-switch1029-t1-lag
-arc-switch1029-ptf32
+arc-switch1029-ptf-any
 
 # MTS testbed mts-sonic-dut topologies
 mts-sonic-dut
@@ -276,10 +267,7 @@ mtbc-3700c-01-ptf32
 
 # MTR r-boxer-sw01 topologies
 r-boxer-sw01
-r-boxer-sw01-t0
-r-boxer-sw01-t1
-r-boxer-sw01-t1-lag
-r-boxer-sw01-ptf32
+r-boxer-sw01-ptf-any
 
 # MTR SimX dev-r-vrt-232-010 topologies
 dev-r-vrt-232-010
@@ -360,10 +348,7 @@ r-leopard-01-ptf32
 
 # MTR arc-switch1029 topologies
 arc-switch1029
-arc-switch1029-t0
-arc-switch1029-t1
-arc-switch1029-t1-lag
-arc-switch1029-ptf32
+arc-switch1029-ptf-any
 
 # MTR arc-switch1041 topologies
 arc-switch1041
@@ -409,10 +394,7 @@ mtbc-3700c-01-ptf32
 
 # MTR r-boxer-sw01 topologies
 r-boxer-sw01
-r-boxer-sw01-t0
-r-boxer-sw01-t1
-r-boxer-sw01-t1-lag
-r-boxer-sw01-ptf32
+r-boxer-sw01-ptf-any
 
 # MTR SimX dev-r-vrt-232-010 topologies
 dev-r-vrt-232-010
