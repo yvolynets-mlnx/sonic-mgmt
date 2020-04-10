@@ -232,36 +232,50 @@ class SonicHost(AnsibleHostBase):
 
         return result
 
-    def get_pmon_daemon_list(self):
+    def get_pmon_daemon_states(self):
         """
-        @summary: get pmon daemon list from the config file (/usr/share/sonic/device/{platform}/{hwsku}/pmon_daemon_control.json)
+        @summary: get state list of daemons from pmon docker.
+                  Referencing (/usr/share/sonic/device/{platform}/pmon_daemon_control.json)
                   if some daemon is disabled in the config file, then remove it from the daemon list.
+
+        @return: dictionary of { service_name1 : state1, ... ... }
         """
-        full_daemon_tup = ('xcvrd', 'ledd', 'psud', 'syseepromd')
+        # some services are meant to have a short life span or not part of the daemons
+        exemptions = ['lm-sensors', 'start.sh', 'rsyslogd']
+
+        daemons = self.shell('docker exec pmon supervisorctl status')['stdout_lines']
+
+        daemon_list = [ line.strip().split()[0] for line in daemons if len(line.strip()) > 0 ] 
+
         daemon_ctl_key_prefix = 'skip_'
-        daemon_list = []
         daemon_config_file_path = os.path.join('/usr/share/sonic/device', self.facts["platform"], 'pmon_daemon_control.json')
 
         try:
             output = self.shell('cat %s' % daemon_config_file_path)
             json_data = json.loads(output["stdout"])
             logging.debug("Original file content is %s" % str(json_data))
-            for key in full_daemon_tup:
+            for key in daemon_list:
                 if (daemon_ctl_key_prefix + key) not in json_data:
-                    daemon_list.append(key)
                     logging.debug("Daemon %s is enabled" % key)
                 elif not json_data[daemon_ctl_key_prefix + key]:
-                    daemon_list.append(key)
                     logging.debug("Daemon %s is enabled" % key)
                 else:
                     logging.debug("Daemon %s is disabled" % key)
+                    exemptions.append(key)
         except:
             # if pmon_daemon_control.json not exist, then it's using default setting,
             # all the pmon daemons expected to be running after boot up.
-            daemon_list = list(full_daemon_tup)
+            pass
 
-        logging.info("Pmon daemon list for this platform is %s" % str(daemon_list))
-        return daemon_list
+        # Collect state of services that are not on the exemption list.
+        daemon_states = {}
+        for line in daemons:
+            words = line.strip().split()
+            if len(words) >= 2 and words[0] not in exemptions:
+                daemon_states[words[0]] = words[1]
+
+        logging.info("Pmon daemon state list for this platform is %s" % str(daemon_states))
+        return daemon_states
 
     def num_npus(self):
         """
@@ -321,7 +335,7 @@ class SonicHost(AnsibleHostBase):
         ret    = {}
         images = []
         for line in lines:
-            words = line.strip().split(' ')
+            words = line.strip().split()
             if len(words) == 2:
                 if words[0] == 'Current:':
                     ret['current'] = words[1]
@@ -332,6 +346,10 @@ class SonicHost(AnsibleHostBase):
 
         ret['installed_list'] = images
         return ret
+
+    def get_asic_type(self):
+        return dut.facts["asic_type"]
+
 
 class EosHost(AnsibleHostBase):
     """
@@ -348,3 +366,62 @@ class EosHost(AnsibleHostBase):
                   'ansible_password': passwd, \
                   'ansible_become_method': 'enable' }
         self.host.options['variable_manager'].extra_vars.update(evars)
+
+    def shutdown(self, interface_name):
+        out = self.host.eos_config(
+            lines=['shutdown'],
+            parents='interface %s' % interface_name)
+        if not self.check_intf_link_state(interface_name):
+            logging.info('Shut interface [%s]' % interface_name)
+            return out
+        raise RunAnsibleModuleFail("The interface state is Up but expect Down, detail output: %s" % out[self.hostname])
+
+    def no_shutdown(self, interface_name):
+        out = self.host.eos_config(
+            lines=['no shutdown'],
+            parents='interface %s' % interface_name)
+        if self.check_intf_link_state(interface_name):
+            logging.info('No shut interface [%s]' % interface_name)
+            return out
+        raise RunAnsibleModuleFail("The interface state is Down but expect Up, detail output: %s" % out[self.hostname])
+
+    def check_intf_link_state(self, interface_name):
+        show_int_result = self.host.eos_command(
+            commands=['show interface %s' % interface_name])[self.hostname]
+        return 'Up' in show_int_result['stdout_lines'][0]
+
+class FanoutHost():
+    """
+    @summary: Class for Fanout switch
+
+    For running ansible module on the Fanout switch
+    """
+
+    def __init__(self, ansible_adhoc, os, hostname, device_type, user, passwd):
+        self.hostname = hostname
+        self.type = device_type
+        if os == 'sonic':
+            self.os = os
+            self.host = SonicHost(ansible_adhoc, hostname)
+        else:
+            # Use eos host if the os type is unknown
+            self.os = 'eos'
+            self.host = EosHost(ansible_adhoc, hostname, user, passwd)
+
+    def get_fanout_os(self):
+        return self.os
+
+    def get_fanout_type(self):
+        return self.type
+    
+    def shutdown(self, interface_name):
+        self.host.shutdown(interface_name)
+    
+    def no_shutdown(self, interface_name):
+        self.host.no_shutdown(interface_name)
+
+    def __str__(self):
+        return "{ os: '%s', hostname: '%s', device_type: '%s' }" % (self.os, self.hostname, self.type)
+    
+    def __repr__(self):
+        return self.__str__()
