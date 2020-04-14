@@ -276,42 +276,42 @@ def test_more_resources_for_ipv6(testbed_devices, request, common_setup_teardown
     #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
 
 
-def test_less_fdb_resources(testbed_devices, request, common_setup_teardown):
-    """
-    @summary: Configure less resources for FDB and check the result.
-    """
+# def test_less_fdb_resources(testbed_devices, request, common_setup_teardown):
+#     """
+#     @summary: Configure less resources for FDB and check the result.
+#     """
 
-    # Related bugs:
-    # * Bug SW #1978577: SONiC failed to init switch with a combination table size set
-    # * Bug SW #1829399: SAI profile: single hash table size calculation need to take IPv6 route and VID
-    #                    into consideration.
+#     # Related bugs:
+#     # * Bug SW #1978577: SONiC failed to init switch with a combination table size set
+#     # * Bug SW #1829399: SAI profile: single hash table size calculation need to take IPv6 route and VID
+#     #                    into consideration.
 
-    dut = testbed_devices["dut"]
-    localhost = testbed_devices["localhost"]
+#     dut = testbed_devices["dut"]
+#     localhost = testbed_devices["localhost"]
 
-    table_size = {
-        "SAI_FDB_TABLE_SIZE": 10240,
-        "SAI_IPV4_ROUTE_TABLE_SIZE": 32768,
-        "SAI_IPV6_ROUTE_TABLE_SIZE": 25600,
-        "SAI_IPV4_NEIGHBOR_TABLE_SIZE": 8192,
-        "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 16384
-    }
+#     table_size = {
+#         "SAI_FDB_TABLE_SIZE": 10240,
+#         "SAI_IPV4_ROUTE_TABLE_SIZE": 32768,
+#         "SAI_IPV6_ROUTE_TABLE_SIZE": 25600,
+#         "SAI_IPV4_NEIGHBOR_TABLE_SIZE": 8192,
+#         "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 16384
+#     }
 
-    table_size_issu = {
-        "SAI_FDB_TABLE_SIZE": 5120,
-        "SAI_IPV4_ROUTE_TABLE_SIZE": 24576,
-        "SAI_IPV6_ROUTE_TABLE_SIZE": 16384,
-        "SAI_IPV4_NEIGHBOR_TABLE_SIZE": 8192,
-        "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 8192
-    }
+#     table_size_issu = {
+#         "SAI_FDB_TABLE_SIZE": 5120,
+#         "SAI_IPV4_ROUTE_TABLE_SIZE": 24576,
+#         "SAI_IPV6_ROUTE_TABLE_SIZE": 16384,
+#         "SAI_IPV4_NEIGHBOR_TABLE_SIZE": 8192,
+#         "SAI_IPV6_NEIGHBOR_TABLE_SIZE": 8192
+#     }
 
-    logging.info("Test less fdb table size configuration with warm-reboot disabled")
-    configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
+#     logging.info("Test less fdb table size configuration with warm-reboot disabled")
+#     configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
 
-    # TODO: Temporarily disabled because of Bug #1800191
-    # Know issue: https://redmine.mellanox.com/issues/1800191
-    # Bug SW #1800191: SAI key/value table size configuration failed if warm-reboot enabled
-    # if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
-    #     logging.info("DUT supports warm reboot")
-    #     logging.info("Test less fdb table size configuration with warm-reboot enabled")
-    #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
+#     # TODO: Temporarily disabled because of Bug #1800191
+#     # Know issue: https://redmine.mellanox.com/issues/1800191
+#     # Bug SW #1800191: SAI key/value table size configuration failed if warm-reboot enabled
+#     # if models[dut.facts["hwsku"]]["reboot"]["warm_reboot"]:
+#     #     logging.info("DUT supports warm reboot")
+#     #     logging.info("Test less fdb table size configuration with warm-reboot enabled")
+#     #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
