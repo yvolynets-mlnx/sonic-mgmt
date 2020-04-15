@@ -19,10 +19,10 @@ THR_VERIFY_CMDS = {
     "clear_percentage": "bash -c \"crm config thresholds {{crm_cli_res}} type percentage && crm config thresholds {{crm_cli_res}} low {{th_lo|int}} && crm config thresholds {{crm_cli_res}} high {{th_hi|int}}\""
     }
 
-ADD_RM_CMDS = {"test_crm_ipv4_route": {"add": "ip route add 2.2.2.0/24 via {}",
-                                       "rm": "ip route del 2.2.2.0/24 via {}"},
-                "test_crm_ipv6_route": {}}
-# TODO: continue fill in -> test_crm_ipv6_route
+RESTORE_CMDS = {"test_crm_route": [],
+                "test_crm_nexthop": [],
+                "test_crm_neighbor": [],
+                "crm_cli_res": None}
 # TODO: add messages to each assert
 
 
@@ -30,8 +30,8 @@ ADD_RM_CMDS = {"test_crm_ipv4_route": {"add": "ip route add 2.2.2.0/24 via {}",
 def crm_interface(duthost, testbed):
     mg_facts = duthost.minigraph_facts(host=duthost.hostname)["ansible_facts"]
     if testbed["topo"]["name"] == "t1":
-        # TODO:
-        pass
+        crm_intf1 = mg_facts["minigraph_interfaces"][0]["attachto"]
+        crm_intf2 = mg_facts["minigraph_interfaces"][2]["attachto"]
     elif testbed["topo"]["name"] in ["t0", "t1-lag", "t0-52", "t0-56", "t0-64", "t0-116"]:
         crm_intf1 = mg_facts["minigraph_portchannel_interfaces"][0]["attachto"]
         crm_intf2 = mg_facts["minigraph_portchannel_interfaces"][2]["attachto"]
@@ -41,10 +41,10 @@ def crm_interface(duthost, testbed):
 
 @pytest.fixture(scope="module", autouse=True)
 def set_polling_interval(duthost):
+    wait_time = 2
     duthost.command("crm config polling interval {}".format(CRM_POLLING_INTERVAL))["stdout"]
-    # TODO: add logging message
-    # Check timeout
-    time.sleep(2)
+    logger.info("Waiting {} sec for CRM counters to become updated".format(wait_time))
+    time.sleep(wait_time)
 
 def verify_thresholds(duthost, **kwargs):
     loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='crm_test')
@@ -58,119 +58,150 @@ def verify_thresholds(duthost, **kwargs):
             kwargs["th_hi"] = (kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])) + 1
         cmd = template.render(**kwargs)
 
-        # loganalyzer.expect_regex = [LOG_EXPECT_POLICY_FILE_INVALID] # TODO: add for 10 times verification
         with loganalyzer:
             duthost.command(cmd)
 
-def test_crm_ipv4_route(duthost, crm_interface, crm_cli_res="ipv4 route"):
-    # Get "crm_stats_ipv4_route" used and available counter value
-    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_route_used crm_stats_ipv4_route_available"
+def get_crm_stats(cmd, duthost):
     out = duthost.command(cmd)
-    crm_stats_ipv4_route_used = int(out["stdout_lines"][0])
-    crm_stats_ipv4_route_available = int(out["stdout_lines"][1])
+    crm_stats_used = int(out["stdout_lines"][0])
+    crm_stats_available = int(out["stdout_lines"][1])
+    return crm_stats_used, crm_stats_available
+
+
+@pytest.mark.parametrize("ip_ver,route_add_cmd,route_del_cmd", [("4", "ip route add 2.2.2.0/24 via {}",
+                                                                "ip route del 2.2.2.0/24 via {}"),
+                                                                ("6", "ip -6 route add 2001::/126 via {}",
+                                                                "ip -6 route del 2001::/126 via {}")],
+                                                                ids=["ipv4", "ipv6"])
+def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd):
+    RESTORE_CMDS["crm_cli_res"] = "ipv{ip_ver} route".format(ip_ver=ip_ver)
+
+    # Get "crm_stats_ipv[4/6]_route" used and available counter value
+    get_route_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv{ip_ver}_route_used crm_stats_ipv{ip_ver}_route_available".format(ip_ver=ip_ver)
+    crm_stats_route_used, crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
 
     # Get NH IP
-    cmd = "ip -4 neigh show dev {crm_intf} nud reachable nud stale".format(crm_intf=crm_interface[0])
+    cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
     out = duthost.command(cmd)
-    assert out != "", "Get Next Hop IP failed. Neighbour not found"
+    assert out != "", "Get Next Hop IP failed. Neighbor not found"
+    nh_ip = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
-    nh_ip= out["stdout"].split()[0]
-
-    # Add IPv4 route
-    cmd = ADD_RM_CMDS["test_crm_ipv4_route"]["add"].format(nh_ip)
-    duthost.command(cmd)
+    # Add IPv[4/6] route
+    RESTORE_CMDS["test_crm_route"].append(route_del_cmd.format(nh_ip))
+    duthost.command(route_add_cmd.format(nh_ip))
 
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
 
-    # Get new "crm_stats_ipv4_route" used and available counter value
-    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_route_used crm_stats_ipv4_route_available"
-    out = duthost.command(cmd)
-    new_crm_stats_ipv4_route_used = int(out["stdout_lines"][0])
-    new_crm_stats_ipv4_route_available = int(out["stdout_lines"][1])
+    # Get new "crm_stats_ipv[4/6]_route" used and available counter value
+    new_crm_stats_route_used, new_crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
 
-    # Verify "crm_stats_ipv4_route_used" counter was incremented
-    assert new_crm_stats_ipv4_route_used - crm_stats_ipv4_route_used == 1
+    # Verify "crm_stats_ipv[4/6]_route_used" counter was incremented
+    assert new_crm_stats_route_used - crm_stats_route_used == 1
+    # Verify "crm_stats_ipv[4/6]_route_available" counter was decremented
+    assert crm_stats_route_available - new_crm_stats_route_available >= 1
 
-    # Verify "crm_stats_ipv4_route_available" counter was decremented
-    assert crm_stats_ipv4_route_available - new_crm_stats_ipv4_route_available >= 1
-
-    # Remove IPv4 route
-    ADD_RM_CMDS["test_crm_ipv4_route"]["rm"] = ADD_RM_CMDS["test_crm_ipv4_route"]["rm"].format(nh_ip)
-    cmd = ADD_RM_CMDS["test_crm_ipv4_route"]["rm"]
-    duthost.command(cmd)
+    # Remove IPv[4/6] route
+    duthost.command(route_del_cmd.format(nh_ip))
 
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
 
-    # Get new "crm_stats_ipv4_route" used and available counter value
-    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_route_used crm_stats_ipv4_route_available"
-    out = duthost.command(cmd)
-    new_crm_stats_ipv4_route_used = int(out["stdout_lines"][0])
-    new_crm_stats_ipv4_route_available = int(out["stdout_lines"][1])
+    # Get new "crm_stats_ipv[4/6]_route" used and available counter value
+    new_crm_stats_route_used, new_crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
 
-    # Verify "crm_stats_ipv4_route_used" counter was decremented
-    assert new_crm_stats_ipv4_route_used - crm_stats_ipv4_route_used == 0
+    # Verify "crm_stats_ipv[4/6]_route_used" counter was decremented
+    assert new_crm_stats_route_used - crm_stats_route_used == 0
+    # Verify "crm_stats_ipv[4/6]_route_available" counter was incremented
+    assert new_crm_stats_route_available - crm_stats_route_available == 0
 
-    # Verify "crm_stats_ipv4_route_available" counter was incremented
-    assert new_crm_stats_ipv4_route_available - crm_stats_ipv4_route_available == 0
-    # Verify thresholds for "IPv4 route" CRM resource
-    verify_thresholds(duthost, crm_cli_res=crm_cli_res, crm_used=new_crm_stats_ipv4_route_used, crm_avail=new_crm_stats_ipv4_route_available)
+    # Verify thresholds for "IPv[4/6] route" CRM resource
+    verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"],
+        crm_used=new_crm_stats_route_used, crm_avail=new_crm_stats_route_available)
 
 
-def test_crm_ipv6_route(duthost, crm_interface, crm_cli_res="ipv6 route"):
-    # Get "crm_stats_ipv6_route" used and available counter value
-    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv6_route_used crm_stats_ipv6_route_available"
-    out = duthost.command(cmd)
-    crm_stats_ipv6_route_used = int(out["stdout_lines"][0])
-    crm_stats_ipv6_route_available = int(out["stdout_lines"][1])
+@pytest.mark.parametrize("ip_ver,nexthop", [("4", "2.2.2.2"), ("6", "2001::1")])
+def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
+    RESTORE_CMDS["crm_cli_res"] = "ipv{ip_ver} nexthop".format(ip_ver=ip_ver)
+    nexthop_add_cmd = "ip neigh replace {nexthop} lladdr 11:22:33:44:55:66 dev {iface}"
+    nexthop_del_cmd = "ip neigh del {nexthop} lladdr 11:22:33:44:55:66 dev {iface}"
 
-    # Get NH IP
-    cmd = "ip -6 neigh show dev {} nud reachable nud stale".format(crm_interface[0])
-    out = duthost.command(cmd)
+    # Get "crm_stats_ipv[4/6]_nexthop" used and available counter value
+    get_nexthop_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv{ip_ver}_nexthop_used crm_stats_ipv{ip_ver}_nexthop_available".format(ip_ver=ip_ver)
+    crm_stats_nexthop_used, crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
 
-    pattern = re.compile(r"(?:[0-9a-fA-F]:?){12}")
-    assert len(re.findall(pattern, out["stdout"])) == 1, "Get Next Hop IP failed. Neighbour not found"
-
-    nh_ip = out["stdout"].split()[0]
-
-    # Add IPv6 route
-    cmd = "ip -6 route add 2001::/126 via {}".format(nh_ip)
-    duthost.command(cmd)
+    # Add nexthop
+    RESTORE_CMDS["test_crm_nexthop"].append(nexthop_del_cmd.format(nexthop=nexthop, iface=crm_interface[0]))
+    duthost.command(nexthop_add_cmd.format(nexthop=nexthop, iface=crm_interface[0]))
 
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
 
-    # Get new "crm_stats_ipv6_route" used and available counter value
-    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv6_route_used crm_stats_ipv6_route_available"
-    out = duthost.command(cmd)
-    new_crm_stats_ipv6_route_used = int(out["stdout_lines"][0])
-    new_crm_stats_ipv6_route_available = int(out["stdout_lines"][1])
+    # Get new "crm_stats_ipv[4/6]_nexthop" used and available counter value
+    new_crm_stats_nexthop_used, new_crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
 
-    # Verify "crm_stats_ipv6_route_used" counter was incremented
-    assert new_crm_stats_ipv6_route_used - crm_stats_ipv6_route_used >= 1
+    # Verify "crm_stats_ipv[4/6]_nexthop_used" counter was incremented
+    assert new_crm_stats_nexthop_used - crm_stats_nexthop_used >= 1
+    # Verify "crm_stats_ipv[4/6]_nexthop_available" counter was decremented
+    assert crm_stats_nexthop_available - new_crm_stats_nexthop_available >= 1
 
-    # Verify "crm_stats_ipv6_route_available" counter was decremented
-    assert crm_stats_ipv6_route_available - new_crm_stats_ipv6_route_available >= 1
-
-    # Remove IPv6 route
-    cmd = "ip -6 route del 2001::/126 via {}".format(nh_ip)
-    duthost.command(cmd)
+    # Remove nexthop
+    duthost.command(nexthop_del_cmd.format(nexthop=nexthop, iface=crm_interface[0]))
 
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
 
-    # Get new "crm_stats_ipv6_route" used and available counter value
-    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv6_route_used crm_stats_ipv6_route_available"
-    out = duthost.command(cmd)
-    new_crm_stats_ipv6_route_used = int(out["stdout_lines"][0])
-    new_crm_stats_ipv6_route_available = int(out["stdout_lines"][1])
+    # Get new "crm_stats_ipv[4/6]_nexthop" used and available counter value
+    new_crm_stats_nexthop_used, new_crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
 
-    # Verify "crm_stats_ipv6_route_used" counter was decremented
-    assert new_crm_stats_ipv6_route_used - crm_stats_ipv6_route_used == 0
+    # Verify "crm_stats_ipv[4/6]_nexthop_used" counter was decremented
+    assert new_crm_stats_nexthop_used - crm_stats_nexthop_used == 0
+    # Verify "crm_stats_ipv[4/6]_nexthop_available" counter was incremented
+    assert new_crm_stats_nexthop_available - crm_stats_nexthop_available == 0
 
-    # Verify "crm_stats_ipv6_route_available" counter was incremented
-    assert new_crm_stats_ipv6_route_available - crm_stats_ipv6_route_available == 0
+    # Verify thresholds for "IPv[4/6] nexthop" CRM resource
+    verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_nexthop_used, crm_avail=new_crm_stats_nexthop_available)
 
-    # Verify thresholds for "IPv6 route" CRM resource
-    verify_thresholds(duthost, crm_cli_res=crm_cli_res, crm_used=new_crm_stats_ipv6_route_used, crm_avail=new_crm_stats_ipv6_route_available)
+
+@pytest.mark.parametrize("ip_ver,neighbor", [("4", "2.2.2.2"), ("6", "2001::1")])
+def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
+    RESTORE_CMDS["crm_cli_res"] = "ipv{ip_ver} neighbor".format(ip_ver=ip_ver)
+    neighbor_add_cmd = "ip neigh replace {neighbor} lladdr 11:22:33:44:55:66 dev {iface}"
+    neighbor_del_cmd = "ip neigh del {neighbor} lladdr 11:22:33:44:55:66 dev {iface}"
+
+    # Get "crm_stats_ipv[4/6]_neighbor" used and available counter value
+    get_neighbor_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv{ip_ver}_neighbor_used crm_stats_ipv{ip_ver}_neighbor_available".format(ip_ver=ip_ver)
+    crm_stats_neighbor_used, crm_stats_neighbor_available = get_crm_stats(get_neighbor_stats, duthost)
+
+    # Add neighbor
+    RESTORE_CMDS["test_crm_neighbor"].append(neighbor_del_cmd.format(neighbor=neighbor, iface=crm_interface[0]))
+    duthost.command(neighbor_add_cmd.format(neighbor=neighbor, iface=crm_interface[0]))
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_ipv[4/6]_neighbor" used and available counter value
+    new_crm_stats_neighbor_used, new_crm_stats_neighbor_available = get_crm_stats(get_neighbor_stats, duthost)
+
+    # Verify "crm_stats_ipv4_neighbor_used" counter was incremented
+    assert new_crm_stats_neighbor_used - crm_stats_neighbor_used >= 1
+    # Verify "crm_stats_ipv4_neighbor_available" counter was decremented
+    assert crm_stats_neighbor_available - new_crm_stats_neighbor_available >= 1
+
+    # Remove neighbor
+    duthost.command(neighbor_del_cmd.format(neighbor=neighbor, iface=crm_interface[0]))
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_ipv[4/6]_neighbor" used and available counter value
+    new_crm_stats_neighbor_used, new_crm_stats_neighbor_available = get_crm_stats(get_neighbor_stats, duthost)
+
+    # Verify "crm_stats_ipv4_neighbor_used" counter was decremented
+    assert new_crm_stats_neighbor_used - crm_stats_neighbor_used >= 0
+    # Verify "crm_stats_ipv4_neighbor_available" counter was incremented
+    assert new_crm_stats_neighbor_available - crm_stats_neighbor_available == 0
+
+    # Verify thresholds for "IPv[4/6] neighbor" CRM resource
+    verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_neighbor_used,
+        crm_avail=new_crm_stats_neighbor_available)
