@@ -85,12 +85,12 @@ def pytest_addoption(parser):
     ############################
     # test_techsupport options #
     ############################
-    
+
     parser.addoption("--loop_num", action="store", default=10, type=int,
                     help="Change default loop range for show techsupport command")
     parser.addoption("--loop_delay", action="store", default=10, type=int,
                     help="Change default loops delay")
-    parser.addoption("--logs_since", action="store", type=int, 
+    parser.addoption("--logs_since", action="store", type=int,
                     help="number of minutes for show techsupport command")
 
 
@@ -206,29 +206,22 @@ def fanouthosts(ansible_adhoc, conn_graph_facts, creds):
     Shortcut fixture for getting Fanout hosts
     """
 
-    with open('../ansible/testbed-new.yaml') as stream:
-        testbed_doc = yaml.safe_load(stream)
+    dev_conn     = conn_graph_facts['device_conn']
+    fanout_hosts = {}
+    for dut_port in dev_conn.keys():
+        fanout_rec  = dev_conn[dut_port]
+        fanout_host = fanout_rec['peerdevice']
+        fanout_port = fanout_rec['peerport']
+        if fanout_host in fanout_hosts.keys():
+            fanout  = fanout_hosts[fanout_host]
+        else:
+            host_vars = ansible_adhoc().options['inventory_manager'].get_host(fanout_host).vars
+            os_type = 'eos' if 'os' not in host_vars else host_vars['os']
+            fanout  = FanoutHost(ansible_adhoc, os_type, fanout_host, 'FanoutLeaf', creds['fanout_admin_user'], creds['fanout_admin_password'])
+            fanout_hosts[fanout_host] = fanout
+        fanout.add_port_map(dut_port, fanout_port)
 
-    fanout_types = ['FanoutLeaf', 'FanoutRoot']
-    devices = {}
-    for hostname in conn_graph_facts['device_info'].keys():
-        device_info = conn_graph_facts['device_info'][hostname]
-        if device_info['Type'] in fanout_types:
-            # Use EOS if the target OS type is unknown
-            os = 'eos' if 'os' not in testbed_doc['devices'][hostname] else testbed_doc['devices'][hostname]['os']
-            device_exists = False
-            try:
-                fanout_host = FanoutHost(ansible_adhoc, os, hostname, device_info['Type'], creds['fanout_admin_user'], creds['fanout_admin_password'])
-                device_exists = True
-            except:
-                logging.warning("Couldn't found the given host(%s) in inventory file" % hostname)
-            
-            if device_exists:
-                # Index fanout host by both hostname and mgmt ip
-                devices[hostname] = fanout_host
-                devices[device_info['mgmtip']] = fanout_host
-
-    return devices
+    return fanout_hosts
 
 @pytest.fixture(scope='session')
 def eos():
@@ -238,11 +231,14 @@ def eos():
         return eos
 
 
-@pytest.fixture(scope="session")
-def creds():
-    """ read and yield lab configuration """
-    files = glob.glob("../ansible/group_vars/lab/*.yml")
-    files += glob.glob("../ansible/group_vars/all/*.yml")
+@pytest.fixture(scope="module")
+def creds(duthost):
+    """ read credential information according to the dut inventory """
+    groups = duthost.host.options['inventory_manager'].get_host(duthost.hostname).get_vars()['group_names']
+    logger.info("dut {} belongs to groups {}".format(duthost.hostname, groups))
+    files = glob.glob("../ansible/group_vars/all/*.yml")
+    for group in groups:
+        files += glob.glob("../ansible/group_vars/{}/*.yml".format(group))
     creds = {}
     for f in files:
         with open(f) as stream:
