@@ -217,7 +217,7 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     nexthop_add_cmd = "ip -{ip_ver} route add {network} nexthop via {nh_ip1} nexthop via {nh_ip2}"
     nexthop_del_cmd = "ip -{ip_ver} route del {network} nexthop via {nh_ip1} nexthop via {nh_ip2}"
 
-    # Get "crm_stats_nexthop_group[member]" used and available counter value
+    # Get "crm_stats_nexthop_group_[member]" used and available counter value
     get_nexthop_group_stats = get_group_member_stats if group_member else get_group_stats
     nexthop_group_used, nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
@@ -243,13 +243,13 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
 
-    # Get new "crm_stats_nexthop_group_member" used and available counter value
+    # Get new "crm_stats_nexthop_group_[member]" used and available counter value
     new_nexthop_group_used, new_nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
-    # Verify "crm_stats_nexthop_group_member_used" counter was incremented
+    # Verify "crm_stats_nexthop_group_[member]_used" counter was incremented
     assert new_nexthop_group_used - nexthop_group_used == 2
 
-    # Verify "crm_stats_nexthop_group_member_available" counter was decremented
+    # Verify "crm_stats_nexthop_group_[member]_available" counter was decremented
     assert nexthop_group_available - new_nexthop_group_available >= 2
 
     # Remove nexthop group members
@@ -258,13 +258,13 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
 
-    # Get new "crm_stats_nexthop_group_member" used and available counter value
+    # Get new "crm_stats_nexthop_group_[member]" used and available counter value
     new_nexthop_group_used, new_nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
-    # Verify "crm_stats_nexthop_group_member_used" counter was decremented
+    # Verify "crm_stats_nexthop_group_[member]_used" counter was decremented
     assert new_nexthop_group_used - nexthop_group_used == 0
 
-    # Verify "crm_stats_nexthop_group_member_available" counter was incremented
+    # Verify "crm_stats_nexthop_group_[member]_available" counter was incremented
     assert new_nexthop_group_available - nexthop_group_available == 0
 
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_nexthop_group_used,
