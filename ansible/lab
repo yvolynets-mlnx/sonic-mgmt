@@ -2,7 +2,7 @@
 arc-switch1038     ansible_host=10.210.25.41 sonic_version=v2 hwsku="ACS-MSN3700" iface_speed=100000  mgmt_subnet_mask_length=22 vm_base=VM0101
 mts-sonic-dut      ansible_host=10.9.74.46  sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=100000 mgmt_subnet_mask_length=24 vm_base=VM0201
 arc-switch1041     ansible_host=10.210.25.48 sonic_version=v2 hwsku="ACS-MSN2740" iface_speed=100000 mgmt_subnet_mask_length=22 vm_base=VM0301
-arc-switch1029     ansible_host=10.210.25.44 sonic_version=v2 hwsku="ACS-MSN2100" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0401
+arc-switch1029     ansible_host=10.210.25.44 sonic_version=v2 hwsku="ACS-MSN2100" iface_speed=25000  mgmt_subnet_mask_length=22 vm_base=VM0401
 arc-mtbc-1001      ansible_host=10.75.206.180 sonic_version=v2 hwsku="ACS-MSN2410" iface_speed=25000 mgmt_subnet_mask_length=24 vm_base=VM0501
 arc-switch1025     ansible_host=10.210.25.45 sonic_version=v2 hwsku="ACS-MSN2700" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0601
 arc-switch1004     ansible_host=10.210.24.176 sonic_version=v2 hwsku="Mellanox-SN2700-D48C8" iface_speed=40000  mgmt_subnet_mask_length=22 vm_base=VM0701

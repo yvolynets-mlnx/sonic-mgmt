@@ -8,7 +8,7 @@ MTS-SAI-HOST-3 ansible_host=mts-sai-host-3
 ARC-HOST83 ansible_host=arc-host83
 
 [vm_host_4]
-ARC-HOST62 ansible_host=arc-host62 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+ARC-HOST62 ansible_host=arc-host62
 
 [vm_host_5]
 DEV-R730-01 ansible_host=dev-r730-01
@@ -23,7 +23,7 @@ ARC-HOST26 ansible_host=arc-host26
 DEV-R730-02 ansible_host=dev-r730-02
 
 [vm_host_9]
-R-SONIC-02 ansible_host=r-sonic-02 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+R-SONIC-02 ansible_host=r-sonic-02
 
 [vm_host_10]
 DEV-R730-03 ansible_host=dev-r730-03
