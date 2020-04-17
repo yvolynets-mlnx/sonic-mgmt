@@ -2,10 +2,10 @@
 ARC-HOST60 ansible_host=arc-host60
 
 [vm_host_2]
-MTS-SAI-HOST-3 ansible_host=mts-sai-host-3 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+MTS-SAI-HOST-3 ansible_host=mts-sai-host-3
 
 [vm_host_3]
-ARC-HOST83 ansible_host=arc-host83 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+ARC-HOST83 ansible_host=arc-host83
 
 [vm_host_4]
 ARC-HOST62 ansible_host=arc-host62 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
@@ -29,10 +29,10 @@ R-SONIC-02 ansible_host=r-sonic-02 ansible_python_interpreter=/images/pyenv/soni
 DEV-R730-03 ansible_host=dev-r730-03
 
 [vm_host_11]
-R-SONIC-03 ansible_host=r-sonic-03 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+R-SONIC-03 ansible_host=r-sonic-03
 
 [vm_host_12]
-R-SONIC-04 ansible_host=r-sonic-04 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+R-SONIC-04 ansible_host=r-sonic-04
 
 [vm_host_13]
 R-SONIC-07 ansible_host=r-sonic-07
