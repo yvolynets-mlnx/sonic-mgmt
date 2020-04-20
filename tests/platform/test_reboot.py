@@ -45,24 +45,6 @@ def teardown_module(duthost, conn_graph_facts):
     check_interfaces_and_services(duthost, interfaces)
 
 
-def check_reboot_cause(dut, reboot_cause_expected):
-    """
-    @summary: Check the reboot cause on DUT.
-    @param dut: The AnsibleHost object of DUT.
-    @param reboot_cause_expected: The expected reboot cause.
-    """
-    if dut.facts["hwsku"] not in sku_supporting_reboot_cause_test:
-        logging.info("Reboot-cause check skipped because %s doesn't support it" % dut.facts["hwsku"])
-        return True
-
-    logging.info("Check the reboot cause")
-    output = dut.shell("show reboot-cause")
-    reboot_cause_got = output["stdout"]
-    logging.debug("show reboot-cause returns {}".format(reboot_cause_got))
-    m = re.search(reboot_cause_expected, reboot_cause_got)
-    return m is not None
-
-
 def reboot_and_check(localhost, dut, interfaces, reboot_type=REBOOT_TYPE_COLD, reboot_helper=None, reboot_kwargs=None):
     """
     Perform the specified type of reboot and check platform status.
