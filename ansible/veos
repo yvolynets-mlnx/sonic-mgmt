@@ -41,7 +41,7 @@ R-SONIC-07 ansible_host=r-sonic-07
 MTBC-R730-04 ansible_host=mtbc-r730-04
 
 [vm_host_15]
-ARC-HOST70 ansible_host=arc-host70 ansible_python_interpreter=/images/pyenv/sonic/bin/python pip_executable=/images/pyenv/sonic/bin/pip
+ARC-HOST70 ansible_host=arc-host70
 
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
