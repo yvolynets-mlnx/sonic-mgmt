@@ -606,7 +606,9 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
             queue_pkt_counters = [0,0,0,0,0,0,0,0,0]
             queue_num_of_pkts  = [queue_0_num_of_pkts, 0, 0, queue_3_num_of_pkts, queue_4_num_of_pkts, 0, 0, 0, 0, queue_1_num_of_pkts]
             total_pkts = 0
-            limit = self.test_params['limit']
+            limit = int(self.test_params['limit'])
+
+            diff_list = []
 
             for pkt_to_inspect in pkts:
                 dscp_of_pkt = pkt_to_inspect.payload.tos >> 2
@@ -616,9 +618,16 @@ class WRRtest(sai_base_test.ThriftInterfaceDataPlane):
 
                 queue_pkt_counters[dscp_of_pkt] += 1
                 if queue_pkt_counters[dscp_of_pkt] == queue_num_of_pkts[dscp_of_pkt]:
-                     assert ( (queue_0_num_of_pkts+queue_1_num_of_pkts+queue_3_num_of_pkts+queue_4_num_of_pkts) - total_pkts < limit)
+                     diff_list.append((dscp_of_pkt, (queue_0_num_of_pkts+queue_1_num_of_pkts+queue_3_num_of_pkts+queue_4_num_of_pkts) - total_pkts))
 
                 print queue_pkt_counters
+
+            print "Difference for each dscp"
+            print diff_list
+            print "Limit is %d" % limit
+
+            for dscp, diff in diff_list:
+                assert diff < limit, "Difference for %d is %d which exceeds limit %d" % (dscp, diff, limit)
 
             # Read Counters
             print "DST port counters: "
