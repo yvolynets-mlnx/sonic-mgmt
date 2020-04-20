@@ -9,7 +9,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-HASH_KEYS = ['src-ip', 'dst-ip', 'src-port', 'dst-port', 'ingress-port']
+HASH_KEYS = ['src-ip', 'dst-ip', 'src-port', 'dst-port']
 SRC_IP_RANGE = ['8.0.0.0', '8.255.255.255']
 DST_IP_RANGE = ['9.0.0.0', '9.255.255.255']
 SRC_IPV6_RANGE = ['20D0:A800:0:00::', '20D0:A800:0:00::FFFF']
