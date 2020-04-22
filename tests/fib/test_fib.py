@@ -85,7 +85,7 @@ def get_router_interface_ports(config_facts, testbed):
 
     return router_interface_ports
 
-@pytest.mark.parametrize("ipv4, ipv6, mtu", [pytest.param(True, True, 1514)])
+@pytest.mark.parametrize("ipv4, ipv6, mtu", [pytest.param(True, True, 128)])
 def test_fib(testbed, duthost, ptfhost, ipv4, ipv6, mtu):
 
     config_facts = duthost.config_facts(host=duthost.hostname, source="running")['ansible_facts']
