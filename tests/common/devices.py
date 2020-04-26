@@ -129,22 +129,34 @@ class SonicHost(AnsibleHostBase):
             self._get_critical_services_for_multi_npu
 
 
-    def _platform_info(self):
+    def get_platform_info(self):
+        """
+        @summary: Get the platform information of the SONiC switch.
+        @return: Returns a dictionary containing preperties of the platform information, for example:
+            {
+                "platform": "",
+                "hwsku": "",
+                "asic_type": ""
+            }
+        """
         platform_info = self.command("show platform summary")["stdout_lines"]
+        result = {}
         for line in platform_info:
             if line.startswith("Platform:"):
-                self.facts["platform"] = line.split(":")[1].strip()
+                result["platform"] = line.split(":")[1].strip()
             elif line.startswith("HwSKU:"):
-                self.facts["hwsku"] = line.split(":")[1].strip()
+                result["hwsku"] = line.split(":")[1].strip()
             elif line.startswith("ASIC:"):
-                self.facts["asic_type"] = line.split(":")[1].strip()
+                result["asic_type"] = line.split(":")[1].strip()
+        return result
 
     def gather_facts(self):
         """
         @summary: Gather facts of the SONiC switch and store the gathered facts in the dict type 'facts' attribute.
         """
         self.facts = {}
-        self._platform_info()
+        platform_info = self.get_platform_info()
+        self.facts.update(platform_info)
         self._get_npu_info()
         logging.debug("SonicHost facts: %s" % json.dumps(self.facts))
 
@@ -350,6 +362,24 @@ class SonicHost(AnsibleHostBase):
     def get_asic_type(self):
         return self.facts["asic_type"]
 
+    def shutdown(self, ifname):
+        """
+            Shutdown interface specified by ifname
+
+            Args:
+                ifname: the interface to shutdown
+        """
+        return self.command("sudo config interface shutdown {}".format(ifname))
+
+    def no_shutdown(self, ifname):
+        """
+            Bring up interface specified by ifname
+
+            Args:
+                ifname: the interface to bring up
+        """
+        return self.command("sudo config interface startup {}".format(ifname))
+
 
 class EosHost(AnsibleHostBase):
     """
@@ -390,6 +420,13 @@ class EosHost(AnsibleHostBase):
 
     def command(self, cmd):
         out = self.host.eos_command(commands=[cmd])
+        return out
+
+    def set_interface_lacp_rate_mode(self, interface_name, mode):
+        out = self.host.eos_config(
+            lines=['lacp rate %s' % mode],
+            parents='interface %s' % interface_name)
+        logging.info("Set interface [%s] lacp rate to [%s]" % (interface_name, mode))
         return out
 
 class FanoutHost():

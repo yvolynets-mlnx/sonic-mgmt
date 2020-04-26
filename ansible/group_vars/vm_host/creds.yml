@@ -1,5 +1,3 @@
----
 ansible_user: root
 ansible_password: 3tango
 ansible_sudo_pass: 3tango
-
