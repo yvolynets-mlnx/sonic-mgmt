@@ -94,6 +94,12 @@ def pytest_addoption(parser):
                     help="number of minutes for show techsupport command")
 
 
+    # fw_utility options
+    parser.addoption("--config_file", action="store", default=None, help="name of configuration file (per each vendor)")
+    parser.addoption("--binaries_path", action="store", default=None, help="path to binaries files")
+    parser.addoption("--second_image_path", action="store", default=None, help="path to second image to be installed if there is no image available")
+
+
 @pytest.fixture(scope="session")
 def testbed(request):
     """
