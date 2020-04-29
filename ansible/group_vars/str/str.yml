@@ -34,7 +34,7 @@ ASIC_params:
     SPC2:
         cell_size: 144
         buffer_utilization_tolerance: 4
-        default_ecn_tolerance: 10
+        default_ecn_tolerance: 15
         ecn_range_threshold: [
             {min: 1088, max: 3264, tolerance: 35},
             {min: 1088, max: 3776, tolerance: 35},
