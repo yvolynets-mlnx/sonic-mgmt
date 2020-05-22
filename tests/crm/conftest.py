@@ -13,11 +13,13 @@ def pytest_runtest_teardown(item, nextitem):
     """
     test_crm_cli_res = RESTORE_CMDS["crm_cli_res"]
     restore_cmd = "bash -c \"crm config thresholds {crm_cli_res} type percentage && crm config thresholds {crm_cli_res} low 70 && crm config thresholds {crm_cli_res} high 85\""
-    # Restore CRM threshods
-    item.funcargs["duthost"].command(restore_cmd.format(crm_cli_res=test_crm_cli_res))
+    if not item.rep_call.skipped:
+        # Restore CRM threshods
+        item.funcargs["duthost"].command(restore_cmd.format(crm_cli_res=test_crm_cli_res))
 
-    if item.rep_call.failed:
-        # Restore DUT after specific test steps
-        for cmd in RESTORE_CMDS[item.originalname]:
-          item.funcargs["duthost"].shell(cmd + " 2> /dev/null || true")
-        RESTORE_CMDS[item.originalname] = []
+        if item.rep_call.failed:
+            test_name = item.function.func_name
+            # Restore DUT after specific test steps
+            for cmd in RESTORE_CMDS[test_name]:
+                item.funcargs["duthost"].shell(cmd + " 2> /dev/null || true")
+            RESTORE_CMDS[test_name] = []

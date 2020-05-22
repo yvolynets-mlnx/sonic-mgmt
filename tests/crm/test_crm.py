@@ -23,6 +23,8 @@ RESTORE_CMDS = {"test_crm_route": [],
                 "test_crm_nexthop": [],
                 "test_crm_neighbor": [],
                 "test_crm_nexthop_group": [],
+                "test_acl_entry": [],
+                "test_acl_counter": [],
                 "crm_cli_res": None}
 # TODO: add messages to each assert
 # TODO: create ansible wrapper for this tests
@@ -41,12 +43,70 @@ def crm_interface(duthost, testbed):
         pytest.skip("Unsupported topology for current test cases - {}".format(testbed["topo"]["name"]))
     yield (crm_intf1, crm_intf2)
 
+
 @pytest.fixture(scope="module", autouse=True)
 def set_polling_interval(duthost):
     wait_time = 2
     duthost.command("crm config polling interval {}".format(CRM_POLLING_INTERVAL))["stdout"]
     logger.info("Waiting {} sec for CRM counters to become updated".format(wait_time))
     time.sleep(wait_time)
+
+
+@pytest.fixture(scope="module")
+def collector(duthost):
+    """ Fixture for sharing variables beatween test cases """
+    data = {}
+    yield data
+
+
+def apply_acl_config(duthost, test_name, collector):
+    """ Create acl rule defined in config file. Return ACL table key. """
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    template_dir = os.path.join(base_dir, "templates")
+    acl_rules_template = "acl.json"
+    dut_tmp_dir = "/tmp"
+
+    duthost.command("mkdir -p {}".format(dut_tmp_dir))
+    dut_conf_file_path = os.path.join(dut_tmp_dir, acl_rules_template)
+
+    # Define test cleanup commands
+    RESTORE_CMDS[test_name].append("rm -rf {}".format(dut_conf_file_path))
+    RESTORE_CMDS[test_name].append("acl-loader delete")
+
+    logger.info("Generating config for ACL rule, ACL table - DATAACL")
+    duthost.template(src=os.path.join(template_dir, acl_rules_template), dest=dut_conf_file_path)
+
+    logger.info("Applying {}".format(dut_conf_file_path))
+    duthost.command("acl-loader update full {}".format(dut_conf_file_path))
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    collector["acl_tbl_key"] = get_acl_tbl_key(duthost)
+
+
+def get_acl_tbl_key(duthost):
+    # Get ACL entry keys
+    cmd = "redis-cli --raw -n 1 KEYS *SAI_OBJECT_TYPE_ACL_ENTRY*"
+    acl_tbl_keys = duthost.command(cmd)["stdout"].split()
+
+    # Get ethertype for ACL entry and match ACL which was configured to ethertype value
+    cmd = "redis-cli -n 1 HGET {item} SAI_ACL_ENTRY_ATTR_FIELD_ETHER_TYPE"
+    for item in acl_tbl_keys:
+        out = duthost.command(cmd.format(item=item))["stdout"]
+        if "2048" in out:
+            key = item
+            break
+    else:
+        pytest.fail("Ether type was not found in SAI ACL Entry table")
+
+    # Get ACL table key
+    cmd = "redis-cli -n 1 HGET {key} SAI_ACL_ENTRY_ATTR_TABLE_ID"
+    oid = duthost.command(cmd.format(key=key))["stdout"]
+    acl_tbl_key = "CRM:ACL_TABLE_STATS:{0}".format(oid.replace("oid:", ""))
+
+    return acl_tbl_key
+
 
 def verify_thresholds(duthost, **kwargs):
     loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='crm_test')
@@ -62,6 +122,7 @@ def verify_thresholds(duthost, **kwargs):
 
         with loganalyzer:
             duthost.command(cmd)
+
 
 def get_crm_stats(cmd, duthost):
     out = duthost.command(cmd)
@@ -269,3 +330,100 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
 
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_nexthop_group_used,
         crm_avail=new_nexthop_group_available)
+
+
+def test_acl_entry(duthost, crm_interface, collector):
+    apply_acl_config(duthost, "test_acl_entry", collector)
+    acl_tbl_key = collector["acl_tbl_key"]
+
+    RESTORE_CMDS["crm_cli_res"] = "acl group entry"
+
+    crm_stats_acl_entry_used = 0
+    crm_stats_acl_entry_available = 0
+
+    # Get new "crm_stats_acl_entry" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET {acl_tbl_key} crm_stats_acl_entry_used crm_stats_acl_entry_available"
+    std_out = duthost.command(cmd.format(acl_tbl_key=acl_tbl_key))["stdout_lines"]
+    new_crm_stats_acl_entry_used = int(std_out[0])
+    new_crm_stats_acl_entry_available = int(std_out[1])
+
+    # Verify "crm_stats_acl_entry_used" counter was incremented
+    assert new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 2
+
+    crm_stats_acl_entry_available = new_crm_stats_acl_entry_available + new_crm_stats_acl_entry_used
+
+    # Verify thresholds for "ACL entry" CRM resource
+    verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_acl_entry_used,
+        crm_avail=new_crm_stats_acl_entry_available)
+
+    # Remove ACL
+    duthost.command("acl-loader delete")
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_acl_entry" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET {acl_tbl_key} crm_stats_acl_entry_used crm_stats_acl_entry_available"
+    std_out = duthost.command(cmd.format(acl_tbl_key=acl_tbl_key))["stdout_lines"]
+    new_crm_stats_acl_entry_used = int(std_out[0])
+    new_crm_stats_acl_entry_available = int(std_out[1])
+
+    # Verify "crm_stats_acl_entry_used" counter was decremented
+    assert new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 0
+
+    # Verify "crm_stats_acl_entry_available" counter was incremented
+    assert new_crm_stats_acl_entry_available - crm_stats_acl_entry_available == 0
+
+
+def test_acl_counter(duthost, crm_interface, collector):
+    if not "acl_tbl_key" in collector:
+        pytest.skip("acl_tbl_key is not retreived")
+    acl_tbl_key = collector["acl_tbl_key"]
+
+    RESTORE_CMDS["crm_cli_res"] = "acl group counter"
+
+    crm_stats_acl_counter_used = 0
+    crm_stats_acl_counter_available = 0
+
+    # Get original "crm_stats_acl_counter_available" counter value
+    cmd = "redis-cli -n 2 HGET {acl_tbl_key} crm_stats_acl_counter_available"
+    std_out = int(duthost.command(cmd.format(acl_tbl_key=acl_tbl_key))["stdout"])
+    original_crm_stats_acl_counter_available = std_out
+
+    apply_acl_config(duthost, "test_acl_counter", collector)
+
+    # Get new "crm_stats_acl_counter" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET {acl_tbl_key} crm_stats_acl_counter_used crm_stats_acl_counter_available"
+    std_out = duthost.command(cmd.format(acl_tbl_key=acl_tbl_key))["stdout_lines"]
+    new_crm_stats_acl_counter_used = int(std_out[0])
+    new_crm_stats_acl_counter_available = int(std_out[1])
+
+    # Verify "crm_stats_acl_counter_used" counter was incremented
+    assert new_crm_stats_acl_counter_used - crm_stats_acl_counter_used == 2
+
+    crm_stats_acl_counter_available = new_crm_stats_acl_counter_available + new_crm_stats_acl_counter_used
+
+    # Verify thresholds for "ACL entry" CRM resource
+    verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_acl_counter_used,
+        crm_avail=new_crm_stats_acl_counter_available)
+
+    # Remove ACL
+    duthost.command("acl-loader delete")
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_acl_counter" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET {acl_tbl_key} crm_stats_acl_counter_used crm_stats_acl_counter_available"
+    std_out = duthost.command(cmd.format(acl_tbl_key=acl_tbl_key))["stdout_lines"]
+    new_crm_stats_acl_counter_used = int(std_out[0])
+    new_crm_stats_acl_counter_available = int(std_out[1])
+
+    # Verify "crm_stats_acl_counter_used" counter was decremented
+    assert new_crm_stats_acl_counter_used - crm_stats_acl_counter_used == 0
+
+    # Verify "crm_stats_acl_counter_available" counter was incremented
+    assert new_crm_stats_acl_counter_available - crm_stats_acl_counter_available >= 0
+
+    # Verify "crm_stats_acl_counter_available" counter was equal to original value
+    assert original_crm_stats_acl_counter_available - new_crm_stats_acl_counter_available == 0
