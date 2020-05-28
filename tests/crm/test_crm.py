@@ -1,9 +1,11 @@
 import pytest
 import time
 import re
+import json
 
 from jinja2 import Template
 from common.plugins.loganalyzer.loganalyzer import LogAnalyzer
+from common.helpers.assertions import pytest_assert
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +27,8 @@ RESTORE_CMDS = {"test_crm_route": [],
                 "test_crm_nexthop_group": [],
                 "test_acl_entry": [],
                 "test_acl_counter": [],
+                "test_crm_fdb_entry": [],
+                "test_crm_vnet_bitmap": [],
                 "crm_cli_res": None}
 # TODO: add messages to each assert
 # TODO: create ansible wrapper for this tests
@@ -332,7 +336,7 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
         crm_avail=new_nexthop_group_available)
 
 
-def test_acl_entry(duthost, crm_interface, collector):
+def test_acl_entry(duthost, collector):
     apply_acl_config(duthost, "test_acl_entry", collector)
     acl_tbl_key = collector["acl_tbl_key"]
 
@@ -375,7 +379,7 @@ def test_acl_entry(duthost, crm_interface, collector):
     assert new_crm_stats_acl_entry_available - crm_stats_acl_entry_available == 0
 
 
-def test_acl_counter(duthost, crm_interface, collector):
+def test_acl_counter(duthost, collector):
     if not "acl_tbl_key" in collector:
         pytest.skip("acl_tbl_key is not retreived")
     acl_tbl_key = collector["acl_tbl_key"]
@@ -427,3 +431,240 @@ def test_acl_counter(duthost, crm_interface, collector):
 
     # Verify "crm_stats_acl_counter_available" counter was equal to original value
     assert original_crm_stats_acl_counter_available - new_crm_stats_acl_counter_available == 0
+
+
+def test_crm_fdb_entry(duthost):
+    RESTORE_CMDS["crm_cli_res"] = "fdb"
+
+    # Configure test restore commands
+    # Remove VLAN member required for FDB entry
+    RESTORE_CMDS["test_crm_fdb_entry"].append("config vlan member del 2 Ethernet0")
+    # Remove VLAN required for FDB entry
+    RESTORE_CMDS["test_crm_fdb_entry"].append("config vlan del 2")
+    # Remove FDB entry
+    RESTORE_CMDS["test_crm_fdb_entry"].append("fdbclear")
+    # Remove FDB JSON config from switch.
+    RESTORE_CMDS["test_crm_fdb_entry"].append("rm /tmp/fdb.json")
+    # Remove FDB JSON config from SWSS container
+    RESTORE_CMDS["test_crm_fdb_entry"].append("docker exec -i swss rm /fdb.json")
+    # Restart arp_update
+    RESTORE_CMDS["test_crm_fdb_entry"].append("docker exec -i swss supervisorctl start arp_update")
+
+    # Stop arp_update
+    cmd = "docker exec -i swss supervisorctl stop arp_update"
+    duthost.command(cmd)
+
+    # Remove FDB entry
+    cmd = "fdbclear"
+    duthost.command(cmd)
+
+    # Get "crm_stats_fdb_entry" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_fdb_entry_used crm_stats_fdb_entry_available"
+    crm_stats_fdb_entry_used, crm_stats_fdb_entry_available = get_crm_stats(cmd, duthost)
+
+    # Copy FDB JSON config to switch.
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    template_dir = os.path.join(base_dir, "../../ansible/roles/test/tasks/crm/fdb.json")
+    duthost.template(src=template_dir, dest="/tmp")
+
+    # Copy FDB JSON config to SWSS container
+    cmd = "docker cp /tmp/fdb.json swss:/"
+    duthost.command(cmd)
+
+    # Add FDB entry
+    cmd = "docker exec -i swss swssconfig /fdb.json"
+    duthost.command(cmd)
+
+    # Add VLAN required for FDB entry
+    cmd = "config vlan add 2"
+    duthost.command(cmd)
+
+    # Add VLAN member required for FDB entry
+    cmd = "config vlan member add 2 Ethernet0"
+    duthost.command(cmd)
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_fdb_entry" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_fdb_entry_used crm_stats_fdb_entry_available"
+    new_crm_stats_fdb_entry_used, new_crm_stats_fdb_entry_available = get_crm_stats(cmd, duthost)
+
+    # Verify "crm_stats_fdb_entry_used" counter was incremented
+    pytest_assert(new_crm_stats_fdb_entry_used - crm_stats_fdb_entry_used == 1, \
+        "Counter 'crm_stats_fdb_entry_used' was not incremented")
+
+    # Verify "crm_stats_fdb_entry_available" counter was decremented
+    pytest_assert(crm_stats_fdb_entry_available - new_crm_stats_fdb_entry_available == 1, \
+        "Counter 'crm_stats_fdb_entry_available' was not incremented")
+
+    # Verify thresholds for "FDB entry" CRM resource
+    verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_fdb_entry_used,
+        crm_avail=new_crm_stats_fdb_entry_available)
+
+    # Remove FDB entry
+    cmd = "fdbclear"
+    duthost.command(cmd)
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_fdb_entry" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_fdb_entry_used crm_stats_fdb_entry_available"
+    new_crm_stats_fdb_entry_used, new_crm_stats_fdb_entry_available = get_crm_stats(cmd, duthost)
+
+    # Verify "crm_stats_fdb_entry_used" counter was decremented
+    pytest_assert(new_crm_stats_fdb_entry_used == 0, "Counter 'crm_stats_fdb_entry_used' was not decremented")
+
+    # Verify "crm_stats_fdb_entry_available" counter was incremented
+    pytest_assert(new_crm_stats_fdb_entry_available - crm_stats_fdb_entry_available >= 0, \
+        "Counter 'crm_stats_fdb_entry_available' was not incremented")
+
+
+def test_crm_vnet_bitmap(duthost):
+    cmd_copy_route_config = "docker cp /tmp/vnet.del.route.json swss:/vnet.route.json"
+    cmd_apply_route_config = "docker exec swss sh -c \"swssconfig /vnet.route.json\""
+    cmd_del_interf_addr = "docker exec -i database redis-cli -n 4 del \"VLAN_INTERFACE|{ifname}|{ifip}\""
+    cmd_del_interf = "docker exec -i database redis-cli -n 4 del \"VLAN_INTERFACE|{ifname}\""
+    cmd_del_vnet = "docker exec -i database redis-cli -n 4 del \"VNET|{vnet}\""
+
+    template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "templates")
+    vnet_conf = os.path.join(template_dir, "vnet.conf.json")
+    vnet_intf = os.path.join(template_dir, "vnet.intf.json")
+    vnet_route_add = os.path.join(template_dir, "vnet.add.route.json")
+    vnet_route_del = os.path.join(template_dir, "vnet.del.route.json")
+    vlan_ifname = None
+    vlan_ifip = None
+    vnet_name = None
+
+    # Get Vlan interface name and IP address
+    with open(vnet_intf) as intf_file:
+        buff = json.load(intf_file)["VLAN_INTERFACE"].keys()[0]
+        vlan_ifname, vlan_ifip = buff.split("|")
+
+    with open(vnet_conf) as conf_file:
+        vnet_name = json.load(conf_file)["VLAN_INTERFACE"][vlan_ifname]["vnet_name"]
+
+    # Configure test restore commands
+    RESTORE_CMDS["test_crm_vnet_bitmap"].append(cmd_copy_route_config)
+    RESTORE_CMDS["test_crm_vnet_bitmap"].append(cmd_apply_route_config)
+    RESTORE_CMDS["test_crm_vnet_bitmap"].append(cmd_del_interf_addr.format(ifname=vlan_ifname, ifip=vlan_ifip))
+    RESTORE_CMDS["test_crm_vnet_bitmap"].append(cmd_del_interf.format(ifname=vlan_ifname))
+    RESTORE_CMDS["test_crm_vnet_bitmap"].append(cmd_del_vnet.format(vnet=vnet_name))
+
+    # Copy configs to switch
+    duthost.template(src=vnet_conf, dest="/tmp")
+    duthost.template(src=vnet_intf, dest="/tmp")
+    duthost.template(src=vnet_route_add, dest="/tmp")
+    duthost.template(src=vnet_route_del, dest="/tmp")
+    time.sleep(1)
+
+    # Clear FDB table
+    cmd = "sonic-clear fdb all"
+    duthost.command(cmd)
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get "crm_stats_ipv4_route" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_route_used crm_stats_ipv4_route_available"
+    crm_stats_ipv4_route_used, crm_stats_ipv4_route_available = get_crm_stats(cmd, duthost)
+
+    # Get "crm_stats_ipv4_nexthop" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_nexthop_used crm_stats_ipv4_nexthop_available"
+    crm_stats_ipv4_nexthop_used, crm_stats_ipv4_nexthop_available = get_crm_stats(cmd, duthost)
+
+    # Get "crm_stats_ipv4_neighbor" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_neighbor_used crm_stats_ipv4_neighbor_available"
+    crm_stats_ipv4_neighbor_used, crm_stats_ipv4_neighbor_available = get_crm_stats(cmd, duthost)
+
+    # Get "crm_stats_fdb_entry" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_fdb_entry_used crm_stats_fdb_entry_available"
+    crm_stats_fdb_entry_used, crm_stats_fdb_entry_available = get_crm_stats(cmd, duthost)
+
+    # Apply VNet Vxlan configuration
+    duthost.command("config load -y /tmp/vnet.conf.json")
+    time.sleep(3)
+    # Copy route configuration to swss container
+    duthost.command("docker cp /tmp/vnet.add.route.json swss:/vnet.route.json")
+    # Apply route json configuration
+    duthost.command("docker exec swss sh -c \"swssconfig /vnet.route.json\"")
+    time.sleep(3)
+
+
+    # Get number of VNET interfaces
+    num = int(duthost.shell("grep \"Vlan\" /tmp/vnet.intf.json | wc -l")["stdout_lines"][0])
+    # Only regular routes are counted here since there is no CRM counter for BITMAP VNET routes.
+    # There is one such route per each interface so it is equal to number of VNET interfaces.
+    ipv4_route_num = num
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_ipv4_route" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_route_used crm_stats_ipv4_route_available"
+    new_crm_stats_ipv4_route_used, new_crm_stats_ipv4_route_available = get_crm_stats(cmd, duthost)
+
+    # Get new "crm_stats_ipv4_nexthop" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_nexthop_used crm_stats_ipv4_nexthop_available"
+    new_crm_stats_ipv4_nexthop_used, new_crm_stats_ipv4_nexthop_available = get_crm_stats(cmd, duthost)
+
+    # Verify "crm_stats_ipv4_route_used" counter was incremented
+    pytest_assert(new_crm_stats_ipv4_route_used - crm_stats_ipv4_route_used == ipv4_route_num, \
+        "'crm_stats_ipv4_route_used' counter was not incremented")
+
+    # Verify "crm_stats_ipv4_route_available" counter was decremented
+    pytest_assert(crm_stats_ipv4_route_available - new_crm_stats_ipv4_route_available >= ipv4_route_num, \
+        "\"crm_stats_ipv4_route_available\" counter was not decremented")
+
+    # Verify "crm_stats_ipv4_nexthop_used" counter was incremented
+    pytest_assert(new_crm_stats_ipv4_nexthop_used - crm_stats_ipv4_nexthop_used == 1, \
+        "\"crm_stats_ipv4_nexthop_used\" counter was not incremented")
+
+    # Verify "crm_stats_ipv4_nexthop_available" counter was decremented
+    pytest_assert(crm_stats_ipv4_nexthop_available - new_crm_stats_ipv4_nexthop_available >= 1, \
+        "\"crm_stats_ipv4_nexthop_available\" counter was not decremented")
+
+    # Clean VNET config
+    # Copy route configuration to swss container
+    duthost.command(cmd_copy_route_config)
+    time.sleep(1)
+    # Apply route json configuration
+    duthost.command(cmd_apply_route_config)
+    time.sleep(3)
+
+    # Remove VNET interfaces addresses
+    duthost.command(cmd_del_interf_addr.format(ifname=vlan_ifname, ifip=vlan_ifip))
+
+    # Remove VNET interfaces
+    duthost.command(cmd_del_interf.format(ifname=vlan_ifname))
+
+    # Remove VNETs
+    duthost.command(cmd_del_vnet.format(vnet=vnet_name))
+
+    # Make sure CRM counters updated
+    time.sleep(CRM_UPDATE_TIME)
+
+    # Get new "crm_stats_ipv4_route" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_route_used crm_stats_ipv4_route_available"
+    new_crm_stats_ipv4_route_used, new_crm_stats_ipv4_route_available = get_crm_stats(cmd, duthost)
+
+    # Get new "crm_stats_ipv4_nexthop" used and available counter value
+    cmd = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv4_nexthop_used crm_stats_ipv4_nexthop_available"
+    new_crm_stats_ipv4_nexthop_used, new_crm_stats_ipv4_nexthop_available = get_crm_stats(cmd, duthost)
+
+    # Verify "crm_stats_ipv4_route_used" counter was decremented
+    pytest_assert(new_crm_stats_ipv4_route_used - crm_stats_ipv4_route_used == 0, \
+        "\"crm_stats_ipv4_route_used\" counter was not decremented")
+
+    # Verify "crm_stats_ipv4_route_available" counter was incremented
+    pytest_assert(new_crm_stats_ipv4_route_available - crm_stats_ipv4_route_available == 0, \
+        "\"crm_stats_ipv4_route_available\" counter was not incremented")
+
+    # Verify "crm_stats_ipv4_nexthop_used" counter was decremented
+    pytest_assert(new_crm_stats_ipv4_nexthop_used - crm_stats_ipv4_nexthop_used == 0, \
+        "\"crm_stats_ipv4_nexthop_used\" counter was not decremented")
+
+    # Verify "crm_stats_ipv4_nexthop_available" counter was incremented
+    pytest_assert(new_crm_stats_ipv4_nexthop_available - crm_stats_ipv4_nexthop_available == 0, \
+        "\"crm_stats_ipv4_nexthop_available\" counter was not incremented")
