@@ -521,7 +521,10 @@ def test_crm_fdb_entry(duthost):
         "Counter 'crm_stats_fdb_entry_available' was not incremented")
 
 
-def test_crm_vnet_bitmap(duthost):
+def test_crm_vnet_bitmap(duthost, testbed):
+    if duthost.facts["asic_type"] != "mellanox":
+        pytest.skip("Unsupported ASIC type")
+
     cmd_copy_route_config = "docker cp /tmp/vnet.del.route.json swss:/vnet.route.json"
     cmd_apply_route_config = "docker exec swss sh -c \"swssconfig /vnet.route.json\""
     cmd_del_interf_addr = "docker exec -i database redis-cli -n 4 del \"VLAN_INTERFACE|{ifname}|{ifip}\""
@@ -537,13 +540,14 @@ def test_crm_vnet_bitmap(duthost):
     vlan_ifip = None
     vnet_name = None
 
-    # Get Vlan interface name and IP address
-    with open(vnet_intf) as intf_file:
-        buff = json.load(intf_file)["VLAN_INTERFACE"].keys()[0]
-        vlan_ifname, vlan_ifip = buff.split("|")
-
     with open(vnet_conf) as conf_file:
-        vnet_name = json.load(conf_file)["VLAN_INTERFACE"][vlan_ifname]["vnet_name"]
+        conf_json = json.load(conf_file)
+
+        for key, value in conf_json["VLAN_INTERFACE"].items():
+            if "|" in key:
+                vlan_ifname, vlan_ifip = key.split("|")
+            else:
+                vnet_name = value["vnet_name"]
 
     # Configure test restore commands
     RESTORE_CMDS["test_crm_vnet_bitmap"].append(cmd_copy_route_config)
