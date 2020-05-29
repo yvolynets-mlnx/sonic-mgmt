@@ -21,6 +21,9 @@ THR_VERIFY_CMDS = {
     "clear_percentage": "bash -c \"crm config thresholds {{crm_cli_res}} type percentage && crm config thresholds {{crm_cli_res}} low {{th_lo|int}} && crm config thresholds {{crm_cli_res}} high {{th_hi|int}}\""
     }
 
+EXPECT_EXCEEDED = ".* THRESHOLD_EXCEEDED .*"
+EXPECT_CLEAR = ".* THRESHOLD_CLEAR .*"
+
 RESTORE_CMDS = {"test_crm_route": [],
                 "test_crm_nexthop": [],
                 "test_crm_neighbor": [],
@@ -30,8 +33,6 @@ RESTORE_CMDS = {"test_crm_route": [],
                 "test_crm_fdb_entry": [],
                 "test_crm_vnet_bitmap": [],
                 "crm_cli_res": None}
-# TODO: add messages to each assert
-# TODO: create ansible wrapper for this tests
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -114,14 +115,17 @@ def get_acl_tbl_key(duthost):
 
 def verify_thresholds(duthost, **kwargs):
     loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='crm_test')
+    loganalyzer.load_common_config()
     for key, value in THR_VERIFY_CMDS.items():
         template = Template(value)
         if key == "exceeded_percentage":
             kwargs["th_lo"] = (kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])) - 1
             kwargs["th_hi"] = kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])
+            loganalyzer.expect_regex = [EXPECT_EXCEEDED]
         elif key == "clear_percentage":
             kwargs["th_lo"] = kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])
             kwargs["th_hi"] = (kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])) + 1
+            loganalyzer.expect_regex = [EXPECT_CLEAR]
         cmd = template.render(**kwargs)
 
         with loganalyzer:
@@ -150,7 +154,7 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
     # Get NH IP
     cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
     out = duthost.command(cmd)
-    assert out != "", "Get Next Hop IP failed. Neighbor not found"
+    pytest_assert(out != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     # Add IPv[4/6] route
@@ -164,9 +168,11 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
     new_crm_stats_route_used, new_crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
 
     # Verify "crm_stats_ipv[4/6]_route_used" counter was incremented
-    assert new_crm_stats_route_used - crm_stats_route_used == 1
+    pytest_assert(new_crm_stats_route_used - crm_stats_route_used == 1, \
+        "\"crm_stats_ipv{}_route_used\" counter was not incremented".format(ip_ver))
     # Verify "crm_stats_ipv[4/6]_route_available" counter was decremented
-    assert crm_stats_route_available - new_crm_stats_route_available >= 1
+    pytest_assert(crm_stats_route_available - new_crm_stats_route_available >= 1, \
+        "\"crm_stats_ipv{}_route_available\" counter was not decremented".format(ip_ver))
 
     # Remove IPv[4/6] route
     duthost.command(route_del_cmd.format(nh_ip))
@@ -178,9 +184,11 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
     new_crm_stats_route_used, new_crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
 
     # Verify "crm_stats_ipv[4/6]_route_used" counter was decremented
-    assert new_crm_stats_route_used - crm_stats_route_used == 0
+    pytest_assert(new_crm_stats_route_used - crm_stats_route_used == 0, \
+        "\"crm_stats_ipv{}_route_used\" counter was not decremented".format(ip_ver))
     # Verify "crm_stats_ipv[4/6]_route_available" counter was incremented
-    assert new_crm_stats_route_available - crm_stats_route_available == 0
+    pytest_assert(new_crm_stats_route_available - crm_stats_route_available == 0, \
+        "\"crm_stats_ipv{}_route_available\" counter was not incremented".format(ip_ver))
 
     # Verify thresholds for "IPv[4/6] route" CRM resource
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"],
@@ -208,9 +216,11 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
     new_crm_stats_nexthop_used, new_crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
 
     # Verify "crm_stats_ipv[4/6]_nexthop_used" counter was incremented
-    assert new_crm_stats_nexthop_used - crm_stats_nexthop_used >= 1
+    pytest_assert(new_crm_stats_nexthop_used - crm_stats_nexthop_used >= 1, \
+        "\"crm_stats_ipv{}_nexthop_used\" counter was not incremented".format(ip_ver))
     # Verify "crm_stats_ipv[4/6]_nexthop_available" counter was decremented
-    assert crm_stats_nexthop_available - new_crm_stats_nexthop_available >= 1
+    pytest_assert(crm_stats_nexthop_available - new_crm_stats_nexthop_available >= 1, \
+        "\"crm_stats_ipv{}_nexthop_available\" counter was not decremented".format(ip_ver))
 
     # Remove nexthop
     duthost.command(nexthop_del_cmd)
@@ -222,9 +232,11 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
     new_crm_stats_nexthop_used, new_crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
 
     # Verify "crm_stats_ipv[4/6]_nexthop_used" counter was decremented
-    assert new_crm_stats_nexthop_used - crm_stats_nexthop_used == 0
+    pytest_assert(new_crm_stats_nexthop_used - crm_stats_nexthop_used == 0, \
+        "\"crm_stats_ipv{}_nexthop_used\" counter was not decremented".format(ip_ver))
     # Verify "crm_stats_ipv[4/6]_nexthop_available" counter was incremented
-    assert new_crm_stats_nexthop_available - crm_stats_nexthop_available == 0
+    pytest_assert(new_crm_stats_nexthop_available - crm_stats_nexthop_available == 0, \
+        "\"crm_stats_ipv{}_nexthop_available\" counter was not incremented".format(ip_ver))
 
     # Verify thresholds for "IPv[4/6] nexthop" CRM resource
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_nexthop_used, crm_avail=new_crm_stats_nexthop_available)
@@ -251,9 +263,11 @@ def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
     new_crm_stats_neighbor_used, new_crm_stats_neighbor_available = get_crm_stats(get_neighbor_stats, duthost)
 
     # Verify "crm_stats_ipv4_neighbor_used" counter was incremented
-    assert new_crm_stats_neighbor_used - crm_stats_neighbor_used >= 1
+    pytest_assert(new_crm_stats_neighbor_used - crm_stats_neighbor_used >= 1, \
+        "\"crm_stats_ipv4_neighbor_used\" counter was not incremented")
     # Verify "crm_stats_ipv4_neighbor_available" counter was decremented
-    assert crm_stats_neighbor_available - new_crm_stats_neighbor_available >= 1
+    pytest_assert(crm_stats_neighbor_available - new_crm_stats_neighbor_available >= 1, \
+        "\"crm_stats_ipv4_neighbor_available\" counter was not decremented")
 
     # Remove neighbor
     duthost.command(neighbor_del_cmd)
@@ -265,9 +279,11 @@ def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
     new_crm_stats_neighbor_used, new_crm_stats_neighbor_available = get_crm_stats(get_neighbor_stats, duthost)
 
     # Verify "crm_stats_ipv4_neighbor_used" counter was decremented
-    assert new_crm_stats_neighbor_used - crm_stats_neighbor_used >= 0
+    pytest_assert(new_crm_stats_neighbor_used - crm_stats_neighbor_used >= 0, \
+        "\"crm_stats_ipv4_neighbor_used\" counter was not decremented")
     # Verify "crm_stats_ipv4_neighbor_available" counter was incremented
-    assert new_crm_stats_neighbor_available - crm_stats_neighbor_available == 0
+    pytest_assert(new_crm_stats_neighbor_available - crm_stats_neighbor_available == 0, \
+        "\"crm_stats_ipv4_neighbor_available\" counter was not incremented")
 
     # Verify thresholds for "IPv[4/6] neighbor" CRM resource
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_neighbor_used,
@@ -289,13 +305,13 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     # Get NH IP 1
     cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
     out = duthost.command(cmd)
-    assert out != "", "Get Next Hop IP failed. Neighbor not found"
+    pytest_assert(out != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip1 = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     # Get NH IP 2
     cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[1])
     out = duthost.command(cmd)
-    assert out != "", "Get Next Hop IP failed. Neighbor not found"
+    pytest_assert(out != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip2 = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     nexthop_add_cmd = nexthop_add_cmd.format(ip_ver=ip_ver, network=network, nh_ip1=nh_ip1, nh_ip2=nh_ip2)
@@ -312,10 +328,12 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     new_nexthop_group_used, new_nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
     # Verify "crm_stats_nexthop_group_[member]_used" counter was incremented
-    assert new_nexthop_group_used - nexthop_group_used == 2
+    pytest_assert(new_nexthop_group_used - nexthop_group_used == 2, \
+        "\"crm_stats_nexthop_group_{}used\" counter was not incremented".format("member_" if group_member else ""))
 
     # Verify "crm_stats_nexthop_group_[member]_available" counter was decremented
-    assert nexthop_group_available - new_nexthop_group_available >= 2
+    pytest_assert(nexthop_group_available - new_nexthop_group_available >= 2, \
+        "\"crm_stats_nexthop_group_{}available\" counter was not decremented".format("member_" if group_member else ""))
 
     # Remove nexthop group members
     duthost.command(nexthop_del_cmd)
@@ -327,10 +345,12 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     new_nexthop_group_used, new_nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
     # Verify "crm_stats_nexthop_group_[member]_used" counter was decremented
-    assert new_nexthop_group_used - nexthop_group_used == 0
+    pytest_assert(new_nexthop_group_used - nexthop_group_used == 0, \
+        "\"crm_stats_nexthop_group_{}used\" counter was not decremented".format("member_" if group_member else ""))
 
     # Verify "crm_stats_nexthop_group_[member]_available" counter was incremented
-    assert new_nexthop_group_available - nexthop_group_available == 0
+    pytest_assert(new_nexthop_group_available - nexthop_group_available == 0, \
+        "\"crm_stats_nexthop_group_{}available\" counter was not incremented".format("member_" if group_member else ""))
 
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_nexthop_group_used,
         crm_avail=new_nexthop_group_available)
@@ -352,7 +372,8 @@ def test_acl_entry(duthost, collector):
     new_crm_stats_acl_entry_available = int(std_out[1])
 
     # Verify "crm_stats_acl_entry_used" counter was incremented
-    assert new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 2
+    pytest_assert(new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 2, \
+        "\"crm_stats_acl_entry_used\" counter was not incremented")
 
     crm_stats_acl_entry_available = new_crm_stats_acl_entry_available + new_crm_stats_acl_entry_used
 
@@ -373,10 +394,12 @@ def test_acl_entry(duthost, collector):
     new_crm_stats_acl_entry_available = int(std_out[1])
 
     # Verify "crm_stats_acl_entry_used" counter was decremented
-    assert new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 0
+    pytest_assert(new_crm_stats_acl_entry_used - crm_stats_acl_entry_used == 0, \
+        "\"crm_stats_acl_entry_used\" counter was not decremented")
 
     # Verify "crm_stats_acl_entry_available" counter was incremented
-    assert new_crm_stats_acl_entry_available - crm_stats_acl_entry_available == 0
+    pytest_assert(new_crm_stats_acl_entry_available - crm_stats_acl_entry_available == 0, \
+        "\"crm_stats_acl_entry_available\" counter was not incremented")
 
 
 def test_acl_counter(duthost, collector):
@@ -403,7 +426,8 @@ def test_acl_counter(duthost, collector):
     new_crm_stats_acl_counter_available = int(std_out[1])
 
     # Verify "crm_stats_acl_counter_used" counter was incremented
-    assert new_crm_stats_acl_counter_used - crm_stats_acl_counter_used == 2
+    pytest_assert(new_crm_stats_acl_counter_used - crm_stats_acl_counter_used == 2, \
+        "\"crm_stats_acl_counter_used\" counter was not incremented")
 
     crm_stats_acl_counter_available = new_crm_stats_acl_counter_available + new_crm_stats_acl_counter_used
 
@@ -424,13 +448,16 @@ def test_acl_counter(duthost, collector):
     new_crm_stats_acl_counter_available = int(std_out[1])
 
     # Verify "crm_stats_acl_counter_used" counter was decremented
-    assert new_crm_stats_acl_counter_used - crm_stats_acl_counter_used == 0
+    pytest_assert(new_crm_stats_acl_counter_used - crm_stats_acl_counter_used == 0, \
+        "\"crm_stats_acl_counter_used\" counter was not decremented")
 
     # Verify "crm_stats_acl_counter_available" counter was incremented
-    assert new_crm_stats_acl_counter_available - crm_stats_acl_counter_available >= 0
+    pytest_assert(new_crm_stats_acl_counter_available - crm_stats_acl_counter_available >= 0, \
+        "\"crm_stats_acl_counter_available\" counter was not incremented")
 
     # Verify "crm_stats_acl_counter_available" counter was equal to original value
-    assert original_crm_stats_acl_counter_available - new_crm_stats_acl_counter_available == 0
+    pytest_assert(original_crm_stats_acl_counter_available - new_crm_stats_acl_counter_available == 0, \
+        "\"crm_stats_acl_counter_available\" counter is not equal to original value")
 
 
 def test_crm_fdb_entry(duthost):
