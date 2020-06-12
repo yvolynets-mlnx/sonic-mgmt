@@ -6,20 +6,23 @@ import json
 from jinja2 import Template
 from common.plugins.loganalyzer.loganalyzer import LogAnalyzer
 from common.helpers.assertions import pytest_assert
+from common.helpers.generators import generate_ips
+from collections import OrderedDict
 
 
 logger = logging.getLogger(__name__)
 
 CRM_POLLING_INTERVAL = 1
 CRM_UPDATE_TIME = 4
-THR_VERIFY_CMDS = {
-    "exceeded_used": "bash -c \"crm config thresholds {{crm_cli_res}}  type used; crm config thresholds {{crm_cli_res}} low {{crm_used|int - 1}}; crm config thresholds {{crm_cli_res}} high {{crm_used|int}}\"",
-    "clear_used": "bash -c \"crm config thresholds {{crm_cli_res}} type used && crm config thresholds {{crm_cli_res}} low {{crm_used|int}} && crm config thresholds {{crm_cli_res}} high {{crm_used|int + 1}}\"",
-    "exceeded_free": "bash -c \"crm config thresholds {{crm_cli_res}} type free && crm config thresholds {{crm_cli_res}} low {{crm_avail|int - 1}} && crm config thresholds {{crm_cli_res}} high {{crm_avail|int}}\"",
-    "clear_free": "bash -c \"crm config thresholds {{crm_cli_res}} type free && crm config thresholds {{crm_cli_res}} low {{crm_avail|int}} && crm config thresholds {{crm_cli_res}} high {{crm_avail|int + 1}}\"",
-    "exceeded_percentage": "bash -c \"crm config thresholds {{crm_cli_res}} type percentage && crm config thresholds {{crm_cli_res}} low {{th_lo|int}} && crm config thresholds {{crm_cli_res}} high {{th_hi|int}}\"",
-    "clear_percentage": "bash -c \"crm config thresholds {{crm_cli_res}} type percentage && crm config thresholds {{crm_cli_res}} low {{th_lo|int}} && crm config thresholds {{crm_cli_res}} high {{th_hi|int}}\""
-    }
+
+THR_VERIFY_CMDS = OrderedDict([
+    ("exceeded_used", "bash -c \"crm config thresholds {{crm_cli_res}}  type used; crm config thresholds {{crm_cli_res}} low {{crm_used|int - 1}}; crm config thresholds {{crm_cli_res}} high {{crm_used|int}}\""),
+    ("clear_used", "bash -c \"crm config thresholds {{crm_cli_res}} type used && crm config thresholds {{crm_cli_res}} low {{crm_used|int}} && crm config thresholds {{crm_cli_res}} high {{crm_used|int + 1}}\""),
+    ("exceeded_free", "bash -c \"crm config thresholds {{crm_cli_res}} type free && crm config thresholds {{crm_cli_res}} low {{crm_avail|int - 1}} && crm config thresholds {{crm_cli_res}} high {{crm_avail|int}}\""),
+    ("clear_free", "bash -c \"crm config thresholds {{crm_cli_res}} type free && crm config thresholds {{crm_cli_res}} low {{crm_avail|int}} && crm config thresholds {{crm_cli_res}} high {{crm_avail|int + 1}}\""),
+    ("exceeded_percentage", "bash -c \"crm config thresholds {{crm_cli_res}} type percentage && crm config thresholds {{crm_cli_res}} low {{th_lo|int}} && crm config thresholds {{crm_cli_res}} high {{th_hi|int}}\""),
+    ("clear_percentage", "bash -c \"crm config thresholds {{crm_cli_res}} type percentage && crm config thresholds {{crm_cli_res}} low {{th_lo|int}} && crm config thresholds {{crm_cli_res}} high {{th_hi|int}}\"")
+])
 
 EXPECT_EXCEEDED = ".* THRESHOLD_EXCEEDED .*"
 EXPECT_CLEAR = ".* THRESHOLD_CLEAR .*"
@@ -113,19 +116,32 @@ def get_acl_tbl_key(duthost):
     return acl_tbl_key
 
 
+def get_used_percent(crm_used, crm_available):
+    return crm_used * 100 / (crm_used + crm_available)
+
+
 def verify_thresholds(duthost, **kwargs):
     loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='crm_test')
     loganalyzer.load_common_config()
     for key, value in THR_VERIFY_CMDS.items():
         template = Template(value)
-        if key == "exceeded_percentage":
-            kwargs["th_lo"] = (kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])) - 1
-            kwargs["th_hi"] = kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])
+        if "exceeded" in key:
             loganalyzer.expect_regex = [EXPECT_EXCEEDED]
-        elif key == "clear_percentage":
-            kwargs["th_lo"] = kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])
-            kwargs["th_hi"] = (kwargs["crm_used"] * 100 / (kwargs["crm_used"] + kwargs["crm_avail"])) + 1
+        elif "clear" in key:
             loganalyzer.expect_regex = [EXPECT_CLEAR]
+
+        if "percentage" in key:
+            used_percent = get_used_percent(kwargs["crm_used"], kwargs["crm_avail"])
+            if used_percent < 1:
+                logger.warning("CRM used entries is < 1 percent")
+            if key == "exceeded_percentage":
+                kwargs["th_lo"] = used_percent - 1
+                kwargs["th_hi"] = used_percent
+                loganalyzer.expect_regex = [EXPECT_EXCEEDED]
+            elif key == "clear_percentage":
+                kwargs["th_lo"] = used_percent
+                kwargs["th_hi"] = used_percent + 1
+                loganalyzer.expect_regex = [EXPECT_CLEAR]
         cmd = template.render(**kwargs)
 
         with loganalyzer:
@@ -154,7 +170,7 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
     # Get NH IP
     cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
     out = duthost.command(cmd)
-    pytest_assert(out != "", "Get Next Hop IP failed. Neighbor not found")
+    pytest_assert(out["stdout"] != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     # Add IPv[4/6] route
@@ -198,8 +214,16 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
 @pytest.mark.parametrize("ip_ver,nexthop", [("4", "2.2.2.2"), ("6", "2001::1")])
 def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
     RESTORE_CMDS["crm_cli_res"] = "ipv{ip_ver} nexthop".format(ip_ver=ip_ver)
-    nexthop_add_cmd = "ip neigh replace {nexthop} lladdr 11:22:33:44:55:66 dev {iface}".format(nexthop=nexthop, iface=crm_interface[0])
-    nexthop_del_cmd = "ip neigh del {nexthop} lladdr 11:22:33:44:55:66 dev {iface}".format(nexthop=nexthop, iface=crm_interface[0])
+    nexthop_add_template = "ip neigh replace {nexthop} lladdr 11:22:33:44:55:66 dev {iface}"
+    nexthop_del_template = "ip neigh del {nexthop} lladdr 11:22:33:44:55:66 dev {iface}"
+    nexthop_add_cmd = nexthop_add_template.format(nexthop=nexthop, iface=crm_interface[0])
+    nexthop_del_cmd = nexthop_del_template.format(nexthop=nexthop, iface=crm_interface[0])
+    del_neigh_template = """for s in {{neigh_ip_list}}
+    do
+        ip neigh del ${s} lladdr 11:22:33:44:55:66 dev {{iface}}
+        echo deleted - ${s}
+    done"""
+    del_neighbours_template = Template(del_neigh_template)
 
     # Get "crm_stats_ipv[4/6]_nexthop" used and available counter value
     get_nexthop_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv{ip_ver}_nexthop_used crm_stats_ipv{ip_ver}_nexthop_available".format(ip_ver=ip_ver)
@@ -238,6 +262,19 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
     pytest_assert(new_crm_stats_nexthop_available - crm_stats_nexthop_available == 0, \
         "\"crm_stats_ipv{}_nexthop_available\" counter was not incremented".format(ip_ver))
 
+    # Add new neighbor entries to correctly calculate used CRM resources in percentage
+    used_percent = get_used_percent(new_crm_stats_nexthop_used, new_crm_stats_nexthop_available)
+    if used_percent < 1:
+        neighbours_num = (new_crm_stats_nexthop_used + new_crm_stats_nexthop_available) / 100
+        lst = []
+        if ip_ver == "4":
+            ip_addr_list = [item.split("/")[0] for item in generate_ips(neighbours_num, "2.2.0.0/16", lst)]
+            # Store CLI command to delete all created neighbours
+            RESTORE_CMDS["test_crm_nexthop"].append(del_neighbours_template.render(neigh_ip_list=" ".join(ip_addr_list),
+                iface=crm_interface[0]))
+            for item in ip_addr_list:
+                cmd = nexthop_add_template.format(nexthop=item, iface=crm_interface[0])
+                duthost.command(cmd)
     # Verify thresholds for "IPv[4/6] nexthop" CRM resource
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_nexthop_used, crm_avail=new_crm_stats_nexthop_available)
 
@@ -305,13 +342,13 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     # Get NH IP 1
     cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
     out = duthost.command(cmd)
-    pytest_assert(out != "", "Get Next Hop IP failed. Neighbor not found")
+    pytest_assert(out["stdout"] != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip1 = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     # Get NH IP 2
     cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[1])
     out = duthost.command(cmd)
-    pytest_assert(out != "", "Get Next Hop IP failed. Neighbor not found")
+    pytest_assert(out["stdout"] != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip2 = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     nexthop_add_cmd = nexthop_add_cmd.format(ip_ver=ip_ver, network=network, nh_ip1=nh_ip1, nh_ip2=nh_ip2)
