@@ -2,6 +2,7 @@ import pytest
 import time
 import re
 import json
+import ipaddress
 
 from jinja2 import Template
 from common.plugins.loganalyzer.loganalyzer import LogAnalyzer
@@ -122,7 +123,6 @@ def get_used_percent(crm_used, crm_available):
 
 def verify_thresholds(duthost, **kwargs):
     loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='crm_test')
-    loganalyzer.load_common_config()
     for key, value in THR_VERIFY_CMDS.items():
         template = Template(value)
         if "exceeded" in key:
@@ -218,12 +218,19 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
     nexthop_del_template = "ip neigh del {nexthop} lladdr 11:22:33:44:55:66 dev {iface}"
     nexthop_add_cmd = nexthop_add_template.format(nexthop=nexthop, iface=crm_interface[0])
     nexthop_del_cmd = nexthop_del_template.format(nexthop=nexthop, iface=crm_interface[0])
-    del_neigh_template = """for s in {{neigh_ip_list}}
+    del_template = """for s in {{neigh_ip_list}}
     do
         ip neigh del ${s} lladdr 11:22:33:44:55:66 dev {{iface}}
         echo deleted - ${s}
     done"""
-    del_neighbours_template = Template(del_neigh_template)
+    add_template = """for s in {{neigh_ip_list}}
+    do
+        ip neigh replace ${s} lladdr 11:22:33:44:55:66 dev {{iface}}
+        echo added - ${s}
+    done"""
+
+    del_neighbours_template = Template(del_template)
+    add_neighbours_template = Template(add_template)
 
     # Get "crm_stats_ipv[4/6]_nexthop" used and available counter value
     get_nexthop_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_ipv{ip_ver}_nexthop_used crm_stats_ipv{ip_ver}_nexthop_available".format(ip_ver=ip_ver)
@@ -268,16 +275,28 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
         neighbours_num = (new_crm_stats_nexthop_used + new_crm_stats_nexthop_available) / 100
         lst = []
         if ip_ver == "4":
-            ip_addr_list = [item.split("/")[0] for item in generate_ips(neighbours_num, "2.2.0.0/16", lst)]
-            # Store CLI command to delete all created neighbours
-            RESTORE_CMDS["test_crm_nexthop"].append(del_neighbours_template.render(neigh_ip_list=" ".join(ip_addr_list),
-                iface=crm_interface[0]))
-            for item in ip_addr_list:
-                cmd = nexthop_add_template.format(nexthop=item, iface=crm_interface[0])
-                duthost.command(cmd)
+            ip_addr_list = list(ipaddress.IPv4Network(u"%s" % "2.2.0.0/16").hosts())[0:neighbours_num]
+            ip_addr_list = " ".join([str(item) for item in ip_addr_list])
+        elif ip_ver == "6":
+            ip_addr_list = list(ipaddress.IPv6Network(u"%s" % "2001::/112").hosts())[0:neighbours_num]
+            ip_addr_list = " ".join([str(item) for item in ip_addr_list])
+        else:
+            pytest.fail("Incorrect IP version specified - {}".format(ip_ver))
+
+        # Store CLI command to delete all created neighbours after test case finish or fail
+        RESTORE_CMDS["test_crm_nexthop"].append(del_neighbours_template.render(neigh_ip_list=ip_addr_list,
+            iface=crm_interface[0]))
+        duthost.shell(add_neighbours_template.render(neigh_ip_list=ip_addr_list, iface=crm_interface[0]))
+        # Make sure CRM counters updated
+        time.sleep(CRM_UPDATE_TIME)
+
+        # Get new "crm_stats_ipv[4/6]_nexthop" used and available counter value
+        new_crm_stats_nexthop_used, new_crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
     # Verify thresholds for "IPv[4/6] nexthop" CRM resource
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_nexthop_used, crm_avail=new_crm_stats_nexthop_available)
 
+    # Remove test neighbour entries
+    duthost.shell(del_neighbours_template.render(neigh_ip_list=ip_addr_list, iface=crm_interface[0]))
 
 @pytest.mark.parametrize("ip_ver,neighbor", [("4", "2.2.2.2"), ("6", "2001::1")])
 def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
