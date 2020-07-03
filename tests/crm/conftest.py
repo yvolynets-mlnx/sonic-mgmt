@@ -22,12 +22,14 @@ def pytest_runtest_teardown(item, nextitem):
             logger.info("Restore CRM thresholds. Execute - {}".format(restore_cmd.format(crm_cli_res=test_crm_cli_res)))
             item.funcargs["duthost"].command(restore_cmd.format(crm_cli_res=test_crm_cli_res))
 
-        if item.rep_call.failed:
-            test_name = item.function.func_name
-            logger.info("Execute test cleanup")
-            # Restore DUT after specific test steps
-            for cmd in RESTORE_CMDS[test_name]:
-                logger.info(cmd)
-                item.funcargs["duthost"].shell(cmd + " 2> /dev/null || true")
-                time.sleep(2)
-            RESTORE_CMDS[test_name] = []
+        # if item.rep_call.failed:
+        test_name = item.function.func_name
+        logger.info("Execute test cleanup")
+        # Restore DUT after specific test steps
+        # Test case name is used to mitigate incorrect cleanup if some of tests was failed on cleanup step and list of
+        # cleanup commands was not cleared
+        for cmd in RESTORE_CMDS[test_name]:
+            logger.info(cmd)
+            item.funcargs["duthost"].shell(cmd + " 2> /dev/null || true")
+            time.sleep(2)
+        RESTORE_CMDS[test_name] = []
