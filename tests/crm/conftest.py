@@ -33,3 +33,4 @@ def pytest_runtest_teardown(item, nextitem):
             item.funcargs["duthost"].shell(cmd + " 2> /dev/null || true")
             time.sleep(2)
         RESTORE_CMDS[test_name] = []
+        time.sleep(50)

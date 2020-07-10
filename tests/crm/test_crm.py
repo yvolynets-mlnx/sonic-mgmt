@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 CRM_POLLING_INTERVAL = 1
 CRM_UPDATE_TIME = 4
+SONIC_RES_UPDATE_TIME = 50
 
 THR_VERIFY_CMDS = OrderedDict([
     ("exceeded_used", "bash -c \"crm config thresholds {{crm_cli_res}}  type used; crm config thresholds {{crm_cli_res}} low {{crm_used|int - 1}}; crm config thresholds {{crm_cli_res}} high {{crm_used|int}}\""),
@@ -36,7 +37,6 @@ RESTORE_CMDS = {"test_crm_route": [],
                 "test_acl_entry": [],
                 "test_acl_counter": [],
                 "test_crm_fdb_entry": [],
-                "test_crm_vnet_bitmap": [],
                 "crm_cli_res": None}
 
 
@@ -175,7 +175,7 @@ def apply_fdb_config(duthost, test_name, vlan_id, iface, entry_num):
     generate_fdb_config(duthost, entry_num, vlan_id, iface, "SET", dut_fdb_config)
 
     # Copy FDB JSON config to SWSS container
-    cmd = "docker cp /tmp/fdb.json swss:/"
+    cmd = "docker cp {} swss:/".format(dut_fdb_config)
     duthost.command(cmd)
 
     # Add FDB entry
@@ -221,6 +221,7 @@ def verify_thresholds(duthost, **kwargs):
     """
     loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='crm_test')
     for key, value in THR_VERIFY_CMDS.items():
+        logger.info("Verifying CRM threshold '{}'".format(key))
         template = Template(value)
         if "exceeded" in key:
             loganalyzer.expect_regex = [EXPECT_EXCEEDED]
@@ -228,7 +229,7 @@ def verify_thresholds(duthost, **kwargs):
             loganalyzer.expect_regex = [EXPECT_CLEAR]
 
         if "percentage" in key:
-            if "nexthop group" in kwargs["crm_cli_res"]:
+            if "nexthop group" in kwargs["crm_cli_res"] and "mellanox" in duthost.facts["asic_type"].lower():
                 # TODO: Fix this. Temporal skip percentage verification for 'test_crm_nexthop_group' test case
                 # Max supported ECMP group values is less then number of entries we need to configure
                 # in order to test percentage threshold (Can't even reach 1 percent)
@@ -249,6 +250,8 @@ def verify_thresholds(duthost, **kwargs):
 
         with loganalyzer:
             duthost.command(cmd)
+            # Make sure CRM counters updated
+            time.sleep(CRM_UPDATE_TIME)
 
 
 def get_crm_stats(cmd, duthost):
@@ -270,36 +273,50 @@ def generate_neighbors(amount, ip_ver):
     return ip_addr_list
 
 
-def configure_nexthop_groups(amount, interface, ip_ver, duthost, test_name):
+def configure_nexthop_groups(amount, interface, duthost, test_name):
     """ Configure bunch of nexthop groups on DUT. Bash template is used to speedup configuration """
     # Template used to speedup execution many similar commands on DUT
     del_template = """
-    ip -{{ip_ver}} route del 2.0.0.0/8 dev {{iface}}
+    ip -4 route del 2.0.0.0/8 dev {{iface}}
     ip neigh del 2.0.0.1 lladdr 11:22:33:44:55:66 dev {{iface}}
     for s in {{neigh_ip_list}}
     do
         ip neigh del ${s} lladdr 11:22:33:44:55:66 dev {{iface}}
-        ip -{{ip_ver}} route del ${s}/32 nexthop via ${s} nexthop via 2.0.0.1
+        ip -4 route del ${s}/32 nexthop via ${s} nexthop via 2.0.0.1
     done"""
     add_template = """
-    ip -{{ip_ver}} route add 2.0.0.0/8 dev {{iface}}
+    ip -4 route add 2.0.0.0/8 dev {{iface}}
     ip neigh replace 2.0.0.1 lladdr 11:22:33:44:55:66 dev {{iface}}
     for s in {{neigh_ip_list}}
     do
         ip neigh replace ${s} lladdr 11:22:33:44:55:66 dev {{iface}}
-        ip -{{ip_ver}} route add ${s}/32 nexthop via ${s} nexthop via 2.0.0.1
+        ip -4 route add ${s}/32 nexthop via ${s} nexthop via 2.0.0.1
     done"""
     del_template = Template(del_template)
     add_template = Template(add_template)
 
-    ip_addr_list = generate_neighbors(amount + 1, ip_ver)
+    ip_addr_list = generate_neighbors(amount + 1, "4")
     ip_addr_list = " ".join([str(item) for item in ip_addr_list[1:]])
     # Store CLI command to delete all created neighbors if test case will fail
-    RESTORE_CMDS[test_name].append(del_template.render(ip_ver=ip_ver, iface=interface, neigh_ip_list=ip_addr_list))
-    duthost.shell(add_template.render(ip_ver=ip_ver, iface=interface, neigh_ip_list=ip_addr_list))
-    # Make sure CRM counters updated
-    time.sleep(10)
-    return del_template.render(ip_ver=ip_ver, iface=interface, neigh_ip_list=ip_addr_list)
+    RESTORE_CMDS[test_name].append(del_template.render(iface=interface, neigh_ip_list=ip_addr_list))
+    logger.info("Configuring {} nexthop groups".format(amount))
+    duthost.shell(add_template.render(iface=interface, neigh_ip_list=ip_addr_list))
+
+
+def increase_arp_cache(duthost, max_value, ip_ver, test_name):
+    # Increase default Linux configuration for ARP cache
+    set_cmd = "sysctl -w net.ipv{}.neigh.default.gc_thresh{}={}"
+    get_cmd = "sysctl net.ipv{}.neigh.default.gc_thresh{}"
+    logger.info("Increase ARP cache")
+    for thresh_id in range(1, 4):
+        res = duthost.shell(get_cmd.format(ip_ver, thresh_id))
+        if res["rc"] != 0:
+            logger.warning("Unable to get kernel ARP cache size: \n{}".format(res))
+        else:
+            RESTORE_CMDS[test_name].append("sysctl -w " + res["stdout"].replace(" ", ""))
+        cmd = set_cmd.format(ip_ver, thresh_id, max_value + 100)
+        duthost.shell(cmd)
+        logger.info("{}".format(cmd))
 
 
 def configure_neighbors(amount, interface, ip_ver, duthost, test_name):
@@ -322,13 +339,16 @@ def configure_neighbors(amount, interface, ip_ver, duthost, test_name):
     ip_addr_list = generate_neighbors(amount, ip_ver)
     ip_addr_list = " ".join([str(item) for item in ip_addr_list])
 
-    # Store CLI command to delete all created neighbors if test case will fail
+    # Store CLI command to delete all created neighbors
     RESTORE_CMDS[test_name].append(del_neighbors_template.render(neigh_ip_list=ip_addr_list,
         iface=interface))
+
+    # Increase default Linux configuration for ARP cache
+    increase_arp_cache(duthost, amount, ip_ver, test_name)
+
     duthost.shell(add_neighbors_template.render(neigh_ip_list=ip_addr_list, iface=interface))
     # Make sure CRM counters updated
     time.sleep(CRM_UPDATE_TIME)
-    return del_neighbors_template.render(neigh_ip_list=ip_addr_list, iface=interface)
 
 
 def get_entries_num(used, available):
@@ -364,8 +384,8 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
     crm_stats_route_used, crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
 
     # Get NH IP
-    cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
-    out = duthost.command(cmd)
+    cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale | grep -v fe80".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
+    out = duthost.shell(cmd)
     pytest_assert(out["stdout"] != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
@@ -404,7 +424,7 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
 
     used_percent = get_used_percent(new_crm_stats_route_used, new_crm_stats_route_available)
     if used_percent < 1:
-        routes_num = get_entries_num(new_crm_stats_route_used + new_crm_stats_route_available)
+        routes_num = get_entries_num(new_crm_stats_route_used, new_crm_stats_route_available)
         if ip_ver == "4":
             routes_list = " ".join([str(ipaddress.IPv4Address(u'2.0.0.1') + item) + "/32"
                 for item in range(1, routes_num + 1)])
@@ -414,11 +434,13 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
         else:
             pytest.fail("Incorrect IP version specified - {}".format(ip_ver))
         # Store CLI command to delete all created neighbours if test case will fail
-        RESTORE_CMDS["test_crm_nexthop"].append(del_routes_template.render(routes_list=routes_list, interface=crm_interface[0]))
+        RESTORE_CMDS["test_crm_route"].append(del_routes_template.render(routes_list=routes_list, interface=crm_interface[0]))
+
         # Add test routes entries to correctly calculate used CRM resources in percentage
         duthost.shell(add_routes_template.render(routes_list=routes_list, interface=crm_interface[0]))
-        # Make sure CRM counters updated
-        time.sleep(CRM_UPDATE_TIME)
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
 
         # Get new "crm_stats_ipv[4/6]_route" used and available counter value
         new_crm_stats_route_used, new_crm_stats_route_available = get_crm_stats(get_route_stats, duthost)
@@ -427,9 +449,6 @@ def test_crm_route(duthost, crm_interface, ip_ver, route_add_cmd, route_del_cmd)
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"],
         crm_used=new_crm_stats_route_used, crm_avail=new_crm_stats_route_available)
 
-    if used_percent < 1:
-        # Remove test routes entries
-        duthost.shell(del_routes_template.render(routes_list=routes_list, interface=crm_interface[0]))
 
 @pytest.mark.parametrize("ip_ver,nexthop", [("4", "2.2.2.2"), ("6", "2001::1")])
 def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
@@ -478,10 +497,14 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
 
     used_percent = get_used_percent(new_crm_stats_nexthop_used, new_crm_stats_nexthop_available)
     if used_percent < 1:
-        neighbours_num = get_entries_num(new_crm_stats_nexthop_used + new_crm_stats_nexthop_available)
+        neighbours_num = get_entries_num(new_crm_stats_nexthop_used, new_crm_stats_nexthop_available)
         # Add new neighbor entries to correctly calculate used CRM resources in percentage
-        cleanup_cmd = configure_neighbors(amount=neighbours_num, interface=crm_interface[0], ip_ver=ip_ver, duthost=duthost,
+        configure_neighbors(amount=neighbours_num, interface=crm_interface[0], ip_ver=ip_ver, duthost=duthost,
             test_name="test_crm_nexthop")
+
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
 
         # Get new "crm_stats_ipv[4/6]_nexthop" used and available counter value
         new_crm_stats_nexthop_used, new_crm_stats_nexthop_available = get_crm_stats(get_nexthop_stats, duthost)
@@ -489,9 +512,6 @@ def test_crm_nexthop(duthost, crm_interface, ip_ver, nexthop):
     # Verify thresholds for "IPv[4/6] nexthop" CRM resource
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_nexthop_used, crm_avail=new_crm_stats_nexthop_available)
 
-    if used_percent < 1:
-        # Remove test neighbour entries
-        duthost.shell(cleanup_cmd)
 
 @pytest.mark.parametrize("ip_ver,neighbor", [("4", "2.2.2.2"), ("6", "2001::1")])
 def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
@@ -540,8 +560,12 @@ def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
     if used_percent < 1:
         neighbours_num = get_entries_num(new_crm_stats_neighbor_used, new_crm_stats_neighbor_available)
         # Add new neighbor entries to correctly calculate used CRM resources in percentage
-        cleanup_cmd = configure_neighbors(amount=neighbours_num, interface=crm_interface[0], ip_ver=ip_ver, duthost=duthost,
+        configure_neighbors(amount=neighbours_num, interface=crm_interface[0], ip_ver=ip_ver, duthost=duthost,
             test_name="test_crm_neighbor")
+
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
 
         # Get new "crm_stats_ipv[4/6]_neighbor" used and available counter value
         new_crm_stats_neighbor_used, new_crm_stats_neighbor_available = get_crm_stats(get_neighbor_stats, duthost)
@@ -550,42 +574,37 @@ def test_crm_neighbor(duthost, crm_interface, ip_ver, neighbor):
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_crm_stats_neighbor_used,
         crm_avail=new_crm_stats_neighbor_available)
 
-    if used_percent < 1:
-        # Remove test neighbour entries
-        duthost.shell(cleanup_cmd)
 
-
-@pytest.mark.parametrize("group_member,network,ip_ver", [(False, "2.2.2.0/24", "4"), (False, "2001::/126", "6"), (True, "2.2.2.0/24", "4"), (True, "2001::/126", "6")])
-def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver):
+@pytest.mark.parametrize("group_member,network", [(False, "2.2.2.0/24"), (True, "2.2.2.0/24")])
+def test_crm_nexthop_group(duthost, crm_interface, group_member, network):
     RESTORE_CMDS["crm_cli_res"] = "nexthop group member" if group_member else "nexthop group object"
     get_group_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_nexthop_group_used crm_stats_nexthop_group_available"
     get_group_member_stats = "redis-cli --raw -n 2 HMGET CRM:STATS crm_stats_nexthop_group_member_used crm_stats_nexthop_group_member_available"
-    nexthop_add_cmd = "ip -{ip_ver} route add {network} nexthop via {nh_ip1} nexthop via {nh_ip2}"
-    nexthop_del_cmd = "ip -{ip_ver} route del {network} nexthop via {nh_ip1} nexthop via {nh_ip2}"
+    nexthop_add_cmd = "ip -4 route add {network} nexthop via {nh_ip1} nexthop via {nh_ip2}"
+    nexthop_del_cmd = "ip -4 route del {network} nexthop via {nh_ip1} nexthop via {nh_ip2}"
 
-    logger.info("# Started test_crm_nexthop_group")
     # Get "crm_stats_nexthop_group_[member]" used and available counter value
     get_nexthop_group_stats = get_group_member_stats if group_member else get_group_stats
     nexthop_group_used, nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
     # Get NH IP 1
-    cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[0])
+    cmd = "ip -4 neigh show dev {crm_intf} nud reachable nud stale".format(crm_intf=crm_interface[0])
     out = duthost.command(cmd)
     pytest_assert(out["stdout"] != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip1 = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
     # Get NH IP 2
-    cmd = "ip -{ip_ver} neigh show dev {crm_intf} nud reachable nud stale".format(ip_ver=ip_ver, crm_intf=crm_interface[1])
+    cmd = "ip -4 neigh show dev {crm_intf} nud reachable nud stale".format(crm_intf=crm_interface[1])
     out = duthost.command(cmd)
     pytest_assert(out["stdout"] != "", "Get Next Hop IP failed. Neighbor not found")
     nh_ip2 = [item.split()[0] for item in out["stdout"].split("\n") if "REACHABLE" in item][0]
 
-    nexthop_add_cmd = nexthop_add_cmd.format(ip_ver=ip_ver, network=network, nh_ip1=nh_ip1, nh_ip2=nh_ip2)
-    nexthop_del_cmd = nexthop_del_cmd.format(ip_ver=ip_ver, network=network, nh_ip1=nh_ip1, nh_ip2=nh_ip2)
+    nexthop_add_cmd = nexthop_add_cmd.format(network=network, nh_ip1=nh_ip1, nh_ip2=nh_ip2)
+    nexthop_del_cmd = nexthop_del_cmd.format(network=network, nh_ip1=nh_ip1, nh_ip2=nh_ip2)
 
     # Add nexthop group members
     RESTORE_CMDS["test_crm_nexthop_group"].append(nexthop_del_cmd)
-    logger.info("# Add nexthop groups")
+    logger.info("Add nexthop groups")
     duthost.command(nexthop_add_cmd)
 
     # Make sure CRM counters updated
@@ -594,16 +613,20 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     # Get new "crm_stats_nexthop_group_[member]" used and available counter value
     new_nexthop_group_used, new_nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
+    if group_member:
+        template_resource = 2
+    else:
+        template_resource = 1
     # Verify "crm_stats_nexthop_group_[member]_used" counter was incremented
-    pytest_assert(new_nexthop_group_used - nexthop_group_used == 1, \
+    pytest_assert(new_nexthop_group_used - nexthop_group_used == template_resource, \
         "\"crm_stats_nexthop_group_{}used\" counter was not incremented".format("member_" if group_member else ""))
 
     # Verify "crm_stats_nexthop_group_[member]_available" counter was decremented
-    pytest_assert(nexthop_group_available - new_nexthop_group_available >= 1, \
+    pytest_assert(nexthop_group_available - new_nexthop_group_available >= template_resource, \
         "\"crm_stats_nexthop_group_{}available\" counter was not decremented".format("member_" if group_member else ""))
 
     # Remove nexthop group members
-    logger.info("# Removing nexthop groups")
+    logger.info("Removing nexthop groups")
     duthost.command(nexthop_del_cmd)
 
     # Make sure CRM counters updated
@@ -624,24 +647,23 @@ def test_crm_nexthop_group(duthost, crm_interface, group_member, network, ip_ver
     used_percent = get_used_percent(new_nexthop_group_used, new_nexthop_group_available)
     if used_percent < 1:
         nexthop_group_num = get_entries_num(new_nexthop_group_used, new_nexthop_group_available)
+
         # Increase default Linux configuration for ARP cache
-        cmd = "sysctl -w net.ipv{}.neigh.default.gc_thresh{}={}"
-        for thresh_id in range(1, 4):
-            duthost.shell(cmd.format(ip_ver, thresh_id, nexthop_group_num + 100))
+        increase_arp_cache(duthost, nexthop_group_num, 4, "test_crm_nexthop_group")
 
         # Add new neighbor entries to correctly calculate used CRM resources in percentage
-        cleanup_cmd = configure_nexthop_groups(amount=nexthop_group_num, interface=crm_interface[0], ip_ver=ip_ver,
+        configure_nexthop_groups(amount=nexthop_group_num, interface=crm_interface[0],
             duthost=duthost, test_name="test_crm_nexthop_group")
+
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
+
         # Get new "crm_stats_ipv[4/6]_neighbor" used and available counter value
         new_nexthop_group_used, new_nexthop_group_available = get_crm_stats(get_nexthop_group_stats, duthost)
 
     verify_thresholds(duthost, crm_cli_res=RESTORE_CMDS["crm_cli_res"], crm_used=new_nexthop_group_used,
         crm_avail=new_nexthop_group_available)
-
-    if used_percent < 1:
-        # Remove test neighbour entries
-        duthost.shell(cleanup_cmd)
-        time.sleep(10)
 
 
 def test_acl_entry(duthost, collector):
@@ -675,6 +697,10 @@ def test_acl_entry(duthost, collector):
         nexthop_group_num = get_entries_num(new_crm_stats_acl_entry_used, new_crm_stats_acl_entry_available)
 
         apply_acl_config(duthost, "test_acl_entry", collector, nexthop_group_num)
+
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
 
         new_crm_stats_acl_entry_used, new_crm_stats_acl_entry_available = get_crm_stats(get_acl_entry_stats, duthost)
 
@@ -732,6 +758,10 @@ def test_acl_counter(duthost, collector):
         nexthop_group_num = get_entries_num(new_crm_stats_acl_counter_used, new_crm_stats_acl_counter_available)
 
         apply_acl_config(duthost, "test_acl_counter", collector, nexthop_group_num)
+
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
 
         new_crm_stats_acl_counter_used, new_crm_stats_acl_counter_available = get_crm_stats(get_acl_counter_stats, duthost)
 
@@ -796,6 +826,7 @@ def test_crm_fdb_entry(duthost, testbed):
     # Remove FDB entry
     cmd = "fdbclear"
     duthost.command(cmd)
+    time.sleep(5)
 
     # Get "crm_stats_fdb_entry" used and available counter value
     crm_stats_fdb_entry_used, crm_stats_fdb_entry_available = get_crm_stats(get_fdb_stats, duthost)
@@ -819,6 +850,9 @@ def test_crm_fdb_entry(duthost, testbed):
         fdb_entries_num = get_entries_num(new_crm_stats_fdb_entry_used, new_crm_stats_fdb_entry_available)
         # Generate FDB json file with 'fdb_entries_num' entries and apply it on DUT
         apply_fdb_config(duthost, "test_crm_fdb_entry", vlan_id, iface, fdb_entries_num)
+        logger.info("Waiting {} seconds for SONiC to update resources...".format(SONIC_RES_UPDATE_TIME))
+        # Make sure SONIC configure expected entries
+        time.sleep(SONIC_RES_UPDATE_TIME)
         # Get new "crm_stats_fdb_entry" used and available counter value
         new_crm_stats_fdb_entry_used, new_crm_stats_fdb_entry_available = get_crm_stats(get_fdb_stats, duthost)
 
